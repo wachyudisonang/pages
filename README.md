@@ -10,6 +10,7 @@ its own repo (`BIG_OWN/<project>`); only the runtime assets are copied here.
 - `https://wachyudisonang.github.io/pages/familytree/`
 - `https://wachyudisonang.github.io/pages/masak-apa/`
 - `https://wachyudisonang.github.io/pages/sentralingua-v2/`
+- `https://wachyudisonang.github.io/pages/grocery/`
 
 ## What lives here
 
@@ -19,7 +20,8 @@ pages/
 ├── .nojekyll           serve files as-is, no Jekyll
 ├── familytree/         web assets only (rsync'd from BIG_OWN/familytree/web)
 ├── masak-apa/          web assets only (rsync'd from BIG_OWN/masak-apa/web)
-└── sentralingua-v2/    web assets only (rsync'd from BIG_OWN/sentralingua-v2)
+├── sentralingua-v2/    web assets only (rsync'd from BIG_OWN/sentralingua-v2)
+└── grocery/            web assets only (rsync'd from BIG_OWN/grocery — single index.html)
 ```
 
 ## What must NEVER be copied here

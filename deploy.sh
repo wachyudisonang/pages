@@ -59,17 +59,26 @@ deploy_sentralingua_v2() {
     index.html 'assets/' 'assets/**'
 }
 
+deploy_grocery() {
+  # grocery serves from repo root; single-file app — everything (CSS/JS/icons) is inlined
+  # in index.html, so index.html is the whole runtime. NOT README.md / .gitignore.
+  rsync_project grocery "$BIG_OWN/grocery" \
+    index.html
+}
+
 TARGET="${1:-all}"
 case "$TARGET" in
   masak-apa)        deploy_masak_apa ;;
   familytree)       deploy_familytree ;;
   sentralingua-v2)  deploy_sentralingua_v2 ;;
+  grocery)          deploy_grocery ;;
   all)
     deploy_masak_apa
     deploy_familytree
     deploy_sentralingua_v2
+    deploy_grocery
     ;;
-  *) echo "unknown project: $TARGET (use: masak-apa | familytree | sentralingua-v2 | all)"; exit 1 ;;
+  *) echo "unknown project: $TARGET (use: masak-apa | familytree | sentralingua-v2 | grocery | all)"; exit 1 ;;
 esac
 
 echo
