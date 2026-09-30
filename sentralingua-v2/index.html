@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Sentralingua — Speak a New Language Like You Mean It | Depok & Jakarta</title>
+<meta name="description" content="Bahasa Indonesia for foreigners plus 6 more languages, taught by friendly experienced tutors through real conversation. Flexible, tailor-made courses in Depok & Jakarta.">
+<meta name="theme-color" content="#17376e">
+<meta property="og:title" content="Sentralingua — Speak a New Language Like You Mean It">
+<meta property="og:description" content="Real conversation from lesson one. 7 languages, friendly tutors, tailor-made courses in Depok & Jakarta.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://sentralingua.com/app/uploads/2015/04/Logo-Image.png">
+<link rel="icon" href="https://sentralingua.com/app/uploads/2015/04/Favicon-32px.png">
+<style>
+  :root{
+    /* Sentralingua brand colors */
+    --blue:#46a5e5; --blue-d:#2e8fd4; --navy:#17376e; --navy-2:#0f2650;
+    --blue-soft:#eaf5fd; --sun:#ffbe4d; --wa:#25D366;
+    --bg:#ffffff; --fg:#1a2436; --muted:#f5f8fc; --card:#ffffff; --border:#e5ecf5; --sub:#5b6ب7c;
+    --sub:#5b6b82;
+    --step--1:clamp(.82rem,.79rem + .12vw,.9rem);
+    --step-0:clamp(1rem,.96rem + .18vw,1.08rem);
+    --step-1:clamp(1.15rem,1.05rem + .5vw,1.4rem);
+    --step-2:clamp(1.45rem,1.2rem + 1.1vw,2rem);
+    --step-3:clamp(1.8rem,1.35rem + 2.4vw,2.9rem);
+    --step-4:clamp(2.3rem,1.5rem + 4vw,4.1rem);
+    --gutter:clamp(1rem,.6rem + 2vw,2rem);
+    --radius:18px; --shadow:0 14px 40px rgba(23,55,110,.10);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --bg:#0c1526; --fg:#e9eef6; --muted:#101c33; --card:#122139; --border:#22304b; --sub:#93a3bd; --blue-soft:#12294a; }
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+  body{ font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color:var(--fg); background:var(--bg); font-size:var(--step-0); line-height:1.65; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a{ text-decoration:none; color:inherit; }
+  img{ display:block; max-width:100%; }
+  .wrap{ width:100%; max-width:1180px; margin-inline:auto; padding-inline:var(--gutter); }
+  .eyebrow{ font-size:var(--step--1); font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--blue-d); }
+  h1,h2,h3{ line-height:1.12; letter-spacing:-.02em; color:var(--navy); }
+  @media (prefers-color-scheme:dark){ h1,h2,h3{ color:#dbe7f7; } }
+
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:.5em; min-height:50px; padding:.7em 1.6em; border-radius:12px; font-weight:800; font-size:var(--step-0); cursor:pointer; border:0; transition:transform .14s, box-shadow .2s, background .2s; }
+  .btn:active{ transform:scale(.97); }
+  .btn-navy{ background:var(--navy); color:#fff; box-shadow:0 10px 24px rgba(23,55,110,.28); } .btn-navy:hover{ background:var(--navy-2); }
+  .hero .btn-navy{ border:1px solid #c6e75a; } .hero .btn-navy:hover{ border-color:#d6f072; }
+  .btn-blue{ background:var(--blue); color:#fff; } .btn-blue:hover{ background:var(--blue-d); }
+  .btn-wa{ background:var(--wa); color:#04310f; }
+  .btn-ghost{ background:transparent; color:var(--navy); border:1.5px solid var(--border); }
+  @media (prefers-color-scheme:dark){ .btn-ghost{ color:#dbe7f7; border-color:var(--border); } }
+
+  /* Header */
+  .header{ position:sticky; top:0; z-index:60; background:color-mix(in srgb,var(--bg) 90%,transparent); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); }
+  .nav{ display:flex; align-items:center; justify-content:space-between; gap:1rem; min-height:66px; }
+  .brand img{ height:30px; width:auto; background:var(--navy); padding:6px 11px; border-radius:10px; }
+  .header-wa{ display:inline-flex; align-items:center; gap:.5rem; min-height:44px; padding:.4em .95em; border-radius:999px; background:#25D366; color:#04310f; font-weight:800; font-size:var(--step--1); }
+  .header-wa .ic{ font-size:1.2em; line-height:1; }
+  .header-wa .num{ letter-spacing:.01em; }
+  .header-wa .wa-label{ display:none; letter-spacing:.01em; }
+  @media (max-width:520px){ .header-wa .num{ display:none; } .header-wa .wa-label{ display:inline; } }
+  .nav-links{ display:flex; gap:1.7rem; font-weight:600; font-size:var(--step--1); }
+  .nav-links a{ opacity:.85; padding:.4em 0; } .nav-links a:hover{ opacity:1; color:var(--blue-d); }
+  .nav-right{ display:flex; align-items:center; gap:.7rem; }
+  .nav-cta{ background:var(--blue); color:#fff; min-height:44px; padding:.5em 1.2em; border-radius:999px; font-weight:800; font-size:var(--step--1); display:inline-flex; align-items:center; }
+  .hamburger{ display:none; width:46px; height:46px; border:0; background:var(--muted); border-radius:12px; color:var(--fg); font-size:22px; cursor:pointer; align-items:center; justify-content:center; }
+
+  .drawer{ position:fixed; inset:0; z-index:70; visibility:hidden; }
+  .drawer .scrim{ position:absolute; inset:0; background:rgba(0,0,0,.5); opacity:0; transition:.25s; }
+  .drawer .panel{ position:absolute; top:0; right:0; height:100%; width:min(82vw,330px); background:var(--card); transform:translateX(100%); transition:.28s cubic-bezier(.4,0,.2,1); padding:1.4rem; display:flex; flex-direction:column; gap:.3rem; box-shadow:-20px 0 40px rgba(0,0,0,.15); }
+  .drawer.open{ visibility:visible; } .drawer.open .scrim{ opacity:1; } .drawer.open .panel{ transform:none; }
+  .drawer .panel .x{ align-self:flex-end; background:var(--muted); border:0; color:var(--fg); width:44px; height:44px; border-radius:12px; font-size:22px; cursor:pointer; margin-bottom:.8rem; }
+  .drawer .panel a{ font-size:var(--step-1); font-weight:700; padding:.7em .4em; border-radius:12px; } .drawer .panel a:hover{ background:var(--muted); }
+  .drawer .panel .btn{ margin-top:1rem; }
+
+  /* Hero — one big background image (above the fold) */
+  .hero{ position:relative; overflow:hidden; isolation:isolate; }
+  .hero::before{ content:""; position:absolute; inset:0; z-index:-2;
+    background:url("assets/img/hero-bg.webp") center 28% / cover no-repeat;
+    animation:heroZoom 26s ease-in-out infinite alternate; transform-origin:60% 40%; }
+  @keyframes heroZoom{ from{ transform:scale(1); } to{ transform:scale(1.09); } }
+  /* readable wash + warm yellow nuance glowing from lower-left */
+  .hero::after{ content:""; position:absolute; inset:0; z-index:-1;
+    background:
+      radial-gradient(120% 90% at 8% 108%, rgba(250,204,21,.30) 0%, rgba(250,204,21,.10) 32%, transparent 60%),
+      linear-gradient(100deg, rgba(23,55,110,.94) 0%, rgba(23,55,110,.80) 38%, rgba(23,55,110,.44) 66%, rgba(23,55,110,.14) 100%); }
+  @media (max-width:860px){ .hero::after{ background:
+      radial-gradient(140% 60% at 12% 104%, rgba(250,204,21,.28) 0%, transparent 55%),
+      linear-gradient(180deg, rgba(23,55,110,.92) 0%, rgba(23,55,110,.80) 55%, rgba(23,55,110,.60) 100%); } }
+
+  /* floating multilingual greetings — pure CSS, drift + fade */
+  .hero-words{ display:none; }
+
+  .hero-inner{ padding-top:clamp(1.6rem,1rem + 3vw,3.4rem); padding-bottom:clamp(3.4rem,2.4rem + 6vw,7rem); max-width:1180px; margin-inline:auto; position:relative; z-index:1; }
+  .hero-copy{ max-width:720px; margin-inline:0; color:#fff; }
+  .hero .pill{ display:inline-flex; align-items:center; gap:.5em; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.3); backdrop-filter:blur(6px); padding:.5em 1em; border-radius:999px; font-size:var(--step--1); font-weight:700; margin-bottom:1.2rem; color:#fff; }
+  .hero .pill .dot{ width:8px; height:8px; border-radius:50%; background:#4ade80; box-shadow:0 0 8px #4ade80; animation:pulseDot 1.8s ease-in-out infinite; }
+  @keyframes pulseDot{ 0%,100%{ box-shadow:0 0 0 0 rgba(74,222,128,.6); } 70%{ box-shadow:0 0 0 8px rgba(74,222,128,0); } }
+  .hero h1{ font-size:var(--step-4); font-weight:900; margin-bottom:.7rem; color:#fff; line-height:1.05; }
+  @media (min-width:861px){ .hero h1, .hero .lead, .hero .cta-row{ margin-left:100px; } }
+
+  /* rotating language word — the eye-catch typography technique */
+  .hero h1 .rotator{ display:inline-flex; overflow:hidden; height:1.2em; vertical-align:baseline; }
+  .hero h1 .rot-track{ display:inline-flex; flex-direction:column; animation:rotWords 9s cubic-bezier(.86,0,.07,1) infinite; }
+  .hero h1 .rot-track > span{ height:1.2em; line-height:1.2em; display:block;
+    background:linear-gradient(92deg,#ffe17a,#ffc020 55%,#ffab00); -webkit-background-clip:text; background-clip:text; color:transparent; white-space:nowrap; }
+  /* 5 real steps (last is a dupe of the first for a seamless loop): shift by 1.2em each (matches h1 line-height) */
+  @keyframes rotWords{
+    0%,15%   { transform:translateY(0); }
+    20%,35%  { transform:translateY(-1.2em); }
+    40%,55%  { transform:translateY(-2.4em); }
+    60%,75%  { transform:translateY(-3.6em); }
+    80%,100% { transform:translateY(-4.8em); }
+  }
+  /* gold accent + animated underline on "confidence" */
+  .hero h1 .u{ color:#fff; position:relative; white-space:nowrap; }
+  .hero h1 .u::after{ content:""; position:absolute; left:0; right:0; bottom:-.04em; height:.1em; border-radius:3px;
+    background:linear-gradient(90deg,#ffd84d,#ffab00); transform:scaleX(0); transform-origin:left; animation:drawUnderline 1s .6s ease-out forwards; }
+  @keyframes drawUnderline{ to{ transform:scaleX(1); } }
+
+  .hero p.lead{ font-size:var(--step-1); color:rgba(255,255,255,.92); max-width:50ch; margin-bottom:1.6rem; }
+  .hero .cta-row{ display:flex; gap:.8rem; flex-wrap:wrap; align-items:center; }
+  .hero .btn-ghost{ border-color:rgba(255,255,255,.55); color:#fff; }
+  .hero .btn-ghost:hover{ background:rgba(255,255,255,.12); }
+  /* logo inside the hero (top-left) */
+  .hero-logo{ display:block; margin:0 0 2.8rem -.4rem; }
+  .hero-logo img{ height:clamp(58px,4vw,74px); width:auto; display:block; }
+  .hero .avatars{ display:flex; align-items:center; gap:.75rem; margin-top:4rem; }
+  .hero .avatars .stack{ display:flex; flex:0 0 auto; }
+  .hero .avatars .stack img{ width:42px; height:42px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,.9); margin-left:-12px; box-shadow:0 2px 6px rgba(0,0,0,.25); }
+  .hero .avatars .stack img:first-child{ margin-left:0; }
+  .hero .avatars small{ color:rgba(255,255,255,.92); font-size:var(--step--1); line-height:1.4; }
+  .hero .avatars b{ color:#ffd84d; }
+  @media (prefers-reduced-motion:reduce){
+    .hero::before,.hero .pill .dot{ animation:none; }
+    .hero h1 .rot-track{ animation:none; transform:translateY(0); }
+    .hero h1 .u::after{ animation:none; transform:scaleX(1); }
+  }
+
+  /* Spotlight cursor text — text hidden, revealed by a light that follows the cursor */
+  .spotlight{ position:relative; background:var(--navy); padding-block:clamp(2rem,1.5rem + 3vw,4rem); overflow:hidden; }
+  .spot-inner{ position:relative; max-width:1180px; margin-inline:auto; padding-inline:var(--gutter); text-align:center; }
+  .spot-hint{ color:rgba(255,255,255,.45); font-weight:700; font-size:var(--step--1); letter-spacing:.08em; text-transform:uppercase; margin-bottom:1.2rem; }
+  .spot-stack{ position:relative; display:inline-block; }
+  .spot-text{ font-size:clamp(2.8rem,8vw,7rem); font-weight:900; line-height:1.06; letter-spacing:-1px; margin:0; }
+  .spot-base{ color:rgba(255,255,255,.08); }
+  .spot-reveal{ position:absolute; inset:0;
+    background:linear-gradient(92deg,#8fc7f2,#ffd84d); -webkit-background-clip:text; background-clip:text; color:transparent;
+    -webkit-mask:radial-gradient(circle 150px at var(--mx,-999px) var(--my,-999px), #000 0%, #000 55%, transparent 100%);
+    mask:radial-gradient(circle 150px at var(--mx,-999px) var(--my,-999px), #000 0%, #000 55%, transparent 100%); }
+  .spot-sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+  .spot-typed{ margin:clamp(1.4rem,1rem + 2vw,2.4rem) 0 0; color:rgba(255,255,255,.9); font-size:var(--step-1); font-weight:600; min-height:1.5em; }
+  .spot-typed .typed-cursor{ color:#ffd84d; font-weight:400; }
+  .spot-gold{ color:#ffd84d; }
+  /* touch / reduced-motion: show the bright text fully, no cursor needed */
+  @media (hover:none), (prefers-reduced-motion:reduce){
+    .spot-hint{ display:none; }
+    .spot-base{ color:transparent; background:linear-gradient(92deg,#8fc7f2,#ffd84d); -webkit-background-clip:text; background-clip:text; }
+    .spot-reveal{ display:none; }
+  }
+
+  /* Language finder (Mango-style tidy list) */
+  section{ padding-block:clamp(2.6rem,1.6rem + 4vw,4.6rem); }
+  .sec-head{ max-width:62ch; margin-bottom:clamp(1.6rem,1rem + 2vw,2.4rem); }
+  .sec-head.center{ margin-inline:auto; text-align:center; }
+  .sec-head h2{ font-size:var(--step-3); font-weight:900; margin:.3rem 0; }
+  .sec-head p{ color:var(--sub); font-size:var(--step-1); }
+  .finder{ display:flex; flex-wrap:wrap; gap:.6rem; }
+  .finder a{ display:inline-flex; align-items:center; gap:.5rem; min-height:48px; padding:.6em 1.1em; border-radius:999px; border:1px solid var(--border); background:var(--card); font-weight:700; transition:.16s; }
+  .finder a:hover{ border-color:var(--blue); color:var(--blue-d); transform:translateY(-2px); box-shadow:var(--shadow); }
+  .finder a .fl{ font-size:20px; }
+  .finder .all{ background:var(--navy); color:#fff; border-color:var(--navy); }
+
+  /* Method (Mango "five skills") */
+  .method{ background:var(--muted); }
+  .method-lead{ max-width:64ch; margin-bottom:2rem; }
+  .method-lead p{ color:var(--sub); font-size:var(--step-1); }
+  .skills{ display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr)); gap:clamp(.9rem,.5rem + 1.5vw,1.3rem); }
+  .skill{ background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:clamp(1.3rem,1rem + 1vw,1.7rem); }
+  .skill .ic{ width:48px; height:48px; border-radius:13px; background:var(--blue-soft); color:var(--blue-d); display:flex; align-items:center; justify-content:center; font-size:24px; margin-bottom:.9rem; }
+  .skill h3{ font-size:var(--step-1); margin-bottom:.3rem; } .skill p{ color:var(--sub); font-size:var(--step-0); }
+
+  /* How it works */
+  .steps{ display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); gap:clamp(1rem,.6rem + 2vw,1.8rem); }
+  .step .num{ width:44px; height:44px; border-radius:50%; background:var(--blue); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:var(--step-1); margin-bottom:.9rem; }
+  .step h3{ font-size:var(--step-1); margin-bottom:.35rem; } .step p{ color:var(--sub); }
+
+  /* Tutors — compact, small avatars (less big imagery) */
+  .tutors{ background:var(--muted); }
+  .tutor-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr)); gap:clamp(.9rem,.5rem + 1.5vw,1.2rem); }
+  .tutor{ display:flex; gap:.9rem; align-items:center; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; transition:.2s; }
+  .tutor:hover{ box-shadow:var(--shadow); transform:translateY(-3px); }
+  .tutor img{ width:64px; height:64px; border-radius:14px; object-fit:cover; flex:0 0 auto; }
+  .tutor b{ font-size:var(--step-0); color:var(--navy); } @media (prefers-color-scheme:dark){ .tutor b{ color:#dbe7f7; } }
+  .tutor .role{ color:var(--sub); font-size:var(--step--1); }
+  .tutor .tags{ display:flex; flex-wrap:wrap; gap:.3rem; margin-top:.35rem; }
+  .tutor .tag{ font-size:.7rem; font-weight:700; padding:.15em .5em; border-radius:999px; background:var(--blue-soft); color:var(--blue-d); }
+
+  /* Reviews — unprompted quote style */
+  .review-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr)); gap:clamp(.8rem,.5rem + 1.5vw,1.2rem); }
+  .review{ background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:clamp(1.3rem,1rem + 1vw,1.7rem); border-left:4px solid var(--blue); }
+  .review p{ font-size:var(--step-0); margin-bottom:1rem; }
+  .review .who{ display:flex; align-items:center; gap:.7rem; }
+  .review .av{ width:38px; height:38px; border-radius:50%; flex:0 0 auto; background:var(--navy); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.85rem; }
+  .review .who b{ display:block; font-size:var(--step--1); color:var(--navy); } @media (prefers-color-scheme:dark){ .review .who b{ color:#dbe7f7; } }
+  .review .who small{ color:var(--sub); }
+
+  /* Clients */
+  .clients-row{ display:flex; flex-wrap:wrap; gap:clamp(1.2rem,.8rem + 2vw,2.2rem); align-items:center; justify-content:center; }
+  .clients-row img{ height:32px; width:auto; object-fit:contain; background:#fff; padding:5px 9px; border-radius:8px; filter:grayscale(1); opacity:.65; transition:.2s; }
+  .clients-row img:hover{ filter:none; opacity:1; }
+
+  /* Services */
+  .svc{ display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr)); gap:.7rem; }
+  .svc a{ display:flex; align-items:center; gap:.7rem; min-height:54px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:.8rem 1rem; font-weight:700; }
+  .svc a:hover{ border-color:var(--blue); }
+  .svc .n{ width:28px; height:28px; flex:0 0 auto; border-radius:8px; background:var(--blue-soft); color:var(--blue-d); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:var(--step--1); }
+
+  /* FAQ (Mango "questions people ask first") */
+  .faq details{ border:1px solid var(--border); border-radius:14px; background:var(--card); margin-bottom:.7rem; overflow:hidden; }
+  .faq summary{ cursor:pointer; padding:1.1rem 1.2rem; font-weight:800; color:var(--navy); list-style:none; display:flex; justify-content:space-between; align-items:center; gap:1rem; }
+  @media (prefers-color-scheme:dark){ .faq summary{ color:#dbe7f7; } }
+  .faq summary::-webkit-details-marker{ display:none; }
+  .faq summary::after{ content:"+"; font-size:1.4em; color:var(--blue-d); transition:.2s; }
+  .faq details[open] summary::after{ transform:rotate(45deg); }
+  .faq p{ padding:0 1.2rem 1.2rem; color:var(--sub); }
+
+  /* CTA */
+  .cta-band{ background:linear-gradient(135deg,var(--navy),var(--navy-2)); color:#fff; border-radius:clamp(20px,4vw,28px); padding:clamp(2rem,1.4rem + 3vw,3.6rem); text-align:center; position:relative; overflow:hidden; }
+  .cta-band::after{ content:""; position:absolute; width:38vw; height:38vw; max-width:320px; max-height:320px; right:-6%; bottom:-28%; background:radial-gradient(circle,rgba(70,165,229,.4),transparent 60%); }
+  .cta-band h2{ color:#fff; font-size:var(--step-3); font-weight:900; margin-bottom:.5rem; position:relative; }
+  .cta-band p{ opacity:.9; margin-bottom:1.5rem; position:relative; }
+  .cta-band .cta-row{ display:flex; gap:.8rem; justify-content:center; flex-wrap:wrap; position:relative; }
+  .cta-info{ display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr)); gap:1.2rem; margin-top:2rem; text-align:left; position:relative; }
+  .cta-info b{ display:block; color:var(--blue); font-size:var(--step--1); text-transform:uppercase; letter-spacing:.06em; margin-bottom:.2rem; }
+  .cta-info div{ font-size:var(--step--1); opacity:.92; }
+
+  footer{ background:var(--navy-2); color:#fff; padding-block:clamp(2.2rem,1.6rem + 2vw,3.2rem); }
+  .foot{ display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr; gap:clamp(1.4rem,1rem + 2vw,2.4rem); }
+  .foot .brand img{ height:30px; background:rgba(255,255,255,.12); padding:6px 11px; border-radius:10px; margin-bottom:.9rem; }
+  .foot p{ opacity:.72; font-size:var(--step--1); max-width:32ch; }
+  footer h4{ font-size:var(--step--1); text-transform:uppercase; letter-spacing:.08em; opacity:.6; margin-bottom:.9rem; color:#fff; }
+  footer li{ list-style:none; opacity:.82; font-size:var(--step--1); margin-bottom:.5rem; }
+  .foot-bottom{ border-top:1px solid rgba(255,255,255,.14); margin-top:2rem; padding-top:1.2rem; text-align:center; font-size:var(--step--1); opacity:.6; }
+
+  .mobile-bar{ display:none; position:fixed; left:0; right:0; bottom:0; z-index:55; gap:.6rem; padding:.6rem var(--gutter); padding-bottom:calc(.6rem + env(safe-area-inset-bottom)); background:color-mix(in srgb,var(--card) 94%,transparent); backdrop-filter:blur(12px); border-top:1px solid var(--border); }
+  .mobile-bar .btn{ flex:1; }
+  .fab{ position:fixed; right:22px; bottom:22px; z-index:50; width:60px; height:60px; border-radius:50%; background:var(--wa); color:#04310f; display:flex; align-items:center; justify-content:center; font-size:29px; box-shadow:0 8px 24px rgba(37,211,102,.5); animation:pulse 2.2s infinite; }
+  .to-top{ position:fixed; right:29px; bottom:100px; z-index:51; width:46px; height:46px; border-radius:50%; border:0; cursor:pointer; background:linear-gradient(145deg,#ffd84d,#ffab00); color:#4a2e00; font-size:22px; line-height:1; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(255,171,0,.45); opacity:0; visibility:hidden; transform:translateY(10px); transition:opacity .25s, transform .25s, visibility .25s; }
+  .to-top.show{ opacity:1; visibility:visible; transform:translateY(0); }
+  .to-top:hover{ filter:brightness(1.06); box-shadow:0 8px 22px rgba(255,171,0,.6); }
+  @keyframes pulse{ 0%{box-shadow:0 0 0 0 rgba(37,211,102,.5);} 70%{box-shadow:0 0 0 16px rgba(37,211,102,0);} 100%{box-shadow:0 0 0 0 rgba(37,211,102,0);} }
+
+  @media (max-width:900px){ .foot{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:640px){
+    .nav-links,.nav-cta{ display:none; } .hamburger{ display:inline-flex; }
+    .fab{ display:none; } .mobile-bar{ display:flex; } body{ padding-bottom:76px; }
+    .to-top{ bottom:88px; right:16px; }
+    .hero-inner{ padding-top:.6rem; padding-bottom:1rem; }
+    .hero-logo{ margin-bottom:2.8rem; }
+    .hero .avatars{ margin-top:2rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="wrap nav">
+    <a class="header-wa" href="https://api.whatsapp.com/send?phone=6282160108500&text=Halo%20Sentralingua,%20saya%20tertarik%20belajar%20bahasa" aria-label="Chat on WhatsApp 0821 6010 8500"><span class="ic">💬</span><span class="num">0821 6010 8500</span><span class="wa-label">Enroll now</span></a>
+    <nav class="nav-links">
+      <a href="#finder">Courses</a><a href="#method">Method</a><a href="#how">How it works</a><a href="#tutors">Tutors</a><a href="#reviews">Reviews</a><a href="#contact">Contact</a>
+    </nav>
+    <div class="nav-right">
+      <a class="nav-cta" href="#contact">Book free trial</a>
+      <button class="hamburger" id="open-menu" aria-label="Open menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
+</header>
+
+<div class="drawer" id="drawer">
+  <div class="scrim" data-close></div>
+  <div class="panel">
+    <button class="x" data-close aria-label="Close menu">×</button>
+    <a href="#finder" data-close>Courses</a>
+    <a href="#method" data-close>Method</a>
+    <a href="#how" data-close>How it works</a>
+    <a href="#tutors" data-close>Tutors</a>
+    <a href="#reviews" data-close>Reviews</a>
+    <a href="#contact" data-close>Contact</a>
+    <a class="btn btn-blue" href="#contact" data-close>Book free trial</a>
+  </div>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="wrap hero-inner">
+    <div class="hero-copy">
+      <a class="hero-logo" href="/" aria-label="Sentralingua home"><img src="assets/img/logo.png" width="286" height="70" alt="Sentralingua — Communicating People"></a>
+      <h1>Speak
+        <span class="rotator" aria-label="Indonesian, English, Mandarin, French, Japanese and more">
+          <span class="rot-track">
+            <span>Indonesian</span>
+            <span>English</span>
+            <span>Mandarin</span>
+            <span>French</span>
+            <span>Japanese</span>
+            <span>Indonesian</span>
+          </span>
+        </span>
+        <br>with <span class="u">confidence</span>.</h1>
+      <p class="lead">Bahasa Indonesia for foreigners and 6 more languages — taught through real conversation by friendly, experienced tutors who build the course around you.</p>
+      <div class="cta-row">
+        <a class="btn btn-navy" href="https://api.whatsapp.com/send?phone=6282166808500&text=Halo%20Sentralingua,%20saya%20tertarik%20belajar%20bahasa">Book a free trial</a>
+        <a class="btn btn-ghost" href="#method">See how it works</a>
+      </div>
+      <div class="avatars">
+        <div class="stack">
+          <img src="https://sentralingua.com/app/uploads/2015/04/Nadia-Adriani1-80x80.jpg" alt="">
+          <img src="https://sentralingua.com/app/uploads/2015/04/Agus-Salim-80x80.jpg" alt="">
+          <img src="https://sentralingua.com/app/uploads/2015/04/Githa1-80x80.jpg" alt="">
+          <img src="https://sentralingua.com/app/uploads/2015/04/Inez-80x80.jpg" alt="">
+        </div>
+        <small><b>Friendly, qualified tutors</b> · trusted by 30+ companies incl. ExxonMobil, Siemens &amp; Merck</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Spotlight cursor text (move your mouse) -->
+<section class="spotlight" id="spotlight" aria-label="Say hello in many languages">
+  <div class="spot-inner">
+    <div class="spot-stack" aria-hidden="true">
+      <h2 class="spot-text spot-base">Halo. Hello. 你好.<br>Bonjour. こんにちは.</h2>
+      <h2 class="spot-text spot-reveal">Halo. Hello. 你好.<br>Bonjour. こんにちは.</h2>
+    </div>
+    <p class="spot-typed"><span id="spot-typed"></span></p>
+    <span class="spot-sr">We help you say hello — and everything after — in Bahasa Indonesia and six more languages. Sentralingua — the easy way to speak languages.</span>
+  </div>
+</section>
+
+<!-- Language finder -->
+<section id="finder">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Our programs</span><h2>Find your next language</h2><p>Pick a language and tell us your goal — travel, work, study, or family.</p></div>
+    <div class="finder">
+      <a href="#contact"><span class="fl">🇮🇩</span>Indonesian</a>
+      <a href="#contact"><span class="fl">🇬🇧</span>English</a>
+      <a href="#contact"><span class="fl">🇩🇪</span>German</a>
+      <a href="#contact"><span class="fl">🇨🇳</span>Mandarin</a>
+      <a href="#contact"><span class="fl">🇫🇷</span>French</a>
+      <a href="#contact"><span class="fl">🇳🇱</span>Dutch</a>
+      <a href="#contact"><span class="fl">🇯🇵</span>Japanese</a>
+      <a class="all" href="#contact">View all courses →</a>
+    </div>
+  </div>
+</section>
+
+<!-- Method -->
+<section id="method" class="method">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">How you learn</span><h2>Four skills, taught as one method</h2></div>
+    <div class="method-lead"><p>Most courses teach one thing at a time — a vocabulary drill, then a grammar rule. Our communicative method works all your skills at once, inside real conversation, because that is how a language is actually used. The goal is being understood, not being perfect.</p></div>
+    <div class="skills">
+      <div class="skill"><div class="ic">🗣️</div><h3>Speaking</h3><p>You speak from lesson one — real dialogue with your tutor, bringing real-life communication into every session.</p></div>
+      <div class="skill"><div class="ic">👂</div><h3>Listening</h3><p>Trained ears through natural, conversational-pace practice, so the language you learn is the language you will hear.</p></div>
+      <div class="skill"><div class="ic">📖</div><h3>Reading &amp; writing</h3><p>Grammar explained through real usage, reinforced by writing and reading in context — not abstract rules.</p></div>
+      <div class="skill"><div class="ic">🌏</div><h3>Culture</h3><p>Cultural context sits inside the conversation, so you learn why someone would say a thing, not just how.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head center"><span class="eyebrow">Simple to start</span><h2>How it works</h2><p>From first message to first lesson in three easy steps.</p></div>
+    <div class="steps">
+      <div class="step"><div class="num">1</div><h3>Pick your language</h3><p>Choose from 7 languages and tell us your goal and current level.</p></div>
+      <div class="step"><div class="num">2</div><h3>Book a free trial</h3><p>Message us on WhatsApp. We match you with the right tutor and a time that suits you — free.</p></div>
+      <div class="step"><div class="num">3</div><h3>Start speaking</h3><p>Begin real conversation from lesson one, on a flexible schedule that fits your life.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Tutors -->
+<section id="tutors" class="tutors">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Meet the team</span><h2>Friendly, qualified tutors</h2></div>
+    <div class="tutor-grid">
+      <div class="tutor"><img src="https://sentralingua.com/app/uploads/2015/04/Nadia-Adriani1-150x150.jpg" alt="Nadia Adriani"><div><b>Nadia Adriani</b><div class="role">English &amp; Indonesian</div><div class="tags"><span class="tag">🇮🇩</span><span class="tag">🇬🇧</span></div></div></div>
+      <div class="tutor"><img src="https://sentralingua.com/app/uploads/2015/04/Agus-Salim-150x150.jpg" alt="Agus Salim"><div><b>Agus Salim</b><div class="role">English &amp; French</div><div class="tags"><span class="tag">🇬🇧</span><span class="tag">🇫🇷</span></div></div></div>
+      <div class="tutor"><img src="https://sentralingua.com/app/uploads/2015/04/Panca-Bayu-Angga-Krisna-150x150.jpg" alt="Panca Bayu Angga Krisna"><div><b>Panca Bayu</b><div class="role">Indonesian &amp; German</div><div class="tags"><span class="tag">🇮🇩</span><span class="tag">🇩🇪</span></div></div></div>
+      <div class="tutor"><img src="https://sentralingua.com/app/uploads/2015/04/Githa1-150x150.jpg" alt="Githa"><div><b>Githa</b><div class="role">English teacher</div><div class="tags"><span class="tag">🇬🇧</span></div></div></div>
+      <div class="tutor"><img src="https://sentralingua.com/app/uploads/2015/04/Inez-150x150.jpg" alt="Inez"><div><b>Inez</b><div class="role">English teacher</div><div class="tags"><span class="tag">🇬🇧</span></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Reviews -->
+<section id="reviews">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Testimonials</span><h2>What learners say</h2></div>
+    <div class="review-grid">
+      <div class="review"><p>“After a year I can express myself well in daily situations — real conversation, not just the book.”</p><div class="who"><span class="av">HE</span><span><b>Hennie Everlo</b><small>Jakarta</small></span></div></div>
+      <div class="review"><p>“Very patient, explains things well, structured. I highly recommend him as a teacher.”</p><div class="who"><span class="av">AD</span><span><b>Annemarieke De Haan</b><small>VP, Unilever Indonesia</small></span></div></div>
+      <div class="review"><p>“Effective and practical lessons — in a short time I could already manage in shops and restaurants.”</p><div class="who"><span class="av">YE</span><span><b>Yvonne Everlo</b><small>Jakarta</small></span></div></div>
+      <div class="review"><p>“He teaches through casual conversation combined with the book. After a few months I could talk and read Bahasa.”</p><div class="who"><span class="av">SC</span><span><b>Stuart Chapman</b><small>Kemang, Jakarta</small></span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Clients -->
+<section class="method">
+  <div class="wrap">
+    <div class="sec-head center"><span class="eyebrow">Trusted by</span><h2>Companies we've taught</h2></div>
+    <div class="clients-row">
+      <img src="https://sentralingua.com/app/uploads/2015/04/Exxon-Mobil-Indonesia.jpg" alt="ExxonMobil">
+      <img src="https://sentralingua.com/app/uploads/2015/04/Deutsche-Bank.jpeg" alt="Deutsche Bank">
+      <img src="https://sentralingua.com/app/uploads/2015/04/Siemens-Indonesia.png" alt="Siemens">
+      <img src="https://sentralingua.com/app/uploads/2015/04/PT-Merck-Indonesia-tbk.jpg" alt="Merck">
+      <img src="https://sentralingua.com/app/uploads/2015/04/Gojek.jpg" alt="Gojek">
+      <img src="https://sentralingua.com/app/uploads/2015/04/Standard-Chartered.jpg" alt="Standard Chartered">
+      <img src="https://sentralingua.com/app/uploads/2015/04/Philips-Logo.jpg" alt="Philips">
+      <img src="https://sentralingua.com/app/uploads/2015/04/McKinsey__Company_logo.png" alt="McKinsey & Company">
+    </div>
+  </div>
+</section>
+
+<!-- Services -->
+<section id="services">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Our services</span><h2>Ways to learn</h2></div>
+    <div class="svc">
+      <a href="#contact"><span class="n">1</span>Private Course</a>
+      <a href="#contact"><span class="n">2</span>In-House Training</a>
+      <a href="#contact"><span class="n">3</span>Customized Course</a>
+      <a href="#contact"><span class="n">4</span>Intensive / Extensive</a>
+      <a href="#contact"><span class="n">5</span>Conversation Class</a>
+      <a href="#contact"><span class="n">6</span>IELTS &amp; TOEFL Prep</a>
+      <a href="#contact"><span class="n">7</span>UKBI / IPT</a>
+      <a href="#contact"><span class="n">8</span>Translation &amp; Interpreting</a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="method">
+  <div class="wrap">
+    <div class="sec-head center"><span class="eyebrow">Before you start</span><h2>Questions people ask first</h2></div>
+    <div class="faq" style="max-width:760px;margin-inline:auto;">
+      <details open><summary>How soon can I hold a conversation?</summary><p>Because you speak from lesson one, most learners manage everyday situations within a few months — the pace depends on the language and how often you practise. Many of our students report real daily-life conversation within a year.</p></details>
+      <details><summary>Where do lessons take place?</summary><p>At your home or office in the Jakarta–Depok area, or online — whatever fits your schedule. We arrange the time and place around you.</p></details>
+      <details><summary>Which languages do you teach?</summary><p>Bahasa Indonesia for foreigners, English, German, Mandarin, French, Dutch and Japanese — for all levels, from beginner to business and diplomatic.</p></details>
+      <details><summary>Do you teach companies and teams?</summary><p>Yes. We run in-house corporate training and have taught teams at ExxonMobil, Siemens, Merck, Standard Chartered and many more. Message us for a custom program.</p></details>
+      <details><summary>How do I get started?</summary><p>Just message us on WhatsApp for a free consultation — no obligation. We'll match you with the right tutor and set up a free trial lesson.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="contact">
+  <div class="wrap">
+    <div class="cta-band">
+      <h2>Your first lesson is a chat away</h2>
+      <p>Free consultation · flexible schedule · no obligation.</p>
+      <div class="cta-row">
+        <a class="btn btn-wa" href="https://api.whatsapp.com/send?phone=6282166808500&text=Halo%20Sentralingua,%20saya%20mau%20coba%20kelas%20gratis">💬 Message us now</a>
+        <a class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.5)" href="mailto:info@sentralingua.com">✉️ Email us</a>
+      </div>
+      <div class="cta-info">
+        <div><b>Address</b>Ruko Le Mirage Point Center A-4, JL. Raden Sanim, Tanah Baru, Depok 16426</div>
+        <div><b>Phone</b>+62 21 7780 8500</div>
+        <div><b>WhatsApp</b>0821 6680 8500<br>0821 6010 8500</div>
+        <div><b>Email</b>info@sentralingua.com</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <div class="brand"><img src="assets/img/logo.png" alt="Sentralingua"></div>
+        <p>Communicating People. Speak a new language like you mean it — 7 languages, tailor-made, in Depok &amp; Jakarta.</p>
+      </div>
+      <div><h4>Languages</h4><ul><li>Bahasa Indonesia</li><li>English</li><li>German</li><li>Mandarin</li><li>French</li><li>Dutch</li><li>Japanese</li></ul></div>
+      <div><h4>Services</h4><ul><li>Private Course</li><li>In-House Training</li><li>Conversation Class</li><li>IELTS / TOEFL</li><li>Translation</li></ul></div>
+      <div><h4>Contact</h4><ul><li>info@sentralingua.com</li><li>+62 21 7780 8500</li><li>WA 0821 6680 8500</li><li>Depok 16426</li></ul></div>
+    </div>
+    <div class="foot-bottom">© 2026 Sentralingua — Communicating People · Redesign prototype v6</div>
+  </div>
+</footer>
+
+<div class="mobile-bar">
+  <a class="btn btn-wa" href="https://api.whatsapp.com/send?phone=6282166808500&text=Halo%20Sentralingua">💬 WhatsApp</a>
+  <a class="btn btn-blue" href="#contact">Free trial</a>
+</div>
+<a class="fab" href="https://api.whatsapp.com/send?phone=6282166808500&text=Halo%20Sentralingua" aria-label="Chat on WhatsApp">💬</a>
+<button class="to-top" id="to-top" aria-label="Back to top" title="Back to top">↑</button>
+
+<script>
+  var drawer=document.getElementById('drawer'), openBtn=document.getElementById('open-menu');
+  function setMenu(o){ drawer.classList.toggle('open',o); openBtn.setAttribute('aria-expanded',o?'true':'false'); document.body.style.overflow=o?'hidden':''; }
+  openBtn.addEventListener('click',function(){ setMenu(true); });
+  drawer.addEventListener('click',function(e){ if(e.target.hasAttribute('data-close')) setMenu(false); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') setMenu(false); });
+
+  // Spotlight cursor text — follow the pointer over the section
+  (function(){
+    var sec=document.getElementById('spotlight'); if(!sec) return;
+    var reveal=sec.querySelector('.spot-reveal'); if(!reveal) return;
+    sec.addEventListener('pointermove',function(e){
+      var r=reveal.getBoundingClientRect();
+      reveal.style.setProperty('--mx',(e.clientX-r.left)+'px');
+      reveal.style.setProperty('--my',(e.clientY-r.top)+'px');
+    });
+    sec.addEventListener('pointerleave',function(){
+      reveal.style.setProperty('--mx','-9999px');
+      reveal.style.setProperty('--my','-9999px');
+    });
+  })();
+
+  // Typed.js line under the greetings (lazy-load the lib only when the section is near view)
+  (function(){
+    var el=document.getElementById('spot-typed'); if(!el) return;
+    var started=false;
+    function start(){
+      if(started) return; started=true;
+      var s=document.createElement('script');
+      s.src='assets/js/typed.umd.js';
+      s.onload=function(){
+        if(typeof Typed!=='function'){ fallback(); return; }
+        new Typed('#spot-typed',{
+          strings:['<span class="spot-gold">Sentralingua</span> — the easy way to speak languages'],
+          contentType:'html', typeSpeed:55, startDelay:400,
+          loop:false, showCursor:true, cursorChar:'|',
+          onComplete:function(self){ if(self&&self.cursor) self.cursor.style.display='none'; }
+        });
+      };
+      s.onerror=fallback;
+      document.head.appendChild(s);
+    }
+    function fallback(){
+      // No lib: tiny built-in typewriter — type the full line once, gold "Sentralingua", then stop.
+      var gold='Sentralingua', rest=' — the easy way to speak languages', full=gold+rest, i=0;
+      function tick(){
+        var n=Math.min(i,full.length);
+        var g=full.slice(0,Math.min(n,gold.length));
+        var r=n>gold.length?full.slice(gold.length,n):'';
+        el.innerHTML='<span class="spot-gold">'+g+'</span>'+r;
+        if(i<full.length){ i++; setTimeout(tick,55); }
+      }
+      tick();
+    }
+    if('IntersectionObserver' in window){
+      var io=new IntersectionObserver(function(en){ en.forEach(function(e){ if(e.isIntersecting){ start(); io.disconnect(); } }); },{rootMargin:'200px'});
+      io.observe(el);
+    } else { start(); }
+  })();
+
+  // Back-to-top button: show after scrolling down, smooth-scroll to top on click
+  (function(){
+    var btn=document.getElementById('to-top');
+    if(!btn) return;
+    function toggle(){ btn.classList.toggle('show', window.scrollY>400); }
+    window.addEventListener('scroll', toggle, {passive:true});
+    btn.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
+    toggle();
+  })();
+</script>
+</body>
+</html>

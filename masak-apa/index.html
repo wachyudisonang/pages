@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#c0392b">
+<title>Masak Apa Hari Ini?</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍲</text></svg>">
+</head>
+<body>
+<header class="app-header">
+  <div class="wrap">
+    <h1>🍲 Masak Apa Hari Ini?</h1>
+    <p class="sub">Biar nggak bingung — pilih menu masakan untuk hari ini</p>
+  </div>
+</header>
+
+<nav class="tabs wrap">
+  <button class="tab active" data-view="rekomendasi">Rekomendasi</button>
+  <button class="tab" data-view="referensi">Referensi Saya</button>
+  <button class="tab" data-view="minggu">Dimasak Minggu Ini</button>
+  <button class="tab" data-view="laporan">Laporan</button>
+  <button class="tab" data-view="pengaturan">Pengaturan</button>
+</nav>
+
+<main class="wrap">
+  <!-- Recommendations -->
+  <section id="view-rekomendasi" class="view active">
+    <div class="filter-row" id="cat-filter"></div>
+    <div class="toolbar">
+      <span id="rec-info" class="muted"></span>
+      <button id="refresh-btn" class="btn-ghost" title="Acak ulang rekomendasi">🔄 Acak ulang</button>
+    </div>
+    <div id="rec-list" class="cards"></div>
+    <div id="rec-empty" class="empty" hidden>
+      <p>Semua rekomendasi sudah dipilih atau dilewati hari ini.</p>
+      <p class="muted">Coba ganti kategori, atau kembali besok untuk menu baru 🌅</p>
+    </div>
+  </section>
+
+  <!-- My references -->
+  <section id="view-referensi" class="view">
+    <h2>Referensi Resep</h2>
+    <p class="muted">Tambah link resep sendiri (Instagram, YouTube, TikTok, web). Simpan pribadi di HP ini, atau bagikan ke komunitas.</p>
+    <div class="setting-card">
+      <h3>Tambah Referensi</h3>
+      <input type="text" id="ref-name" class="ref-input" placeholder="Nama masakan (mis. Rendang mbak Dewi)">
+      <input type="url" id="ref-url" class="ref-input" placeholder="Tempel link di sini (https://...)">
+      <div class="ref-form-row">
+        <select id="ref-cat" class="ref-input ref-select">
+          <option value="Lainnya">Kategori: Lainnya</option>
+          <option value="Ayam">Ayam</option>
+          <option value="Sapi">Sapi</option>
+          <option value="Kambing">Kambing</option>
+          <option value="Ikan">Ikan</option>
+          <option value="Udang">Udang</option>
+          <option value="Telur">Telur</option>
+          <option value="Tahu">Tahu</option>
+          <option value="Tempe">Tempe</option>
+          <option value="Sayur">Sayur</option>
+        </select>
+        <label class="ref-check"><input type="checkbox" id="ref-in-recs" checked> Ikut di rekomendasi</label>
+      </div>
+      <div class="ref-form-row">
+        <button id="ref-add-btn" class="btn">➕ Simpan di HP ini</button>
+        <button id="ref-suggest-btn" class="btn btn-ghost" hidden>🌐 Sarankan ke komunitas</button>
+      </div>
+      <span id="ref-add-status" class="muted"></span>
+    </div>
+
+    <!-- Community shared references -->
+    <div id="community-block" hidden>
+      <h3 style="margin:16px 0 4px;">🌐 Referensi Komunitas</h3>
+      <p class="muted">Dibagikan & disetujui bersama. Muncul juga di rekomendasi harian.</p>
+      <div id="community-list" class="cards"></div>
+      <div id="community-empty" class="empty" hidden><p>Belum ada referensi komunitas.</p></div>
+    </div>
+
+    <h3 style="margin:16px 0 4px;">📱 Referensi Pribadi (HP ini)</h3>
+    <div id="ref-list" class="cards"></div>
+    <div id="ref-empty" class="empty" hidden><p>Belum ada referensi pribadi. Tempel link resep favorit di atas ➕</p></div>
+
+    <!-- Admin moderation (only visible to the signed-in admin) -->
+    <div class="setting-card" style="margin-top:18px;">
+      <h3>Moderasi (Admin)</h3>
+      <p class="muted" id="admin-status">Masuk sebagai admin untuk meninjau saran komunitas.</p>
+      <button id="admin-signin-btn" class="btn btn-ghost">🔑 Masuk sebagai admin (Google)</button>
+      <button id="admin-signout-btn" class="btn btn-ghost" hidden>Keluar</button>
+      <div id="pending-block" hidden>
+        <h4 style="margin:12px 0 6px;">Menunggu persetujuan</h4>
+        <div id="pending-list" class="cards"></div>
+        <div id="pending-empty" class="muted" hidden>Tidak ada saran yang menunggu.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cooked this week -->
+  <section id="view-minggu" class="view">
+    <h2>Dimasak dalam 7 hari terakhir</h2>
+    <p class="muted">Menu ini tidak muncul di rekomendasi selama 7 hari.</p>
+    <div id="week-list" class="cards"></div>
+    <div id="week-empty" class="empty" hidden><p>Belum ada masakan yang dipilih minggu ini.</p></div>
+  </section>
+
+  <!-- Report -->
+  <section id="view-laporan" class="view">
+    <h2>Laporan Masakan</h2>
+    <div class="filter-row" id="report-period">
+      <button class="chip active" data-days="7">Minggu Ini (7 hari)</button>
+      <button class="chip" data-days="14">2 Minggu (14 hari)</button>
+      <button class="chip" data-days="30">Bulan Ini (30 hari)</button>
+    </div>
+    <div id="report-summary"></div>
+    <div id="report-cats"></div>
+    <h3 style="margin:18px 0 8px;">Rincian</h3>
+    <div id="report-list"></div>
+    <div id="report-empty" class="empty" hidden><p>Belum ada masakan dalam periode ini.</p></div>
+  </section>
+
+  <!-- Settings -->
+  <section id="view-pengaturan" class="view">
+    <h2>Pengaturan &amp; Data</h2>
+    <div class="setting-card">
+      <h3>Statistik</h3>
+      <p id="stats-line" class="muted"></p>
+    </div>
+    <div class="setting-card">
+      <h3>Cadangkan Data</h3>
+      <p class="muted">Simpan riwayat pilihan ke sebuah file (untuk pindah HP atau jaga-jaga).</p>
+      <button id="export-btn" class="btn">⬇️ Unduh Cadangan</button>
+    </div>
+    <div class="setting-card">
+      <h3>Pulihkan Data</h3>
+      <p class="muted">Muat kembali riwayat dari file cadangan.</p>
+      <input type="file" id="import-file" accept="application/json" hidden>
+      <button id="import-btn" class="btn">⬆️ Pilih File Cadangan</button>
+      <span id="import-status" class="muted"></span>
+    </div>
+    <div class="setting-card danger">
+      <h3>Hapus Semua Riwayat</h3>
+      <p class="muted">Mengosongkan semua data pilihan. Tidak bisa dibatalkan.</p>
+      <button id="reset-btn" class="btn btn-danger">🗑️ Reset</button>
+    </div>
+    <p class="footnote">Data disimpan di browser HP ini saja (IndexedDB). Sumber resep: Kaggle — Indonesian Food Recipes (Cookpad-ID).</p>
+  </section>
+</main>
+
+<!-- Recipe detail modal -->
+<div id="modal" class="modal" hidden>
+  <div class="modal-box">
+    <button id="modal-close" class="modal-close" aria-label="Tutup">✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="firebase-config.js"></script>
+<script type="module" src="firebase-sync.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
