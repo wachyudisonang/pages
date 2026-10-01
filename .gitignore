@@ -1,3 +1,5 @@
 .DS_Store
 *.log
 Thumbs.db
+.kiro/
+node_modules/
