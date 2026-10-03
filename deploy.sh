@@ -23,6 +23,9 @@ set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BIG_OWN="$(cd "$HERE/.." && pwd)"
 
+# One cache-bust stamp per deploy run (YYYYMMDDHHMM), shared by all stamped projects.
+DEPLOY_STAMP="$(date +%Y%m%d%H%M)"
+
 rsync_project() {
   local name="$1" src="$2"; shift 2
   local dest="$HERE/$name"
@@ -37,6 +40,29 @@ rsync_project() {
   for f in "$@"; do args+=(--include="$f"); done
   rsync -a --delete "${args[@]}" --exclude='*' "$src"/ "$dest"/
   echo "   files: $(find "$dest" -type f | wc -l | tr -d ' ')"
+}
+
+# stamp_version <project> — bake a deploy timestamp into a single-file app so every
+# deploy changes the served bytes (new ETag -> browser refetches) AND the hub link
+# carries ?v=<stamp> (so hub click-throughs bust too). Runs AFTER rsync, because
+# rsync --delete overwrites the deployed copy from the clean source each time.
+# macOS/BSD sed (-i '') is used; the source file is never touched, only pages/<p>/.
+stamp_version() {
+  local name="$1" ver="$2"
+  local file="$HERE/$name/index.html"
+  [[ -f "$file" ]] || { echo "   !! stamp skipped — $file missing"; return 0; }
+  # 1) Inject/replace a version meta right after the <title> in the DEPLOYED copy.
+  if grep -q 'name="app-version"' "$file"; then
+    sed -i '' -E "s|<meta name=\"app-version\" content=\"[^\"]*\" />|<meta name=\"app-version\" content=\"$ver\" />|" "$file"
+  else
+    # insert after the first </title>
+    sed -i '' "s|</title>|</title>\\
+<meta name=\"app-version\" content=\"$ver\" />|" "$file"
+  fi
+  # 2) Point the hub card's link at the current version (idempotent: bare or ?v=…).
+  local hub="$HERE/index.html"
+  sed -i '' -E "s|href=\"\./$name/(\?v=[0-9]+)?\"|href=\"./$name/?v=$ver\"|" "$hub"
+  echo "   stamped v=$ver (meta in pages/$name/index.html + hub link)"
 }
 
 deploy_masak_apa() {
@@ -64,6 +90,9 @@ deploy_grocery() {
   # in index.html, so index.html is the whole runtime. NOT README.md / .gitignore.
   rsync_project grocery "$BIG_OWN/grocery" \
     index.html
+  # Auto cache-bust: single-file app has no external asset to version, so stamp a
+  # deploy-time meta into the served file (new bytes -> new ETag) and the hub link.
+  stamp_version grocery "$DEPLOY_STAMP"
 }
 
 TARGET="${1:-all}"
