@@ -50,12 +50,29 @@ last):
 
 1. a `<meta name="app-version" content="<stamp>">` line in the **deployed**
    `pages/<project>/index.html` — this changes the served bytes, so the ETag
-   changes and the browser refetches (the only lever for a single-file app with
-   no external assets, and the part that reaches a home-screen shortcut that
+   changes and the browser refetches (and reaches a home-screen shortcut that
    never passes through the hub);
 2. the hub card link → `./<project>/?v=<stamp>` (idempotent; replaces any prior
-   `?v=`), so hub click-throughs also bust.
+   `?v=`), so hub click-throughs also bust;
+3. for multi-file apps, a `?v=<stamp>` appended to every **local** asset
+   reference (`<script src>`, `<link href>`, CSS `url(...)`, and `fetch('…')`
+   calls inside the JS), so a stale `app.js` / `style.css` / `recipes.json` /
+   image can't be served from cache either. **External** `http(s)://` URLs are
+   never touched.
 
-The project **source** file is never touched — the version is a deploy artifact
-only. Currently stamped: **grocery**. Confirm what's live with:
+The project **source** files are never modified — the version is a deploy
+artifact only, applied to the copy in `pages/` after rsync. All runs are
+idempotent (an existing `?v=` is replaced, never duplicated).
+
+Per-project local assets that get versioned:
+- **grocery** — single-file, meta only (everything inlined).
+- **masak-apa** — `style.css`, `firebase-config.js`, `firebase-sync.js`,
+  `app.js`, and `recipes.json` (fetched from inside `app.js`). `manifest.json`
+  is left bare on purpose.
+- **sentralingua-v2** — `assets/js/typed.umd.js`, `assets/img/logo.png`,
+  `assets/img/hero-bg.webp` (the `sentralingua.com` images are external).
+- **familytree** — `styles.css`, `app.js`, `debug.js` (stamped only when
+  actually deployed).
+
+Confirm what's live with:
 `curl -s https://wachyudisonang.github.io/pages/grocery/ | grep app-version`.

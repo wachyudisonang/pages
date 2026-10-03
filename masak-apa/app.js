@@ -777,7 +777,7 @@
   // ---------- boot ----------
   async function init() {
     try {
-      var resp = await fetch('recipes.json');
+      var resp = await fetch('recipes.json?v=202610031611');
       var data = await resp.json();
       RECIPES = data.recipes || [];
       RECIPES.forEach(function (r) { RECIPE_BY_ID[r.id] = r; });

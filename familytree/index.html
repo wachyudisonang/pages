@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate">
+<meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="googlebot-news" content="noindex, nofollow">
+<meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="referrer" content="no-referrer">
+<title>Family Tree</title>
+<meta name="app-version" content="202610031611" />
+<script>
+// ?dev (or #dev) loads the RAW, readable source/ files; the live URL loads the minified web/ copy built by tools/build.js.
+var FT_DEV = /\bdev\b/i.test(location.search + " " + location.hash);
+var FT_BASE = FT_DEV ? "../source/" : "";
+// DEBUG-ONLY engine A/B: with ?debug, an engine radio (built in the debug card
+// below) stores the choice in localStorage.ft_engine and reloads. "refactor" loads
+// the parallel refactor build web/app.refactor.js; anything else (default) loads the
+// current engine web/app.js. Ignored entirely on ?dev (raw source has no minified
+// alt) and on the live URL (no ?debug → the radio is never built, choice unread).
+var FT_DEBUG = /\bdebug\b/i.test(location.search + " " + location.hash);
+// Does a refactor build exist? Probe ONLY under ?debug (dev-only, so the tiny sync
+// HEAD cost never touches the live path). When source/refactor/ is promoted or
+// deleted and web/app.refactor.js is gone, this is false → the loader can't pick it
+// AND the debug card hides the whole Engine radio (see the radio IIFE below). So the
+// A/B tooling self-removes once the refactor build no longer exists — nothing to
+// hand-delete in index.html.
+var FT_HAS_REFACTOR = false;
+if (FT_DEBUG && !FT_DEV) {
+  try {
+    var xhr = new XMLHttpRequest();
+    xhr.open("HEAD", "app.refactor.js", false);   // sync, debug-only
+    xhr.send();
+    FT_HAS_REFACTOR = (xhr.status >= 200 && xhr.status < 300);
+  } catch (e) { FT_HAS_REFACTOR = false; }
+}
+var FT_ENGINE = "current";
+try { if (FT_HAS_REFACTOR && localStorage.getItem("ft_engine") === "refactor") FT_ENGINE = "refactor"; } catch (e) {}
+var FT_APP_FILE = (FT_ENGINE === "refactor") ? "app.refactor.js" : "app.js?v=202610031611";
+document.write('<link rel="stylesheet" href="' + FT_BASE + 'styles.css?v=' + Date.now() + '">');
+</script>
+</head>
+<body>
+<div id="ft-root">
+  <div id="ft-controls">
+    <div class="ft-ctl-title">Controls
+      <button type="button" class="ft-card-toggle" data-card="ft-controls" title="Collapse / expand">&minus;</button>
+    </div>
+    <div class="ft-card-body">
+    <div class="ft-ctl-row">
+      <label class="ft-ctl-check">
+        <input type="checkbox" id="ft-show-couples" autocomplete="off" checked>
+        <span>Show all couples</span>
+      </label>
+    </div>
+    <div class="ft-ctl-row">
+      <label class="ft-ctl-check">
+        <input type="checkbox" id="ft-patrilineal" autocomplete="off" checked>
+        <span>Patrilineal lineage <small>(uncheck = matrilineal)</small></span>
+      </label>
+    </div>
+    <div class="ft-ctl-row">
+      <label class="ft-ctl-check">
+        <input type="checkbox" id="ft-show-siblings" autocomplete="off" checked>
+        <span>Show siblings <small>(uncheck = key person's line only)</small></span>
+      </label>
+    </div>
+    <div class="ft-ctl-row">
+      <label class="ft-ctl-check">
+        <input type="checkbox" id="ft-show-avatar" autocomplete="off" checked>
+        <span>Show avatar <small>(uncheck = name only)</small></span>
+      </label>
+    </div>
+    <div class="ft-ctl-row">
+      <span class="ft-ctl-label">Key person (focus)</span>
+      <select id="ft-key-select"></select>
+    </div>
+    <div class="ft-ctl-row">
+      <label class="ft-ctl-check">
+        <input type="checkbox" id="ft-root-on" autocomplete="off">
+        <span>Root <small>(print from a chosen ancestor)</small></span>
+      </label>
+    </div>
+    <div class="ft-ctl-row" id="ft-root-row" style="display:none">
+      <span class="ft-ctl-label">Root ancestor</span>
+      <select id="ft-root-select"></select>
+    </div>
+    </div>
+  </div>
+
+  <div id="ft-print">
+    <div class="ft-ctl-title">Print
+      <button type="button" class="ft-card-toggle" data-card="ft-print" title="Collapse / expand">&minus;</button>
+    </div>
+    <div class="ft-card-body">
+    <div class="ft-ctl-row">
+      <button type="button" id="ft-print-view">Print current view</button>
+    </div>
+    <div class="ft-ctl-row">
+      <span class="ft-ctl-label">Book PDF (all descendants)</span>
+      <p class="ft-print-note">A wide tree spans many pages, so the multi-page
+        book is built with the command below and saved to
+        <code>print/</code>. Couples, siblings, avatars, lineage &amp; Root follow
+        the Control card; pick the rest, copy the command, then run it in a
+        terminal:</p>
+
+      <div class="ft-print-opts">
+        <div class="ft-print-optrow">
+          <span class="ft-print-optlbl">Page</span>
+          <label><input type="radio" name="ft-pf-mode" value="fit" checked> Fit</label>
+          <label><input type="radio" name="ft-pf-mode" value="tile"> Tile</label>
+        </div>
+        <div class="ft-print-optrow">
+          <span class="ft-print-optlbl">Cohort</span>
+          <label><input type="checkbox" name="ft-pf-cohort"> One page per generation-peer</label>
+        </div>
+      </div>
+
+      <code class="ft-print-cmd" id="ft-print-cmd">node tools/print-engine.js P1</code>
+      <button type="button" id="ft-print-copy">Copy command</button>
+    </div>
+    </div>
+  </div>
+  <div id="ft-debug-mount"></div>
+  <h1 id="ft-title">FAMILY TREE</h1>
+  <p id="ft-subtitle"></p>
+  <div id="ft-stage"></div>
+  <p id="ft-hint">&#9888;&#65039; Fictional Javanese sample names &mdash; not real people. Layout &amp; connectors are computed programmatically from the data model below.</p>
+</div>
+
+<script>document.write('<script src="' + FT_BASE + FT_APP_FILE + '?v=' + Date.now() + '"><\/script>');</script>
+
+<!-- DEV-ONLY debug tools. Loaded ONLY when the page URL carries ?debug (or #debug).
+     The live environment opens the plain URL, so neither the card DOM below nor
+     debug.js is ever injected or fetched. To remove entirely, delete this block
+     and web/debug.js. -->
+<script>
+(function () {
+  var q = location.search + " " + location.hash;
+  if (!/\bdebug\b/i.test(q)) return;                 // no ?debug / #debug → live: do nothing
+  var mount = document.getElementById("ft-debug-mount");
+  if (mount) {
+    mount.innerHTML =
+      '<div id="ft-debug">' +
+        '<div class="ft-ctl-title">Debug &mdash; layout constants' +
+          '<button type="button" id="ft-debug-toggle" title="Collapse / expand">&minus;</button>' +
+        '</div>' +
+        '<div id="ft-debug-body">' +
+          '<div class="ft-debug-engine" id="ft-debug-engine">' +
+            '<span class="ft-ctl-label">Engine</span>' +
+            '<label class="ft-dbg-radio"><input type="radio" name="ft-engine" value="current" autocomplete="off"><span>Current</span></label>' +
+            '<label class="ft-dbg-radio"><input type="radio" name="ft-engine" value="refactor" autocomplete="off"><span>Refactor</span></label>' +
+          '</div>' +
+          '<div id="ft-debug-fields"></div>' +
+          '<div class="ft-debug-actions">' +
+            '<label class="ft-dbg-check">' +
+              '<input type="checkbox" id="ft-debug-clusters" autocomplete="off">' +
+              '<span>Show cluster borders</span>' +
+            '</label>' +
+            '<button type="button" id="ft-debug-reset">Reset defaults</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  }
+  // Engine A/B radio: reflect the ACTIVE engine (FT_APP_FILE, decided above), and
+  // on change store the choice and reload so the loader picks the other build.
+  // If NO refactor build exists (FT_HAS_REFACTOR false — source/refactor promoted or
+  // deleted), hide the whole Engine block so the A/B tooling self-removes. On ?dev
+  // there is no minified alt, so disable the radio and pin it to Current.
+  (function () {
+    var block = mount ? mount.querySelector("#ft-debug-engine") : null;
+    if (block && (typeof FT_HAS_REFACTOR === "undefined" || !FT_HAS_REFACTOR)) {
+      block.style.display = "none";   // no refactor build → no A/B toggle
+      return;
+    }
+    var radios = mount ? mount.querySelectorAll('input[name="ft-engine"]') : [];
+    var active = (typeof FT_ENGINE !== "undefined" && FT_ENGINE === "refactor") ? "refactor" : "current";
+    for (var i = 0; i < radios.length; i++) {
+      radios[i].checked = (radios[i].value === active);
+      if (FT_DEV) { radios[i].disabled = true; continue; }
+      radios[i].addEventListener("change", function () {
+        if (!this.checked) return;
+        try { localStorage.setItem("ft_engine", this.value); } catch (e) {}
+        location.reload();
+      });
+    }
+  })();
+  // Persist the Controls + focus across an engine-swap reload (DEBUG-ONLY). The
+  // engine resets its own control globals on init, so without this a radio flip
+  // drops back to defaults and you must re-uncheck everything. We save each
+  // control's value to localStorage on change, and restore them ONCE after the
+  // engine's first render (via window.__ftOnRender) by setting the value and
+  // dispatching a synthetic 'change' so the engine's OWN handlers apply it — no
+  // engine code is touched, and both engines share the saved state. Not active on
+  // the live URL (this whole block runs only under ?debug).
+  (function () {
+    var KEY = "ft_controls";
+    var IDS = ["ft-show-couples", "ft-patrilineal", "ft-show-siblings", "ft-show-avatar"];
+    var SEL = "ft-key-select";
+    function save() {
+      var st = {};
+      IDS.forEach(function (id) { var el = document.getElementById(id); if (el) st[id] = el.checked; });
+      var sel = document.getElementById(SEL); if (sel && sel.value) st[SEL] = sel.value;
+      try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {}
+    }
+    // Save whenever any control changes (capture phase, so we record the state the
+    // user just chose regardless of the engine's own listener order).
+    IDS.concat([SEL]).forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener("change", save);
+    });
+    // A node TAP re-focuses via focusOn()→render()→syncControls(), which sets the
+    // <select> value programmatically WITHOUT firing a 'change' event — so the
+    // change-listener above never sees a tap-driven focus, and the reload would drop
+    // back to the boot default. Watch the select's value on a light rAF loop and
+    // save whenever it moves, so tapping a node persists the focus too.
+    var lastFocus = null;
+    (function watchFocus() {
+      // Do NOT save until restore() has applied the saved focus — otherwise the boot
+      // default (P1) would be written over the user's saved focus before we read it.
+      if (restored) {
+        var sel = document.getElementById(SEL);
+        if (sel && sel.value && sel.value !== lastFocus) { lastFocus = sel.value; save(); }
+      }
+      requestAnimationFrame(watchFocus);
+    })();
+    // Restore once, after the engine has wired + first-rendered its controls.
+    var restored = false;
+    function restore() {
+      if (restored) return;
+      var st; try { st = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) { st = null; }
+      if (!st) { restored = true; return; }
+      // Focus first (changes the tree), then the boolean toggles. Only fire a
+      // synthetic change when the saved value DIFFERS from the current control, so
+      // we don't trigger redundant re-renders or fight the engine's own state.
+      var sel = document.getElementById(SEL);
+      if (sel && st[SEL] && sel.value !== st[SEL]) {
+        sel.value = st[SEL];
+        sel.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      IDS.forEach(function (id) {
+        if (!(id in st)) return;
+        var el = document.getElementById(id);
+        if (el && el.checked !== st[id]) {
+          el.checked = st[id];
+          el.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      });
+      restored = true;
+    }
+    // The engine's __ftOnRender hook is hard-assigned by debug.js (which loads
+    // after this block and would clobber a wrapper here), so we do NOT chain onto
+    // it. Instead poll until the engine has BOOTED — the Key-person <select> is
+    // populated asynchronously after the CSV fetch + first render — then restore
+    // once. rAF-based so it costs nothing once done; gives up after ~5s.
+    var tries = 0;
+    (function waitReady() {
+      var sel = document.getElementById(SEL);
+      var ready = sel && sel.options && sel.options.length > 0;
+      if (ready) {
+        // The engine wires its control CHANGE handlers in wireControls(), which runs
+        // right AFTER the first render() (same tick) — i.e. after the <select> is
+        // populated but possibly not yet when we first observe it. Wait ONE more
+        // frame so those handlers are attached before we dispatch synthetic changes,
+        // otherwise the events hit nothing and nothing is restored.
+        requestAnimationFrame(restore);
+        return;
+      }
+      if (tries++ > 300) { restored = true; return; }   // ~5s at 60fps — engine never booted
+      requestAnimationFrame(waitReady);
+    })();
+  })();
+  document.write('<script src="debug.js?v=' + Date.now() + '"><\/script>');
+})();
+</script>
+</body>
+</html>

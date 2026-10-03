@@ -65,16 +65,56 @@ stamp_version() {
   echo "   stamped v=$ver (meta in pages/$name/index.html + hub link)"
 }
 
+# stamp_asset <file> <asset-ref> <ver> — append/refresh ?v=<ver> on one LOCAL asset
+# reference inside a deployed file. Works for href="…", src="…", url("…"), and
+# fetch('…') forms. Idempotent: an existing ?v=NNN is replaced, a bare ref gets one.
+# <asset-ref> is the bare path exactly as it appears (e.g. style.css, app.js,
+# assets/img/logo.png, assets/js/typed.umd.js, recipes.json). Only matches the
+# local path, never an absolute http(s):// URL (those are external, left alone).
+stamp_asset() {
+  local file="$1" ref="$2" ver="$3"
+  [[ -f "$file" ]] || { echo "   !! asset-stamp skipped — $file missing"; return 0; }
+  # Escape regex metachars in the ref (., /) for a safe match.
+  local esc; esc="$(printf '%s' "$ref" | sed -e 's/[.[\*^$/]/\\&/g')"
+  # Replace an existing ?v=NNN on this exact ref, else append ?v=ver.
+  # Guard: the char before the ref must be a quote or paren (so we match a real
+  # reference, not a substring), and we never touch a ref preceded by // (http(s)).
+  sed -i '' -E \
+    -e "s@([\"'(])${esc}\?v=[0-9]+@\1${ref}?v=${ver}@g" \
+    -e "s@([\"'(])${esc}([\"')])@\1${ref}?v=${ver}\2@g" \
+    "$file"
+}
+
 deploy_masak_apa() {
   rsync_project masak-apa "$BIG_OWN/masak-apa/web" \
     index.html style.css app.js firebase-sync.js firebase-config.js \
     manifest.json recipes.json
+  # Cache-bust: meta + hub link, then version every LOCAL asset ref so a stale
+  # app.js/style.css/recipes.json can't be served from the browser cache.
+  stamp_version masak-apa "$DEPLOY_STAMP"
+  local d="$HERE/masak-apa"
+  stamp_asset "$d/index.html" style.css          "$DEPLOY_STAMP"
+  stamp_asset "$d/index.html" firebase-config.js "$DEPLOY_STAMP"
+  stamp_asset "$d/index.html" firebase-sync.js   "$DEPLOY_STAMP"
+  stamp_asset "$d/index.html" app.js             "$DEPLOY_STAMP"
+  # recipes.json is fetched from inside app.js, not referenced in the HTML.
+  stamp_asset "$d/app.js"     recipes.json        "$DEPLOY_STAMP"
+  echo "   assets versioned: style.css, firebase-*.js, app.js, recipes.json"
 }
 
 deploy_familytree() {
   # familytree serves from web/; publish only runtime files (NOT source/, tools/, print/, node_modules/).
   rsync_project familytree "$BIG_OWN/familytree/web" \
     index.html styles.css app.js debug.js robots.txt
+  # Only stamp if actually deployed (index.html present). Local assets: styles.css, app.js, debug.js.
+  if [[ -f "$HERE/familytree/index.html" ]]; then
+    stamp_version familytree "$DEPLOY_STAMP"
+    local d="$HERE/familytree"
+    stamp_asset "$d/index.html" styles.css "$DEPLOY_STAMP"
+    stamp_asset "$d/index.html" app.js     "$DEPLOY_STAMP"
+    stamp_asset "$d/index.html" debug.js   "$DEPLOY_STAMP"
+    echo "   assets versioned: styles.css, app.js, debug.js"
+  fi
 }
 
 deploy_sentralingua_v2() {
@@ -83,6 +123,14 @@ deploy_sentralingua_v2() {
   # (No per-folder .nojekyll needed — the root pages/.nojekyll covers the whole site.)
   rsync_project sentralingua-v2 "$BIG_OWN/sentralingua-v2" \
     index.html 'assets/' 'assets/**'
+  # Cache-bust: meta + hub link, then version LOCAL assets/ refs only (the many
+  # https://sentralingua.com/… images are external and intentionally left alone).
+  stamp_version sentralingua-v2 "$DEPLOY_STAMP"
+  local d="$HERE/sentralingua-v2"
+  stamp_asset "$d/index.html" assets/js/typed.umd.js "$DEPLOY_STAMP"
+  stamp_asset "$d/index.html" assets/img/logo.png    "$DEPLOY_STAMP"
+  stamp_asset "$d/index.html" assets/img/hero-bg.webp "$DEPLOY_STAMP"
+  echo "   assets versioned: typed.umd.js, logo.png, hero-bg.webp"
 }
 
 deploy_grocery() {

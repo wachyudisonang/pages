@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Sentralingua — Speak a New Language Like You Mean It | Depok & Jakarta</title>
+<meta name="app-version" content="202610031611" />
 <meta name="description" content="Bahasa Indonesia for foreigners plus 6 more languages, taught by friendly experienced tutors through real conversation. Flexible, tailor-made courses in Depok & Jakarta.">
 <meta name="theme-color" content="#17376e">
 <meta property="og:title" content="Sentralingua — Speak a New Language Like You Mean It">
@@ -75,7 +76,7 @@
   /* Hero — one big background image (above the fold) */
   .hero{ position:relative; overflow:hidden; isolation:isolate; }
   .hero::before{ content:""; position:absolute; inset:0; z-index:-2;
-    background:url("assets/img/hero-bg.webp") center 28% / cover no-repeat;
+    background:url("assets/img/hero-bg.webp?v=202610031611") center 28% / cover no-repeat;
     animation:heroZoom 26s ease-in-out infinite alternate; transform-origin:60% 40%; }
   @keyframes heroZoom{ from{ transform:scale(1); } to{ transform:scale(1.09); } }
   /* readable wash + warm yellow nuance glowing from lower-left */
@@ -294,7 +295,7 @@
 <section class="hero">
   <div class="wrap hero-inner">
     <div class="hero-copy">
-      <a class="hero-logo" href="/" aria-label="Sentralingua home"><img src="assets/img/logo.png" width="286" height="70" alt="Sentralingua — Communicating People"></a>
+      <a class="hero-logo" href="/" aria-label="Sentralingua home"><img src="assets/img/logo.png?v=202610031611" width="286" height="70" alt="Sentralingua — Communicating People"></a>
       <h1>Speak
         <span class="rotator" aria-label="Indonesian, English, Mandarin, French, Japanese and more">
           <span class="rot-track">
@@ -479,7 +480,7 @@
   <div class="wrap">
     <div class="foot">
       <div>
-        <div class="brand"><img src="assets/img/logo.png" alt="Sentralingua"></div>
+        <div class="brand"><img src="assets/img/logo.png?v=202610031611" alt="Sentralingua"></div>
         <p>Communicating People. Speak a new language like you mean it — 7 languages, tailor-made, in Depok &amp; Jakarta.</p>
       </div>
       <div><h4>Languages</h4><ul><li>Bahasa Indonesia</li><li>English</li><li>German</li><li>Mandarin</li><li>French</li><li>Dutch</li><li>Japanese</li></ul></div>
@@ -526,7 +527,7 @@
     function start(){
       if(started) return; started=true;
       var s=document.createElement('script');
-      s.src='assets/js/typed.umd.js';
+      s.src='assets/js/typed.umd.js?v=202610031611';
       s.onload=function(){
         if(typeof Typed!=='function'){ fallback(); return; }
         new Typed('#spot-typed',{
