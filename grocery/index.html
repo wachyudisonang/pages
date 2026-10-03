@@ -130,8 +130,11 @@
   .priceline label{font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap}
   .priceline input{flex:1;min-width:0;padding:10px 11px;border:1.5px solid var(--border-2);border-radius:10px;font-size:15px;font-family:inherit;font-variant-numeric:tabular-nums}
   .priceline input:focus{outline:none;border-color:var(--accent)}
+  .priceline input.qty{flex:0 0 58px;width:58px;text-align:center}
+  .priceline .mul{font-size:14px;color:var(--muted);font-weight:800}
   .priceline .go{border:none;background:var(--accent);color:#fff;border-radius:10px;padding:10px 14px;font-weight:700;font-size:14px;cursor:pointer}
-  .priceline .hint{font-size:11.5px;color:var(--muted);margin-top:5px}
+  .priceline .hint{font-size:11.5px;color:var(--muted);margin-top:5px;display:flex;justify-content:space-between;gap:8px}
+  .priceline .hint .sub{font-weight:800;color:var(--text)}
 
   /* history popover for a row's price */
   .pop-list{padding:0 13px 12px;display:none;background:var(--chip)}
@@ -467,14 +470,25 @@ function removeItem(catId){
   return Promise.all(ps).then(function(){ if(OPEN_ID===catId)OPEN_ID=null; if(CHECK_ID===catId)CHECK_ID=null; toast('Dihapus: '+(c?c.name:'item')); return refresh(); });
 }
 /* open the inline price field for a wishlist item before moving it to the basket */
-function beginCheck(catId){ CHECK_ID=(CHECK_ID===catId?null:catId); OPEN_ID=null; renderWish(); if(CHECK_ID===catId){ var i=$('pin_'+catId); if(i){ i.focus(); i.select(); } } }
+function beginCheck(catId){ CHECK_ID=(CHECK_ID===catId?null:catId); OPEN_ID=null; renderWish(); if(CHECK_ID===catId){ var i=$('pin_'+catId); if(i){ i.focus(); i.select(); } updateSub(catId); } }
 /* confirm the price and move the item into the basket */
 function toBasket(catId){
   var i=$('pin_'+catId); if(!i) return;
   var price=digitsToNum(i.value);
   if(isNaN(price)||price<0){ toast('Isi harga dulu'); i.focus(); return; }
-  var c=catById(catId); c.state='basket'; c.checkPrice=price;
+  var qty=qtyVal(catId);
+  var c=catById(catId); c.state='basket'; c.checkPrice=price; c.checkQty=qty;
   put('catalog',c).then(function(){ CHECK_ID=null; toast('Masuk keranjang: '+c.name); return refresh(); });
+}
+/* read the quantity field for an item (defaults to 1, min 1) */
+function qtyVal(catId){ var q=$('qin_'+catId); var n=q?digitsToNum(q.value):NaN; return (isNaN(n)||n<1)?1:n; }
+/* live subtotal shown under the price line (price × qty) */
+function updateSub(catId){
+  var el=$('sub_'+catId); if(!el) return;
+  var p=$('pin_'+catId); var price=p?digitsToNum(p.value):NaN;
+  if(isNaN(price)){ el.textContent=''; return; }
+  var qty=qtyVal(catId);
+  el.textContent=(qty>1?(qty+' × '+money(price)+' = '):'')+money(price*qty);
 }
 /* toggle the price-history popover on a wishlist row */
 function togglePop(catId){ OPEN_ID=(OPEN_ID===catId?null:catId); CHECK_ID=null; renderWish(); }
@@ -497,10 +511,12 @@ function renderWish(){
       '</div>'+
       '<div class="priceline'+(checking?' on':'')+'">'+
         '<div class="pin"><label>Harga</label>'+
-          '<input id="pin_'+c.id+'" type="text" inputmode="numeric" enterkeyhint="done" autocomplete="off" placeholder="0" value="'+(lp?groupDigits(lp.price):'')+'" data-price="'+c.id+'">'+
+          '<input id="pin_'+c.id+'" type="text" inputmode="numeric" enterkeyhint="next" autocomplete="off" placeholder="0" value="'+(lp?groupDigits(lp.price):'')+'" data-price="'+c.id+'">'+
+          '<span class="mul">×</span>'+
+          '<input id="qin_'+c.id+'" class="qty" type="text" inputmode="numeric" enterkeyhint="done" autocomplete="off" placeholder="1" value="'+(c.checkQty||1)+'" data-qty="'+c.id+'">'+
           '<button class="go" data-tobasket="'+c.id+'">Masuk keranjang</button>'+
         '</div>'+
-        '<div class="hint">'+(lp?('Harga terakhir '+money(lp.price)+' · '+ymd(lp.ts)):'Belum ada harga sebelumnya')+'</div>'+
+        '<div class="hint"><span>'+(lp?('Harga terakhir '+money(lp.price)+' · '+ymd(lp.ts)):'Belum ada harga sebelumnya')+'</span><span class="sub" id="sub_'+c.id+'"></span></div>'+
       '</div>'+
       renderPop(c.id,open);
     wrap.appendChild(el);
@@ -528,13 +544,13 @@ function renderBasket(){
   if(!items.length){ box.innerHTML='<div class="empty"><span class="big"><svg viewBox="0 0 576 512"><path d="M253.3 35.1c6.1-11.8 1.5-26.3-10.2-32.4s-26.3-1.5-32.4 10.2L117.6 192 32 192c-17.7 0-32 14.3-32 32s14.3 32 32 32L83.9 463.5C91 492 116.6 512 146 512L430 512c29.4 0 55-20 62.1-48.5L544 256c17.7 0 32-14.3 32-32s-14.3-32-32-32l-85.6 0L365.3 12.9C359.2 1.2 344.7-3.4 332.9 2.7s-16.3 20.6-10.2 32.4L404.3 192l-232.6 0L253.3 35.1z"/></svg></span>Keranjang kosong.<br>Centang item di wishlist saat kamu mengambilnya.</div>'; $('basketTotal').textContent='—'; $('payBtn').disabled=true; setBadge(0); return; }
   var wrap=document.createElement('div'); wrap.className='rows'; var total=0;
   items.forEach(function(c){
-    var price=c.checkPrice||0; total+=price;
+    var unit=c.checkPrice||0; var qty=c.checkQty||1; var line=unit*qty; total+=line;
     var el=document.createElement('div');
     el.innerHTML=
       '<div class="row">'+
         '<div class="cb on" data-uncheck="'+c.id+'"><svg viewBox="0 0 448 512"><path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/></svg></div>'+
-        '<div class="rname">'+esc(c.name)+'</div>'+
-        '<div class="rlast"><b>'+money(price)+'</b></div>'+
+        '<div class="rname">'+esc(c.name)+(qty>1?'<span class="tag">'+qty+' × '+money(unit)+'</span>':'')+'</div>'+
+        '<div class="rlast"><b>'+money(line)+'</b></div>'+
         '<button class="rdel" data-uncheck="'+c.id+'" title="Kembalikan ke wishlist"><svg viewBox="0 0 512 512"><path d="M125.7 160l50.3 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L48 224c-17.7 0-32-14.3-32-32L16 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 51.2L97.6 97.6c87.5-87.5 229.3-87.5 316.8 0s87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3s-163.8-62.5-226.3 0L125.7 160z"/></svg></button>'+
       '</div>';
     wrap.appendChild(el);
@@ -551,10 +567,10 @@ function payAll(){
   var items=basketItems(); if(!items.length) return;
   var now=Date.now(), ops=[];
   items.forEach(function(c){
-    var price=c.checkPrice||0;
-    ops.push(add('purchases',{catId:c.id,name:c.name,price:price,ts:now}));
-    ops.push(add('prices',{catId:c.id,price:price,ts:now}));
-    c.state='idle'; delete c.checkPrice; ops.push(put('catalog',c));  // paid: leaves wishlist, history/search still keep it
+    var unit=c.checkPrice||0; var qty=c.checkQty||1; var line=unit*qty;
+    ops.push(add('purchases',{catId:c.id,name:c.name,price:line,unit:unit,qty:qty,ts:now}));
+    ops.push(add('prices',{catId:c.id,price:unit,ts:now}));  // history tracks UNIT price
+    c.state='idle'; delete c.checkPrice; delete c.checkQty; ops.push(put('catalog',c));  // paid: leaves wishlist, history/search still keep it
   });
   Promise.all(ops).then(function(){ toast('✓ '+items.length+' item ditandai dibayar'); ACTIVE='history'; applyTab(); return refresh(); });
 }
@@ -568,7 +584,7 @@ function renderHistory(){
     var arr=byMonth[k].sort(function(a,b){ return b.ts-a.ts; });
     var tot=arr.reduce(function(s,x){ return s+(x.price||0); },0);
     var m=document.createElement('div'); m.className='month';
-    var rows=arr.map(function(it){ return '<div class="hrow"><div class="hn">'+esc(it.name)+'<span class="hd">'+dayLabel(it.ts)+'</span></div><div class="hp">'+money(it.price)+'</div><button class="rdel" data-hdel="'+it.id+'" title="Hapus pembelian ini"><svg viewBox="0 0 448 512"><path d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0L284.2 0c12.1 0 23.2 6.8 28.6 17.7L320 32l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 96C14.3 96 0 81.7 0 64S14.3 32 32 32l96 0 7.2-14.3zM32 128l384 0 0 320c0 35.3-28.7 64-64 64L96 512c-35.3 0-64-28.7-64-64l0-320zm96 64c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16z"/></svg></button></div>'; }).join('');
+    var rows=arr.map(function(it){ var qn=(it.qty&&it.qty>1)?' <span class="hd">'+it.qty+' × '+money(it.unit!=null?it.unit:(it.price/it.qty))+'</span>':''; return '<div class="hrow"><div class="hn">'+esc(it.name)+'<span class="hd">'+dayLabel(it.ts)+'</span>'+qn+'</div><div class="hp">'+money(it.price)+'</div><button class="rdel" data-hdel="'+it.id+'" title="Hapus pembelian ini"><svg viewBox="0 0 448 512"><path d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0L284.2 0c12.1 0 23.2 6.8 28.6 17.7L320 32l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 96C14.3 96 0 81.7 0 64S14.3 32 32 32l96 0 7.2-14.3zM32 128l384 0 0 320c0 35.3-28.7 64-64 64L96 512c-35.3 0-64-28.7-64-64l0-320zm96 64c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16z"/></svg></button></div>'; }).join('');
     m.innerHTML='<h3><span>'+monthLabel(k)+' <span style="color:var(--muted);font-weight:600;font-size:12px">('+arr.length+')</span></span><span class="mtot">'+money(tot)+'</span></h3>'+rows;
     box.appendChild(m);
   });
@@ -603,7 +619,7 @@ function purgeOld(){
   ).then(function(){ return oldP.length; });
 }
 function exportData(){
-  var payload={app:'grocery',version:3,exported:new Date().toISOString(),catalog:CAT,prices:PRICES,purchases:PURCH};
+  var payload={app:'grocery',version:4,exported:new Date().toISOString(),catalog:CAT,prices:PRICES,purchases:PURCH};
   var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='belanja-cadangan-'+new Date().toISOString().slice(0,10)+'.json';
   document.body.appendChild(a); a.click(); a.remove(); toast('Cadangan diunduh');
@@ -614,10 +630,10 @@ function importData(file){
     try{
       var d=JSON.parse(fr.result);
       var cats=d.catalog||[], prs=d.prices||[], pus=d.purchases||[], idmap={}, chain=Promise.resolve();
-      cats.forEach(function(c){ chain=chain.then(function(){ return add('catalog',{name:c.name,nameKey:c.nameKey||normName(c.name),category:c.category||'',state:c.state==='basket'?'basket':'wish',checkPrice:c.checkPrice}).then(function(nid){ idmap[c.id]=nid; }); }); });
+      cats.forEach(function(c){ chain=chain.then(function(){ return add('catalog',{name:c.name,nameKey:c.nameKey||normName(c.name),category:c.category||'',state:c.state==='basket'?'basket':'wish',checkPrice:c.checkPrice,checkQty:c.checkQty}).then(function(nid){ idmap[c.id]=nid; }); }); });
       chain=chain.then(function(){ var ps=[];
         prs.forEach(function(p){ ps.push(add('prices',{catId:idmap[p.catId]!=null?idmap[p.catId]:p.catId,price:p.price,ts:p.ts})); });
-        pus.forEach(function(b){ ps.push(add('purchases',{catId:idmap[b.catId]!=null?idmap[b.catId]:b.catId,name:b.name,price:b.price,ts:b.ts||Date.now()})); });
+        pus.forEach(function(b){ ps.push(add('purchases',{catId:idmap[b.catId]!=null?idmap[b.catId]:b.catId,name:b.name,price:b.price,unit:b.unit!=null?b.unit:b.price,qty:b.qty||1,ts:b.ts||Date.now()})); });
         return Promise.all(ps);
       });
       chain.then(function(){ toast('Cadangan dipulihkan'); return refresh(); });
@@ -693,9 +709,18 @@ function bind(){
     else if((b=e.target.closest('[data-pop]'))) togglePop(+b.getAttribute('data-pop'));
     else if((b=e.target.closest('[data-del]'))) removeItem(+b.getAttribute('data-del'));
   });
-  $('wishBox').addEventListener('keydown',function(e){ var p=e.target.closest('[data-price]'); if(p && e.key==='Enter'){ e.preventDefault(); toBasket(+p.getAttribute('data-price')); } });
-  /* live thousand-separator formatting in the price field (534534 -> 534.534) */
-  $('wishBox').addEventListener('input',function(e){ var p=e.target.closest('[data-price]'); if(!p)return; var f=groupDigits(p.value); if(f!==p.value){ p.value=f; try{ p.setSelectionRange(f.length,f.length); }catch(_){} } });
+  $('wishBox').addEventListener('keydown',function(e){
+    if(e.key!=='Enter') return;
+    var p=e.target.closest('[data-price]'); if(p){ e.preventDefault(); var q=$('qin_'+p.getAttribute('data-price')); if(q){ q.focus(); q.select(); } return; }
+    var qf=e.target.closest('[data-qty]'); if(qf){ e.preventDefault(); toBasket(+qf.getAttribute('data-qty')); }
+  });
+  /* live thousand-separator formatting in the price field (534534 -> 534.534) + qty digits-only, both refresh the subtotal */
+  $('wishBox').addEventListener('input',function(e){
+    var p=e.target.closest('[data-price]');
+    if(p){ var f=groupDigits(p.value); if(f!==p.value){ p.value=f; try{ p.setSelectionRange(f.length,f.length); }catch(_){} } updateSub(+p.getAttribute('data-price')); return; }
+    var q=e.target.closest('[data-qty]');
+    if(q){ var d=q.value.replace(/\D/g,''); if(d!==q.value){ q.value=d; } updateSub(+q.getAttribute('data-qty')); }
+  });
 
   /* basket interactions */
   $('basketBox').addEventListener('click',function(e){ var b=e.target.closest('[data-uncheck]'); if(b) fromBasket(+b.getAttribute('data-uncheck')); });
