@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Belanja">
 <title>Daftar Belanja</title>
-<meta name="app-version" content="202610031611" />
+<meta name="app-version" content="202610031932" />
 <style>
   /* ============================================================
      Grocery — native-app style, flat, no gradients.
@@ -114,15 +114,24 @@
   .cb.on{background:var(--grad);border-color:transparent}
   .cb.on svg{opacity:1}
   .cb:active{transform:scale(.9)}
-  .rname{flex:1;min-width:0;font-weight:700;font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rname{flex:1;min-width:0;font-weight:700;font-size:15.5px;line-height:1.3;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
   .rname .tag{background:var(--chip);border-radius:20px;padding:2px 8px;font-size:10.5px;color:var(--muted);font-weight:600;margin-left:6px;vertical-align:middle}
-  .rlast{flex:none;font-size:13px;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums;cursor:pointer;padding:5px 3px}
+  .rlast{flex:none;font-size:13px;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums;cursor:pointer;padding:5px 7px;display:inline-flex;align-items:center;gap:5px;border-radius:8px}
+  .rlast:active{background:var(--chip)}
+  .rlast .hicon{width:13px;height:13px;fill:var(--accent);flex:none;opacity:.85}
   .rlast b{color:var(--text)}
   .rlast.hist,.rlast.hist b{color:var(--muted-2);font-weight:600}
   .rlast .none{color:var(--muted-2);font-weight:600;font-size:12px}
   .rdel{flex:none;color:var(--muted-2);background:none;border:none;cursor:pointer;padding:6px;display:flex;align-items:center}
   .rdel svg{width:17px;height:17px;fill:currentColor}
   .rdel:active{color:var(--danger)}
+  .redit{flex:none;color:var(--muted-2);background:none;border:none;cursor:pointer;padding:6px;display:flex;align-items:center}
+  .redit svg{width:16px;height:16px;fill:currentColor}
+  .redit:active{color:var(--accent)}
+  .redit.act{color:var(--accent)}
+  .optedit{flex:none;background:none;border:none;color:var(--muted-2);cursor:pointer;padding:5px;display:flex;align-items:center;margin-left:2px}
+  .optedit svg{width:14px;height:14px;fill:currentColor}
+  .optedit:active{color:var(--accent)}
 
   /* price entry inline (when checking) */
   .priceline{padding:0 13px 12px;display:none;background:var(--card);border-bottom:1px solid var(--border)}
@@ -136,10 +145,22 @@
   .priceline .go{border:none;background:var(--accent);color:#fff;border-radius:10px;padding:10px 14px;font-weight:700;font-size:14px;cursor:pointer}
   .priceline .hint{font-size:11.5px;color:var(--muted);margin-top:5px;display:flex;justify-content:space-between;gap:8px}
   .priceline .hint .sub{font-weight:800;color:var(--text)}
+  .bedit{padding:0 13px 12px;background:var(--card);display:none}
+  .bedit.on{display:block;animation:fade .14s ease}
+  .bedit .pin{display:flex;gap:8px;align-items:center}
+  .bedit label{font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap}
+  .bedit input{flex:1;min-width:0;padding:9px 11px;border:1.5px solid var(--border-2);border-radius:10px;font-size:15px;font-family:inherit;font-variant-numeric:tabular-nums;background:var(--card);color:var(--text)}
+  .bedit input:focus{outline:none;border-color:var(--accent)}
+  .bedit input.qty{flex:0 0 54px;width:54px;text-align:center}
+  .bedit .mul{font-size:14px;color:var(--muted);font-weight:800}
+  .bedit .bline{margin-left:auto;font-weight:800;font-size:15px;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
 
   /* history popover for a row's price */
   .pop-list{padding:0 13px 12px;display:none;background:var(--chip)}
   .pop-list.on{display:block}
+  .pop-head{font-size:12px;font-weight:800;color:var(--muted);padding:9px 0 6px;display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;text-transform:uppercase;letter-spacing:.02em}
+  .pop-head .pop-sum{font-size:11.5px;font-weight:600;color:var(--muted-2);text-transform:none;letter-spacing:0}
+  .pop-list .pbadge{display:inline-block;margin-left:6px;background:var(--down);color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;vertical-align:middle}
   .pop-list .ph{display:flex;align-items:center;gap:10px;font-size:13px;padding:5px 0;border-bottom:1px dashed var(--border-2)}
   .pop-list .ph:last-child{border-bottom:none}
   .pop-list .pd{color:var(--muted);flex:1;min-width:0}
@@ -318,9 +339,8 @@
         <div class="retain">
           <div class="retain-lbl">Simpan riwayat selama</div>
           <div class="seg" id="retainSeg">
-            <button data-m="1">1 bulan</button>
-            <button data-m="2">2 bulan</button>
             <button data-m="3">3 bulan</button>
+            <button data-m="6">6 bulan</button>
           </div>
         </div>
         <div class="hint">Pembelian lebih lama dari periode di atas dihapus otomatis saat aplikasi dibuka. Daftar item &amp; harga terakhir tetap tersimpan. Semua data hanya di perangkat ini (offline).</div>
@@ -363,6 +383,7 @@
   <div class="modal">
     <h2 id="confirmTitle">Konfirmasi</h2>
     <div id="confirmMsg" style="font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:16px"></div>
+    <input id="confirmInput" type="text" autocomplete="off" enterkeyhint="done" style="display:none;width:100%;box-sizing:border-box;padding:11px 13px;font-size:15px;border:1px solid var(--border-2);border-radius:10px;background:var(--card);color:var(--text);margin-bottom:16px">
     <div style="display:flex;gap:10px">
       <button class="btn ghost" id="confirmNo" style="flex:1">Batal</button>
       <button class="btn danger" id="confirmYes" style="flex:1">Hapus</button>
@@ -377,12 +398,13 @@
 /* ================= config ================= */
 var DB_NAME='grocery_v3', DB_VER=1;
 var RETAIN_KEY='grocery_retain_months';                                    // localStorage key for the rotation setting
-function getRetain(){ var v=parseInt(localStorage.getItem(RETAIN_KEY),10); return (v===1||v===2||v===3)?v:2; } // default 2 months
-function setRetain(m){ localStorage.setItem(RETAIN_KEY,m); }              // persist 1/2/3
+function getRetain(){ var v=parseInt(localStorage.getItem(RETAIN_KEY),10); return (v===3||v===6)?v:3; } // valid 3/6, default 3 (old 1/2 settings fall back to 3)
+function setRetain(m){ localStorage.setItem(RETAIN_KEY,m); }              // persist 3/6
 var CUR='Rp';                    // Rupiah — Indonesia-only app
 var db=null;
 var OPEN_ID=null;                // catalog id whose price-history popover is open
 var CHECK_ID=null;               // catalog id whose inline price entry is open
+var BEDIT_ID=null;               // basket catalog id whose price/qty editor is open
 var ACTIVE='wish';               // active tab
 
 /* in-memory caches, reloaded from IndexedDB */
@@ -432,6 +454,9 @@ function reload(){ return Promise.all([getAll('catalog'),getAll('prices'),getAll
 function catById(id){ for(var i=0;i<CAT.length;i++) if(CAT[i].id===id) return CAT[i]; return null; }
 function pricesFor(catId){ return PRICES.filter(function(p){ return p.catId===catId; }).sort(function(a,b){ return a.ts-b.ts; }); }
 function lastPrice(catId){ var h=pricesFor(catId); return h.length? h[h.length-1] : null; }
+/* cheapest recorded price observation for an item (used as the price reference
+   shown in the dropdown and wishlist badge). Null when there is no history. */
+function lowestPrice(catId){ var h=pricesFor(catId); if(!h.length) return null; return h.reduce(function(lo,x){ return x.price<lo.price?x:lo; }, h[0]); }
 function wishItems(){ return CAT.filter(function(c){ return c.state==='wish'; }).sort(function(a,b){ return a.name.localeCompare(b.name); }); }
 function basketItems(){ return CAT.filter(function(c){ return c.state==='basket'; }).sort(function(a,b){ return a.name.localeCompare(b.name); }); }
 
@@ -446,8 +471,8 @@ function renderDrop(dropEl,q,allowNew,newFirst){
   var typed=q.trim();
   var newOpt = (allowNew && typed && !CAT.some(function(c){ return c.nameKey===normName(typed); }))
     ? '<div class="opt new" data-new="'+esc(typed)+'">+ Tambah baru: “'+esc(typed)+'”</div>' : '';
-  var list=''; buildOptions(q).forEach(function(c){ var lp=lastPrice(c.id);
-    list+='<div class="opt" data-cat="'+c.id+'"><span class="nm">'+esc(c.name)+'</span><span class="op">'+(lp?money(lp.price):'—')+'</span><button class="optdel" data-catdel="'+c.id+'" title="Hapus dari daftar"><svg viewBox="0 0 448 512"><path d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0L284.2 0c12.1 0 23.2 6.8 28.6 17.7L320 32l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 96C14.3 96 0 81.7 0 64S14.3 32 32 32l96 0 7.2-14.3zM32 128l384 0 0 320c0 35.3-28.7 64-64 64L96 512c-35.3 0-64-28.7-64-64l0-320zm96 64c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16z"/></svg></button></div>'; });
+  var list=''; buildOptions(q).forEach(function(c){ var lp=lowestPrice(c.id);
+    list+='<div class="opt" data-cat="'+c.id+'"><span class="nm">'+esc(c.name)+'</span><span class="op">'+(lp?money(lp.price):'—')+'</span><button class="optedit" data-catedit="'+c.id+'" title="Ubah nama"><svg viewBox="0 0 512 512"><path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.3 22.5-9.6 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg></button><button class="optdel" data-catdel="'+c.id+'" title="Hapus dari daftar"><svg viewBox="0 0 448 512"><path d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0L284.2 0c12.1 0 23.2 6.8 28.6 17.7L320 32l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 96C14.3 96 0 81.7 0 64S14.3 32 32 32l96 0 7.2-14.3zM32 128l384 0 0 320c0 35.3-28.7 64-64 64L96 512c-35.3 0-64-28.7-64-64l0-320zm96 64c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16z"/></svg></button></div>'; });
   var html = newFirst ? (newOpt+list) : (list+newOpt);
   if(!html) html='<div class="opt" style="color:var(--muted)">Ketik nama baru untuk menambah</div>';
   dropEl.innerHTML=html; dropEl.classList.add('on');
@@ -500,19 +525,20 @@ function renderWish(){
   if(!items.length){ box.innerHTML='<div class="empty"><span class="big"><svg viewBox="0 0 384 512"><path d="M192 0c-41.8 0-77.4 26.7-90.5 64L64 64C28.7 64 0 92.7 0 128L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64l-37.5 0C269.4 26.7 233.8 0 192 0zm0 64a32 32 0 1 1 0 64 32 32 0 1 1 0-64zM72 272a24 24 0 1 1 48 0 24 24 0 1 1 -48 0zm104-16l128 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-128 0c-8.8 0-16-7.2-16-16s7.2-16 16-16zM72 368a24 24 0 1 1 48 0 24 24 0 1 1 -48 0zm88 0c0-8.8 7.2-16 16-16l128 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-128 0c-8.8 0-16-7.2-16-16z"/></svg></span>Wishlist masih kosong.<br>Ketuk tombol <b>+</b> di bawah untuk menambah barang.</div>'; return; }
   var wrap=document.createElement('div'); wrap.className='rows';
   items.forEach(function(c){
-    var lp=lastPrice(c.id); var open=OPEN_ID===c.id; var checking=CHECK_ID===c.id;
+    var lp=lastPrice(c.id); var low=lowestPrice(c.id); var open=OPEN_ID===c.id; var checking=CHECK_ID===c.id;
     var el=document.createElement('div');
     el.setAttribute('data-item',c.id);
     el.innerHTML=
       '<div class="row">'+
         '<div class="cb" data-check="'+c.id+'" title="Tandai diambil"><svg viewBox="0 0 448 512"><path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/></svg></div>'+
         '<div class="rname" data-check="'+c.id+'">'+esc(c.name)+(c.category?'<span class="tag">'+esc(c.category)+'</span>':'')+'</div>'+
-        '<div class="rlast hist" data-pop="'+c.id+'">'+(lp?('<b>'+money(lp.price)+'</b>'):'<span class="none">belum ada</span>')+'</div>'+
+        '<div class="rlast hist" data-pop="'+c.id+'">'+(low?('<b>'+money(low.price)+'</b><svg class="hicon" viewBox="0 0 512 512"><path d="M64 64c0-17.7-14.3-32-32-32S0 46.3 0 64L0 400c0 44.2 35.8 80 80 80l400 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 416c-8.8 0-16-7.2-16-16L64 64zm406.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L320 210.7l-57.4-57.4c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L240 221.3l57.4 57.4c12.5 12.5 32.8 12.5 45.3 0l128-128z"/></svg>'):'<span class="none">belum ada</span>')+'</div>'+
+        '<button class="redit" data-edit="'+c.id+'" title="Ubah nama"><svg viewBox="0 0 512 512"><path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.3 22.5-9.6 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg></button>'+
         '<button class="rdel" data-del="'+c.id+'" title="Hapus"><svg viewBox="0 0 448 512"><path d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0L284.2 0c12.1 0 23.2 6.8 28.6 17.7L320 32l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 96C14.3 96 0 81.7 0 64S14.3 32 32 32l96 0 7.2-14.3zM32 128l384 0 0 320c0 35.3-28.7 64-64 64L96 512c-35.3 0-64-28.7-64-64l0-320zm96 64c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16z"/></svg></button>'+
       '</div>'+
       '<div class="priceline'+(checking?' on':'')+'">'+
         '<div class="pin"><label>Harga</label>'+
-          '<input id="pin_'+c.id+'" type="text" inputmode="numeric" enterkeyhint="next" autocomplete="off" placeholder="0" value="'+(lp?groupDigits(lp.price):'')+'" data-price="'+c.id+'">'+
+          '<input id="pin_'+c.id+'" type="text" inputmode="numeric" enterkeyhint="next" autocomplete="off" placeholder="0" value="'+(c.checkPrice!=null?groupDigits(c.checkPrice):(lp?groupDigits(lp.price):''))+'" data-price="'+c.id+'">'+
           '<span class="mul">×</span>'+
           '<input id="qin_'+c.id+'" class="qty" type="text" inputmode="numeric" enterkeyhint="done" autocomplete="off" placeholder="1" value="'+(c.checkQty||1)+'" data-qty="'+c.id+'">'+
           '<button class="go" data-tobasket="'+c.id+'">Masuk keranjang</button>'+
@@ -528,17 +554,36 @@ function renderWish(){
 function renderPop(catId,open){
   if(!open) return '';
   var h=pricesFor(catId);
-  if(!h.length) return '<div class="pop-list on"><div class="ph"><span class="pd">Belum ada riwayat harga</span></div></div>';
+  if(!h.length) return '<div class="pop-list on"><div class="pop-head">Riwayat harga</div><div class="ph"><span class="pd">Belum ada riwayat harga</span></div></div>';
   var prices=h.map(function(x){ return x.price; }); var min=Math.min.apply(null,prices), max=Math.max.apply(null,prices);
+  var last=h[h.length-1];
+  var head='<div class="pop-head">Riwayat harga <span class="pop-sum">terendah '+money(min)+' · terakhir '+money(last.price)+'</span></div>';
   var rows=h.slice().reverse().map(function(x){
     var cls=x.price<=min?'cheap':(x.price>=max&&max>min?'dear':'');
-    return '<div class="ph"><span class="pd">'+ymd(x.ts)+'</span><span class="pp '+cls+'">'+money(x.price)+'</span></div>';
+    var tag=x.price<=min&&max>min?' <span class="pbadge">termurah</span>':'';
+    return '<div class="ph"><span class="pd">'+ymd(x.ts)+tag+'</span><span class="pp '+cls+'">'+money(x.price)+'</span></div>';
   }).join('');
-  return '<div class="pop-list on">'+rows+'</div>';
+  return '<div class="pop-list on">'+head+rows+'</div>';
 }
 
 /* ================= basket ================= */
-function fromBasket(catId){ var c=catById(catId); if(!c)return; c.state='wish'; put('catalog',c).then(function(){ toast('Kembali ke wishlist: '+c.name); return refresh(); }); }
+function fromBasket(catId){ var c=catById(catId); if(!c)return; c.state='wish'; if(BEDIT_ID===catId)BEDIT_ID=null; put('catalog',c).then(function(){ toast('Kembali ke wishlist: '+c.name); return refresh(); }); }
+/* toggle the inline price/qty editor for one basket row */
+function toggleBedit(catId){ BEDIT_ID=(BEDIT_ID===catId?null:catId); renderBasket(); if(BEDIT_ID===catId){ var i=$('bpin_'+catId); if(i){ i.focus(); i.select(); } } }
+/* persist an in-basket price/qty edit and update the line + grand total live,
+   WITHOUT re-rendering (so the field being typed in keeps focus). */
+function saveBasketEdit(catId){
+  var c=catById(catId); if(!c) return;
+  var pin=$('bpin_'+catId), qin=$('bqin_'+catId);
+  var price=pin?digitsToNum(pin.value):NaN; if(isNaN(price)||price<0) price=0;
+  var qn=qin?digitsToNum(qin.value):NaN; var qty=(isNaN(qn)||qn<1)?1:qn;
+  c.checkPrice=price; c.checkQty=qty;
+  var lineEl=$('bline_'+catId); if(lineEl) lineEl.textContent=money(price*qty);
+  // recompute grand total from the in-memory basket (using the just-set values)
+  var total=basketItems().reduce(function(s,x){ return s+((x.checkPrice||0)*(x.checkQty||1)); },0);
+  $('basketTotal').textContent=money(total);
+  put('catalog',c); // fire-and-forget persist; no refresh (keeps focus)
+}
 function renderBasket(){
   var box=$('basketBox'); box.innerHTML='';
   var items=basketItems();
@@ -546,13 +591,23 @@ function renderBasket(){
   var wrap=document.createElement('div'); wrap.className='rows'; var total=0;
   items.forEach(function(c){
     var unit=c.checkPrice||0; var qty=c.checkQty||1; var line=unit*qty; total+=line;
+    var editing=BEDIT_ID===c.id;
     var el=document.createElement('div');
     el.innerHTML=
       '<div class="row">'+
         '<div class="cb on" data-uncheck="'+c.id+'"><svg viewBox="0 0 448 512"><path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/></svg></div>'+
-        '<div class="rname">'+esc(c.name)+(qty>1?'<span class="tag">'+qty+' × '+money(unit)+'</span>':'')+'</div>'+
+        '<div class="rname" data-edit="'+c.id+'" title="Ketuk untuk ubah nama">'+esc(c.name)+'<span class="tag">'+qty+' × '+money(unit)+'</span></div>'+
         '<div class="rlast"><b>'+money(line)+'</b></div>'+
+        '<button class="redit'+(editing?' act':'')+'" data-bedit="'+c.id+'" title="Ubah harga / jumlah"><svg viewBox="0 0 512 512"><path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.3 22.5-9.6 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg></button>'+
         '<button class="rdel" data-uncheck="'+c.id+'" title="Kembalikan ke wishlist"><svg viewBox="0 0 512 512"><path d="M125.7 160l50.3 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L48 224c-17.7 0-32-14.3-32-32L16 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 51.2L97.6 97.6c87.5-87.5 229.3-87.5 316.8 0s87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3s-163.8-62.5-226.3 0L125.7 160z"/></svg></button>'+
+      '</div>'+
+      '<div class="bedit'+(editing?' on':'')+'">'+
+        '<div class="pin"><label>Harga</label>'+
+          '<input id="bpin_'+c.id+'" type="text" inputmode="numeric" enterkeyhint="next" autocomplete="off" placeholder="0" value="'+(unit?groupDigits(unit):'')+'" data-bprice="'+c.id+'">'+
+          '<span class="mul">×</span>'+
+          '<input id="bqin_'+c.id+'" class="qty" type="text" inputmode="numeric" enterkeyhint="done" autocomplete="off" placeholder="1" value="'+qty+'" data-bqty="'+c.id+'">'+
+          '<span class="bline" id="bline_'+c.id+'">'+money(line)+'</span>'+
+        '</div>'+
       '</div>';
     wrap.appendChild(el);
   });
@@ -585,7 +640,7 @@ function renderHistory(){
     var arr=byMonth[k].sort(function(a,b){ return b.ts-a.ts; });
     var tot=arr.reduce(function(s,x){ return s+(x.price||0); },0);
     var m=document.createElement('div'); m.className='month';
-    var rows=arr.map(function(it){ var qn=(it.qty&&it.qty>1)?' <span class="hd">'+it.qty+' × '+money(it.unit!=null?it.unit:(it.price/it.qty))+'</span>':''; return '<div class="hrow"><div class="hn">'+esc(it.name)+'<span class="hd">'+dayLabel(it.ts)+'</span>'+qn+'</div><div class="hp">'+money(it.price)+'</div><button class="rdel" data-hdel="'+it.id+'" title="Hapus pembelian ini"><svg viewBox="0 0 448 512"><path d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0L284.2 0c12.1 0 23.2 6.8 28.6 17.7L320 32l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 96C14.3 96 0 81.7 0 64S14.3 32 32 32l96 0 7.2-14.3zM32 128l384 0 0 320c0 35.3-28.7 64-64 64L96 512c-35.3 0-64-28.7-64-64l0-320zm96 64c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16z"/></svg></button></div>'; }).join('');
+    var rows=arr.map(function(it){ var qn=' <span class="hd">'+(it.qty||1)+' × '+money(it.unit!=null?it.unit:(it.price/(it.qty||1)))+'</span>'; return '<div class="hrow"><div class="hn">'+esc(it.name)+'<span class="hd">'+dayLabel(it.ts)+'</span>'+qn+'</div><div class="hp">'+money(it.price)+'</div><button class="rdel" data-hdel="'+it.id+'" title="Hapus pembelian ini"><svg viewBox="0 0 448 512"><path d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0L284.2 0c12.1 0 23.2 6.8 28.6 17.7L320 32l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 96C14.3 96 0 81.7 0 64S14.3 32 32 32l96 0 7.2-14.3zM32 128l384 0 0 320c0 35.3-28.7 64-64 64L96 512c-35.3 0-64-28.7-64-64l0-320zm96 64c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16z"/></svg></button></div>'; }).join('');
     m.innerHTML='<h3><span>'+monthLabel(k)+' <span style="color:var(--muted);font-weight:600;font-size:12px">('+arr.length+')</span></span><span class="mtot">'+money(tot)+'</span></h3>'+rows;
     box.appendChild(m);
   });
@@ -609,6 +664,19 @@ function renderLook(catId){
 
 /* ================= purge / export / import ================= */
 /* rotation: delete purchases (and their price observations) older than RETAIN_MONTHS */
+/* Align every purchase's frozen name to its catalog item's CURRENT name.
+   Self-heals any history row left stale by an earlier rename (including renames
+   done before this behaviour existed). Keyed by catId; a purchase whose catId no
+   longer resolves to a catalog item is left untouched (its name is all we have). */
+function syncHistoryNames(){
+  var ops=[];
+  PURCH.forEach(function(p){
+    if(p.catId==null) return;
+    var c=catById(p.catId); if(!c) return;
+    if(p.name!==c.name){ p.name=c.name; ops.push(put('purchases',p)); }
+  });
+  return ops.length?Promise.all(ops):Promise.resolve(0);
+}
 function purgeOld(){
   var cutoff=new Date(); cutoff.setMonth(cutoff.getMonth()-getRetain()); var c=cutoff.getTime();
   var oldP=PURCH.filter(function(x){ return x.ts<c; });
@@ -652,7 +720,13 @@ function clearAll(){
 }
 
 /* ================= render + tabs ================= */
-function refresh(){ return reload().then(function(){ renderWish(); renderBasket(); renderHistory(); var lc=$('hsearch')._catId; if(lc)renderLook(lc); updateStat(); }); }
+function refresh(){ return reload().then(function(){ renderWish(); renderBasket(); renderHistory(); var lc=$('hsearch')._catId; if(lc)renderLook(lc); refreshOpenDrops(); updateStat(); }); }
+/* Re-render any dropdown currently open, so a rename/delete made from it shows
+   immediately (refresh() otherwise only repaints the tab lists, not the drops). */
+function refreshOpenDrops(){
+  var wd=$('wdrop'); if(wd && wd.classList.contains('on')) renderDrop(wd,$('wsearch').value,true,true);
+  var hd=$('hdrop'); if(hd && hd.classList.contains('on')) renderDrop(hd,$('hsearch').value,false);
+}
 function updateStat(){ $('dataStat').textContent='Item: '+CAT.length+' · Catatan harga: '+PRICES.length+' · Pembelian: '+PURCH.length; }
 
 var TITLES={wish:['Daftar Belanja','Catat dulu, belanja lebih hemat'],basket:['Keranjang','Siap dibayar di kasir'],history:['Riwayat','Belanja &amp; harga sebelumnya'],more:['Lainnya','Pengaturan &amp; data']};
@@ -671,11 +745,53 @@ var _confirmCb=null;
 function confirmSheet(title,msg,yesLabel,onYes){
   $('confirmTitle').textContent=title;
   $('confirmMsg').textContent=msg;
+  $('confirmMsg').style.display='';
+  $('confirmInput').style.display='none';
   $('confirmYes').textContent=yesLabel||'Hapus';
+  $('confirmYes').className='btn danger'; $('confirmYes').style.flex='1';
   _confirmCb=onYes;
   $('confirmBg').classList.add('on');
 }
-function closeConfirm(){ $('confirmBg').classList.remove('on'); _confirmCb=null; }
+/* text-input variant of the sheet — used for renaming an item.
+   onOk receives the trimmed value; it is only called when the value is non-empty. */
+function promptSheet(title,initial,okLabel,onOk){
+  $('confirmTitle').textContent=title;
+  $('confirmMsg').style.display='none';
+  var inp=$('confirmInput'); inp.style.display='';
+  inp.value=initial||'';
+  $('confirmYes').textContent=okLabel||'Simpan';
+  $('confirmYes').className='btn primary'; $('confirmYes').style.flex='1';
+  _confirmCb=function(){ var v=(inp.value||'').trim(); if(!v) return false; return onOk(v); };
+  $('confirmBg').classList.add('on');
+  setTimeout(function(){ inp.focus(); inp.select(); },30);
+}
+function closeConfirm(){ $('confirmBg').classList.remove('on'); _confirmCb=null; var inp=$('confirmInput'); if(inp){ inp.style.display='none'; inp.value=''; } $('confirmMsg').style.display=''; }
+
+/* rename a catalog item in place — keeps its id, so price history (keyed by catId)
+   survives. The live name updates everywhere it is read from the catalog: wishlist,
+   basket, and the search/lookup dropdown. Matching purchase (history) rows are also
+   rewritten so past entries show the corrected name too. */
+function renameItem(catId){
+  var c=catById(catId); if(!c) return;
+  promptSheet('Ubah nama barang', c.name, 'Simpan', function(name){
+    var nk=normName(name);
+    var dup=CAT.filter(function(x){ return x.id!==catId && x.nameKey===nk; })[0];
+    if(dup){ toast('Nama “'+name+'” sudah ada di daftar'); return false; }
+    var nm=name.trim();
+    var oldName=c.name;
+    c.name=nm; c.nameKey=nk;
+    var ops=[put('catalog',c)];
+    // Rewrite the frozen name on every purchase of this item so History updates too.
+    // Match by catId (type-tolerant) OR by the previous name, so legacy/imported
+    // rows whose catId doesn't line up are still caught.
+    PURCH.forEach(function(p){
+      var sameId=(p.catId!=null && String(p.catId)===String(catId));
+      var sameName=(p.name===oldName);
+      if((sameId||sameName) && p.name!==nm){ p.name=nm; ops.push(put('purchases',p)); }
+    });
+    Promise.all(ops).then(function(){ toast('Nama diubah: '+nm); return refresh(); });
+  });
+}
 
 /* ================= bind ================= */
 function bind(){
@@ -691,6 +807,8 @@ function bind(){
   w.addEventListener('input',wd);
   w.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); var t=w.value.trim(); if(t) addWish(t); } });
   $('wdrop').addEventListener('click',function(e){
+    var eb=e.target.closest('[data-catedit]');
+    if(eb){ e.stopPropagation(); renameItem(+eb.getAttribute('data-catedit')); return; }
     var db2=e.target.closest('[data-catdel]');
     if(db2){ e.stopPropagation(); var did=+db2.getAttribute('data-catdel'); var dc=catById(did); if(!dc)return;
       confirmSheet('Hapus “'+dc.name+'” dari daftar?', 'Item ini beserta riwayat harganya dihapus permanen. Berguna kalau namanya salah ketik. Tidak bisa dibatalkan.', 'Ya, hapus', function(){
@@ -706,6 +824,7 @@ function bind(){
   /* wishlist interactions (event delegation) */
   $('wishBox').addEventListener('click',function(e){ var b;
     if((b=e.target.closest('[data-tobasket]'))) toBasket(+b.getAttribute('data-tobasket'));
+    else if((b=e.target.closest('[data-edit]'))) renameItem(+b.getAttribute('data-edit'));
     else if((b=e.target.closest('[data-check]'))) beginCheck(+b.getAttribute('data-check'));
     else if((b=e.target.closest('[data-pop]'))) togglePop(+b.getAttribute('data-pop'));
     else if((b=e.target.closest('[data-del]'))) removeItem(+b.getAttribute('data-del'));
@@ -724,14 +843,31 @@ function bind(){
   });
 
   /* basket interactions */
-  $('basketBox').addEventListener('click',function(e){ var b=e.target.closest('[data-uncheck]'); if(b) fromBasket(+b.getAttribute('data-uncheck')); });
+  $('basketBox').addEventListener('click',function(e){ var b;
+    if((b=e.target.closest('[data-bedit]'))) toggleBedit(+b.getAttribute('data-bedit'));
+    else if((b=e.target.closest('[data-edit]'))) renameItem(+b.getAttribute('data-edit'));
+    else if((b=e.target.closest('[data-uncheck]'))) fromBasket(+b.getAttribute('data-uncheck'));
+  });
+  /* edit price/qty directly in the basket: persist to the catalog item's
+     checkPrice/checkQty and refresh the line + grand total live. */
+  $('basketBox').addEventListener('input',function(e){
+    var p=e.target.closest('[data-bprice]');
+    if(p){ var f=groupDigits(p.value); if(f!==p.value){ p.value=f; try{ p.setSelectionRange(f.length,f.length); }catch(_){} } saveBasketEdit(+p.getAttribute('data-bprice')); return; }
+    var q=e.target.closest('[data-bqty]');
+    if(q){ var d=q.value.replace(/\D/g,''); if(d!==q.value){ q.value=d; } saveBasketEdit(+q.getAttribute('data-bqty')); }
+  });
+  $('basketBox').addEventListener('keydown',function(e){
+    if(e.key!=='Enter') return;
+    var p=e.target.closest('[data-bprice]'); if(p){ e.preventDefault(); var q=$('bqin_'+p.getAttribute('data-bprice')); if(q){ q.focus(); q.select(); } return; }
+    var qf=e.target.closest('[data-bqty]'); if(qf){ e.preventDefault(); e.target.blur(); }
+  });
   $('payBtn').onclick=payAll;
 
   /* history search */
   var hs=$('hsearch'); hs._catId=null;
   function hd(){ renderDrop($('hdrop'),hs.value,false); }
   hs.addEventListener('input',hd); hs.addEventListener('focus',hd);
-  $('hdrop').addEventListener('click',function(e){ var o=e.target.closest('.opt[data-cat]'); if(!o)return; var cid=+o.getAttribute('data-cat'); var c=catById(cid); hs.value=c?c.name:''; hs._catId=cid; $('hdrop').classList.remove('on'); renderLook(cid); });
+  $('hdrop').addEventListener('click',function(e){ var eb=e.target.closest('[data-catedit]'); if(eb){ e.stopPropagation(); renameItem(+eb.getAttribute('data-catedit')); return; } var o=e.target.closest('.opt[data-cat]'); if(!o)return; var cid=+o.getAttribute('data-cat'); var c=catById(cid); hs.value=c?c.name:''; hs._catId=cid; $('hdrop').classList.remove('on'); renderLook(cid); });
 
   /* settings */
   $('exportBtn').onclick=exportData;
@@ -758,8 +894,9 @@ function bind(){
   seg.addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b)return; var m=+b.getAttribute('data-m'); if(m===getRetain())return; setRetain(m); paintRetain(); purgeOld().then(function(n){ toast(n>0?('Riwayat disetel '+m+' bulan · '+n+' pembelian lama dihapus'):('Riwayat disetel '+m+' bulan')); return refresh(); }); });
 
   /* confirm sheet */
-  $('confirmYes').onclick=function(){ var cb=_confirmCb; closeConfirm(); if(cb) cb(); };
+  $('confirmYes').onclick=function(){ var cb=_confirmCb; var keep=false; if(cb){ keep=(cb()===false); } if(!keep) closeConfirm(); };
   $('confirmNo').onclick=closeConfirm;
+  $('confirmInput').addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); $('confirmYes').click(); } });
   $('confirmBg').addEventListener('click',function(e){ if(e.target===$('confirmBg')) closeConfirm(); });
 
   /* close dropdowns when tapping outside */
@@ -779,6 +916,8 @@ function bind(){
   openDB()
     .then(reload)
     .then(purgeOld)
+    .then(reload)
+    .then(syncHistoryNames)
     .then(reload)
     .then(function(){ bind(); applyTab(); renderWish(); renderBasket(); renderHistory(); updateStat(); })
     .catch(function(err){ document.querySelector('main').innerHTML='<div class="empty">Gagal membuka penyimpanan.<br>'+esc(err&&err.message||err)+'</div>'; });
