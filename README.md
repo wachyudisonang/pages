@@ -37,3 +37,25 @@ by accident. Never copied: `*.md`, `node_modules/`, `.git/`, `source/`, `tools/`
 Assets are pushed here by a deploy script that rsyncs each project's allow-list
 into `pages/<project>/`. Run it from each private repo, then commit + push this
 `pages` repo. (Nothing here is hand-edited except `index.html` and this README.)
+
+### Cache-busting (auto-stamp)
+
+GitHub Pages serves with `cache-control: max-age=600`, so a browser (and a
+phone's "Add to Home Screen" copy) can keep showing a stale page for up to 10
+minutes — longer if the device cache is sticky. To defeat this, `deploy.sh`
+computes one timestamp per run (`DEPLOY_STAMP=YYYYMMDDHHMM`) and, for a stamped
+project, injects it in two places **after** the rsync (rsync `--delete`
+overwrites the deployed copy from clean source each time, so stamping must come
+last):
+
+1. a `<meta name="app-version" content="<stamp>">` line in the **deployed**
+   `pages/<project>/index.html` — this changes the served bytes, so the ETag
+   changes and the browser refetches (the only lever for a single-file app with
+   no external assets, and the part that reaches a home-screen shortcut that
+   never passes through the hub);
+2. the hub card link → `./<project>/?v=<stamp>` (idempotent; replaces any prior
+   `?v=`), so hub click-throughs also bust.
+
+The project **source** file is never touched — the version is a deploy artifact
+only. Currently stamped: **grocery**. Confirm what's live with:
+`curl -s https://wachyudisonang.github.io/pages/grocery/ | grep app-version`.
