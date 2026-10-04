@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
 /* ============================================================
      Grocery — native-app style, flat, no gradients.
      Mobile-first, bottom tab bar, fixed FAB. Vanilla JS only.
@@ -36,7 +37,7 @@
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0}
   body{
-    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
     background:linear-gradient(180deg,var(--bg-2),var(--bg) 220px) fixed,var(--bg);
     color:var(--text);letter-spacing:-.01em;
     font-size:15px;line-height:1.45;
@@ -70,13 +71,18 @@
     background:var(--card);font-size:15px;font-family:inherit;color:var(--text);
   }
   .searchbox input:focus{outline:none;border-color:var(--accent)}
+  /* type="search" is used to suppress Chrome Android's password/card autofill ribbon;
+     neutralize its native chrome so it looks like a plain text field. */
+  input[type="search"]{-webkit-appearance:none;appearance:none}
+  input[type="search"]::-webkit-search-decoration,
+  input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
   .drop{
     position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:30;
     background:var(--card);border:1px solid var(--border);border-radius:var(--r-sm);
     box-shadow:0 12px 30px -10px rgba(20,30,40,.28);overflow:hidden;display:none;max-height:280px;overflow-y:auto;
   }
   .drop.on{display:block}
-  .drop.static{position:static;box-shadow:none;margin-top:8px;max-height:44dvh}
+  .drop.static{position:static;box-shadow:none;margin-top:8px;max-height:calc(var(--vvh,100dvh) - 170px);overflow-y:auto}
   .opt{padding:11px 13px;display:flex;align-items:center;gap:8px;cursor:pointer;border-bottom:1px solid var(--border)}
   .opt:last-child{border-bottom:none}
   .opt:active{background:var(--chip)}
@@ -256,9 +262,9 @@
   .fab:active{transform:translateX(-50%) scale(.9)}
 
   /* ---- modal (add wish) ---- */
-  .modal-bg{position:fixed;inset:0;height:100dvh;z-index:40;background:rgba(20,30,40,.4);display:none;align-items:flex-end;justify-content:center}
+  .modal-bg{position:fixed;left:0;top:0;right:0;height:var(--vvh,100dvh);z-index:40;background:rgba(20,30,40,.4);display:none;align-items:flex-end;justify-content:center}
   .modal-bg.on{display:flex}
-  .modal{background:var(--card);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + var(--safe-b));animation:up .2s ease;max-height:88dvh;overflow-y:auto}
+  .modal{background:var(--card);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + var(--safe-b));animation:up .2s ease;max-height:var(--vvh,88dvh);overflow-y:auto}
   @keyframes up{from{transform:translateY(100%)}to{transform:none}}
   .modal h2{margin:0 0 12px;font-size:16px}
   .modal .x{float:right;background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:0 4px}

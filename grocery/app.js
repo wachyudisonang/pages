@@ -419,8 +419,48 @@ function bind(){
   window.addEventListener('resize',measureHead);
   if(window.visualViewport) window.visualViewport.addEventListener('resize',measureHead);
 
+  /* keyboard-safe sheets: track the ACTUAL visible viewport height into --vvh.
+     In an installed PWA (standalone) `dvh` is unreliable on some Android WebViews,
+     so the add/rename bottom sheet is sized against visualViewport.height instead —
+     when the keyboard opens, this shrinks immediately and the sheet rises above it. */
+  function measureVVH(){
+    var vv=window.visualViewport;
+    var h=vv?vv.height:window.innerHeight;
+    document.documentElement.style.setProperty('--vvh', h+'px');
+  }
+  measureVVH();
+  window.addEventListener('resize',measureVVH);
+  if(window.visualViewport){ window.visualViewport.addEventListener('resize',measureVVH); window.visualViewport.addEventListener('scroll',measureVVH); }
+
   /* bottom nav */
   document.querySelectorAll('nav.tabs .nav').forEach(function(b){ b.onclick=function(){ ACTIVE=b.getAttribute('data-tab'); applyTab(); }; });
+
+  /* swipe left/right on the content area to switch tabs (in nav order).
+     Per the user's convention: a left→right swipe (finger moves rightward) goes
+     FORWARD to the next tab (wish → basket → history → more); right→left goes back.
+     Guards: ignore when a sheet is open, when the gesture is mostly vertical (a
+     scroll), when it is too short, or when it starts on a horizontally-scrollable
+     element — so taps and vertical scrolls are never hijacked. */
+  var TAB_ORDER=['wish','basket','history','more'];
+  var swMain=document.querySelector('main'), tsx=0, tsy=0, tst=0, swActive=false;
+  function anySheetOpen(){ return document.querySelector('.modal-bg.on')!==null; }
+  if(swMain){
+    swMain.addEventListener('touchstart',function(e){
+      if(e.touches.length!==1||anySheetOpen()){ swActive=false; return; }
+      var t=e.touches[0]; tsx=t.clientX; tsy=t.clientY; tst=Date.now(); swActive=true;
+    },{passive:true});
+    swMain.addEventListener('touchend',function(e){
+      if(!swActive||anySheetOpen()) return; swActive=false;
+      var t=e.changedTouches[0], dx=t.clientX-tsx, dy=t.clientY-tsy, dt=Date.now()-tst;
+      /* decisive horizontal: far enough, mostly sideways, and reasonably quick */
+      if(Math.abs(dx)<60 || Math.abs(dx)<Math.abs(dy)*1.8 || dt>600) return;
+      var i=TAB_ORDER.indexOf(ACTIVE); if(i<0) return;
+      var ni = dx>0 ? i+1 : i-1;          /* left→right = next, right→left = prev */
+      if(ni<0 || ni>=TAB_ORDER.length) return;   /* no wrap at the ends */
+      ACTIVE=TAB_ORDER[ni]; applyTab();
+      try{ window.scrollTo(0,0); }catch(_){ }
+    },{passive:true});
+  }
 
   /* FAB + modal */
   $('fab').onclick=openModal;
