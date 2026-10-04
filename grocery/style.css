@@ -82,7 +82,7 @@
     box-shadow:0 12px 30px -10px rgba(20,30,40,.28);overflow:hidden;display:none;max-height:280px;overflow-y:auto;
   }
   .drop.on{display:block}
-  .drop.static{position:static;box-shadow:none;margin-top:8px;max-height:calc(var(--vvh,100dvh) - 170px);overflow-y:auto}
+  .drop.static{position:static;box-shadow:none;margin-top:8px;max-height:52dvh;overflow-y:auto}
   .opt{padding:11px 13px;display:flex;align-items:center;gap:8px;cursor:pointer;border-bottom:1px solid var(--border)}
   .opt:last-child{border-bottom:none}
   .opt:active{background:var(--chip)}
@@ -271,9 +271,9 @@
   .fab:active{transform:translateX(-50%) scale(.9)}
 
   /* ---- modal (add wish) ---- */
-  .modal-bg{position:fixed;left:0;top:0;right:0;bottom:0;height:var(--vvh,100dvh);z-index:40;background:rgba(10,16,24,.66);display:none;align-items:flex-end;justify-content:center}
-  .modal-bg.on{display:flex}
-  .modal{background:var(--card);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + var(--safe-b));animation:up .2s ease;min-height:220px;max-height:var(--vvh,88dvh);overflow-y:auto}
+  .modal-bg{position:fixed;inset:0;height:100dvh;z-index:40;background:rgba(10,16,24,.66);display:none}
+  .modal-bg.on{display:block}
+  .modal{position:fixed;left:0;right:0;bottom:0;margin:0 auto;background:var(--card);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + var(--safe-b));animation:up .2s ease;min-height:200px;max-height:88dvh;overflow-y:auto;box-shadow:0 -8px 30px -6px rgba(0,0,0,.45)}
   @keyframes up{from{transform:translateY(100%)}to{transform:none}}
   .modal h2{margin:0 0 12px;font-size:16px}
   .modal .x{float:right;background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:0 4px}
