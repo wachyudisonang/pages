@@ -134,13 +134,18 @@ deploy_sentralingua_v2() {
 }
 
 deploy_grocery() {
-  # grocery serves from repo root; single-file app — everything (CSS/JS/icons) is inlined
-  # in index.html, so index.html is the whole runtime. NOT README.md / .gitignore.
+  # grocery serves from repo root; multi-file app (index.html + style.css + app.js +
+  # manifest.json + icon.png 192 + icon-512.png 512). NOT README.md / .gitignore / .kiro.
   rsync_project grocery "$BIG_OWN/grocery" \
-    index.html
-  # Auto cache-bust: single-file app has no external asset to version, so stamp a
-  # deploy-time meta into the served file (new bytes -> new ETag) and the hub link.
+    index.html style.css app.js manifest.json icon.png icon-512.png
+  # Cache-bust: meta + hub link, then version every LOCAL asset ref so a stale
+  # style.css/app.js/icon.png can't be served from the browser cache.
   stamp_version grocery "$DEPLOY_STAMP"
+  local d="$HERE/grocery"
+  stamp_asset "$d/index.html" style.css "$DEPLOY_STAMP"
+  stamp_asset "$d/index.html" app.js    "$DEPLOY_STAMP"
+  stamp_asset "$d/index.html" icon.png  "$DEPLOY_STAMP"
+  echo "   assets versioned: style.css, app.js, icon.png"
 }
 
 TARGET="${1:-all}"
