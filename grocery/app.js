@@ -36,6 +36,10 @@ function monthKey(ts){ var d=new Date(ts); return d.getFullYear()+'-'+String(d.g
 var MONTHS=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; // Indonesian labels shown in UI
 function monthLabel(k){ var p=k.split('-'); return MONTHS[+p[1]-1]+' '+p[0]; }
 function dayLabel(ts){ var d=new Date(ts); return d.getDate()+' '+MONTHS[d.getMonth()].slice(0,3); }
+/* day grouping for history: a stable key per calendar day + a full label for its header */
+function dayKey(ts){ var d=new Date(ts); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+var DAYS=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu']; // Indonesian weekday labels shown in UI
+function dayLabelFull(ts){ var d=new Date(ts); return DAYS[d.getDay()]+', '+d.getDate()+' '+MONTHS[d.getMonth()].slice(0,3); }
 function ymd(ts){ var d=new Date(ts); return d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear(); }
 
 /* ================= IndexedDB layer =================
@@ -91,16 +95,54 @@ function renderDrop(dropEl,q,allowNew,newFirst){
   dropEl.innerHTML=html; dropEl.classList.add('on');
 }
 
+/* add an item from the History tab's search. addWish() switches to the Wishlist
+   itself; here we just clear the History search + any open lookup. */
+function addFromHistory(name){
+  var hs=$('hsearch'); hs.value=''; hs._catId=null; $('hdrop').classList.remove('on'); $('lookResult').innerHTML='';
+  addWish(name);
+}
+
 /* ================= wishlist ================= */
+/* after any add, make sure the user is looking at the Wishlist (the FAB add can
+   be triggered from any tab, so the item must be shown where it landed). */
+function goWishlist(){ if(ACTIVE!=='wish'){ ACTIVE='wish'; applyTab(); } try{ window.scrollTo(0,0); }catch(_){ } }
 function addWish(name){
   var nk=normName(name), ex=CAT.filter(function(c){ return c.nameKey===nk; })[0];
   if(ex){
-    if(ex.state==='wish'){ closeModal(); toast('Sudah ada di wishlist'); return Promise.resolve(); }
-    // idle (previously bought) or in basket -> bring back into the wishlist
+    if(ex.state==='wish'){ closeModal(); toast('Sudah ada di wishlist'); goWishlist(); return Promise.resolve(); }
+    if(ex.state==='basket'){ closeModal(); toast('Sudah ada di keranjang: '+ex.name); return Promise.resolve(); }
+    // idle (previously bought, on no list) -> bring it back into the wishlist
     ex.state='wish';
-    return put('catalog',ex).then(function(){ closeModal(); toast('Ditambah ke wishlist: '+ex.name); return refresh(); });
+    return put('catalog',ex).then(function(){ closeModal(); toast('Ditambah ke wishlist: '+ex.name); return refresh(); }).then(goWishlist);
   }
-  return add('catalog',{name:name.trim(),nameKey:nk,category:'',state:'wish'}).then(function(){ closeModal(); toast('Ditambah: '+name.trim()); return refresh(); });
+  return add('catalog',{name:name.trim(),nameKey:nk,category:'',state:'wish'}).then(function(){ closeModal(); toast('Ditambah: '+name.trim()); return refresh(); }).then(goWishlist);
+}
+/* remove an item FROM THE WISHLIST. Two cases:
+   - the item is USED anywhere worth keeping -- has real history (a purchase in
+     PURCH), is currently in the basket, or has any recorded price observation --
+     -> set it idle so it leaves the wishlist but KEEPS its catalog entry,
+     recorded prices, and History rows (re-adding the name later finds it and its
+     price history is preserved);
+   - the item is a TRUE ORPHAN (no history, not in the cart, no prices) -> purge
+     it entirely (catalog + any price rows), so a typo like "sus" does not linger
+     in the recommendation dropdown.
+   Contrast removeItem(), the unconditional hard purge used by the dropdown's
+   typo-cleanup button. */
+function removeFromWishlist(catId){
+  var c=catById(catId); if(!c) return Promise.resolve();
+  // "used" = referenced anywhere worth keeping: a purchase in History, currently
+  // in the basket, or any recorded price observation. Only a truly orphan item
+  // (e.g. a typo never bought, never priced, not in the cart) is purged.
+  var inHistory = PURCH.some(function(p){ return p.catId===catId; });
+  var inBasket  = c.state==='basket';
+  var hasPrice  = PRICES.some(function(p){ return p.catId===catId; });
+  var used = inHistory || inBasket || hasPrice;
+  if(used){
+    c.state='idle';
+    return put('catalog',c).then(function(){ if(OPEN_ID===catId)OPEN_ID=null; if(CHECK_ID===catId)CHECK_ID=null; toast('Dihapus dari wishlist: '+c.name); return refresh(); });
+  }
+  // unused -> remove the record completely (catalog + any orphan price observations)
+  return removeItem(catId);
 }
 function removeItem(catId){
   var c=catById(catId);
@@ -256,8 +298,21 @@ function renderHistory(){
     var arr=byMonth[k].sort(function(a,b){ return b.ts-a.ts; });
     var tot=arr.reduce(function(s,x){ return s+(x.price||0); },0);
     var m=document.createElement('div'); m.className='month';
-    var rows=arr.map(function(it){ var qn=' <span class="hd">'+(it.qty||1)+' × '+money(it.unit!=null?it.unit:(it.price/(it.qty||1)))+'</span>'; return '<div class="hrow"><div class="hn">'+esc(it.name)+'<span class="hd">'+dayLabel(it.ts)+'</span>'+qn+'</div><div class="hp">'+money(it.price)+'</div><button class="rdel" data-hdel="'+it.id+'" title="Hapus pembelian ini"><svg viewBox="0 0 448 512"><path d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0L284.2 0c12.1 0 23.2 6.8 28.6 17.7L320 32l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 96C14.3 96 0 81.7 0 64S14.3 32 32 32l96 0 7.2-14.3zM32 128l384 0 0 320c0 35.3-28.7 64-64 64L96 512c-35.3 0-64-28.7-64-64l0-320zm96 64c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16z"/></svg></button></div>'; }).join('');
-    m.innerHTML='<h3><span>'+monthLabel(k)+' <span style="color:var(--muted);font-weight:600;font-size:12px">('+arr.length+')</span></span><span class="mtot">'+money(tot)+'</span></h3>'+rows;
+    /* within a month, group rows by DAY: a date sub-header shows the date once,
+       so individual rows no longer repeat "4 Okt". */
+    var byDay={}, dayOrder=[];
+    arr.forEach(function(it){ var dk=dayKey(it.ts); if(!byDay[dk]){ byDay[dk]=[]; dayOrder.push(dk); } byDay[dk].push(it); });
+    var body=dayOrder.map(function(dk){
+      var ditems=byDay[dk];
+      var dtot=ditems.reduce(function(s,x){ return s+(x.price||0); },0);
+      var head='<div class="hday"><span>'+dayLabelFull(ditems[0].ts)+'</span><span class="hdtot">'+money(dtot)+'</span></div>';
+      var rows=ditems.map(function(it){
+        var qn='<span class="hq">'+(it.qty||1)+' × '+money(it.unit!=null?it.unit:(it.price/(it.qty||1)))+'</span>';
+        return '<div class="hrow"><div class="hn">'+esc(it.name)+qn+'</div><div class="hp">'+money(it.price)+'</div><button class="rdel" data-hdel="'+it.id+'" title="Hapus pembelian ini"><svg viewBox="0 0 448 512"><path d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0L284.2 0c12.1 0 23.2 6.8 28.6 17.7L320 32l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 96C14.3 96 0 81.7 0 64S14.3 32 32 32l96 0 7.2-14.3zM32 128l384 0 0 320c0 35.3-28.7 64-64 64L96 512c-35.3 0-64-28.7-64-64l0-320zm96 64c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16z"/></svg></button></div>';
+      }).join('');
+      return head+rows;
+    }).join('');
+    m.innerHTML='<h3><span>'+monthLabel(k)+' <span style="color:var(--muted);font-weight:600;font-size:12px">('+arr.length+')</span></span><span class="mtot">'+money(tot)+'</span></h3>'+body;
     box.appendChild(m);
   });
 }
@@ -265,16 +320,17 @@ function renderLook(catId){
   var out=$('lookResult'); var c=catById(catId);
   if(!c){ out.innerHTML=''; return; }
   var h=pricesFor(catId);
-  if(!h.length){ out.innerHTML='<div class="lookresult"><div class="empty" style="padding:14px">Belum ada riwayat harga untuk “'+esc(c.name)+'”.</div></div>'; return; }
+  if(!h.length){ out.innerHTML='<div class="lookresult"><button class="lookx" id="lookClose" title="Tutup">✕</button><div class="empty" style="padding:14px 44px 14px 14px">Belum ada riwayat harga untuk “'+esc(c.name)+'”.</div></div>'; return; }
   var prices=h.map(function(x){ return x.price; }); var min=Math.min.apply(null,prices), max=Math.max.apply(null,prices);
   var avg=prices.reduce(function(a,b){ return a+b; },0)/prices.length; var latest=h[h.length-1];
   var span=(max-min)||1;
   var bars=h.slice().reverse().map(function(x){ var w=Math.round(((x.price-min)/span)*100);
     return '<div class="sparow"><span style="color:var(--muted);width:52px">'+dayLabel(x.ts)+'</span><div class="barwrap"><div class="bar" style="width:'+Math.max(w,4)+'%"></div></div><span style="width:100px;text-align:right;font-weight:800;font-variant-numeric:tabular-nums">'+money(x.price)+'</span></div>'; }).join('');
   out.innerHTML='<div class="lookresult">'+
-    '<div style="font-size:13px;color:var(--muted)">'+esc(c.name)+' — harga terakhir</div>'+
+    '<button class="lookx" id="lookClose" title="Tutup">✕</button>'+
+    '<div style="font-size:13px;color:var(--muted);padding-right:40px">'+esc(c.name)+' — harga terakhir</div>'+
     '<div style="font-size:24px;font-weight:900;font-variant-numeric:tabular-nums">'+money(latest.price)+'</div>'+
-    '<div style="display:flex;justify-content:space-between;font-size:13px;margin:8px 0"><span>Min <b>'+money(min)+'</b></span><span>Rata <b>'+money(Math.round(avg))+'</b></span><span>Maks <b>'+money(max)+'</b></span></div>'+
+    '<div style="display:flex;justify-content:space-between;font-size:13px;margin:8px 0"><span>Min <b>'+money(min)+'</b></span><span>Avg <b>'+money(Math.round(avg))+'</b></span><span>Maks <b>'+money(max)+'</b></span></div>'+
     '<div style="font-size:12px;color:var(--muted);margin-bottom:4px">Riwayat harga ('+h.length+')</div>'+bars+'</div>';
 }
 
@@ -455,7 +511,7 @@ function bind(){
       /* decisive horizontal: far enough, mostly sideways, and reasonably quick */
       if(Math.abs(dx)<60 || Math.abs(dx)<Math.abs(dy)*1.8 || dt>600) return;
       var i=TAB_ORDER.indexOf(ACTIVE); if(i<0) return;
-      var ni = dx>0 ? i+1 : i-1;          /* left→right = next, right→left = prev */
+      var ni = dx>0 ? i-1 : i+1;          /* left→right (swipe right) = prev, right→left = next */
       if(ni<0 || ni>=TAB_ORDER.length) return;   /* no wrap at the ends */
       ACTIVE=TAB_ORDER[ni]; applyTab();
       try{ window.scrollTo(0,0); }catch(_){ }
@@ -494,7 +550,7 @@ function bind(){
     else if((b=e.target.closest('[data-edit]'))) renameItem(+b.getAttribute('data-edit'));
     else if((b=e.target.closest('[data-check]'))) beginCheck(+b.getAttribute('data-check'));
     else if((b=e.target.closest('[data-pop]'))) togglePop(+b.getAttribute('data-pop'));
-    else if((b=e.target.closest('[data-del]'))) removeItem(+b.getAttribute('data-del'));
+    else if((b=e.target.closest('[data-del]'))) removeFromWishlist(+b.getAttribute('data-del'));
   });
   $('wishBox').addEventListener('keydown',function(e){
     if(e.key!=='Enter') return;
@@ -532,9 +588,20 @@ function bind(){
 
   /* history search */
   var hs=$('hsearch'); hs._catId=null;
-  function hd(){ renderDrop($('hdrop'),hs.value,false); }
+  function hd(){ renderDrop($('hdrop'),hs.value,true); }
   hs.addEventListener('input',hd); hs.addEventListener('focus',hd);
-  $('hdrop').addEventListener('click',function(e){ var eb=e.target.closest('[data-catedit]'); if(eb){ e.stopPropagation(); renameItem(+eb.getAttribute('data-catedit')); return; } var o=e.target.closest('.opt[data-cat]'); if(!o)return; var cid=+o.getAttribute('data-cat'); var c=catById(cid); hs.value=c?c.name:''; hs._catId=cid; $('hdrop').classList.remove('on'); renderLook(cid); });
+  hs.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); var t=hs.value.trim(); if(t) addFromHistory(t); } });
+  $('hdrop').addEventListener('click',function(e){
+    var eb=e.target.closest('[data-catedit]'); if(eb){ e.stopPropagation(); renameItem(+eb.getAttribute('data-catedit')); return; }
+    var db=e.target.closest('[data-catdel]'); if(db){ e.stopPropagation(); var did=+db.getAttribute('data-catdel'); var dc=catById(did); if(!dc)return;
+      confirmSheet('Hapus “'+dc.name+'” dari daftar?','Item ini beserta riwayat harganya dihapus permanen. Tidak bisa dibatalkan.','Ya, hapus',function(){ removeItem(did).then(hd); });
+      return;
+    }
+    var nw=e.target.closest('.opt[data-new]'); if(nw){ addFromHistory(nw.getAttribute('data-new')); return; }
+    var o=e.target.closest('.opt[data-cat]'); if(!o)return; var cid=+o.getAttribute('data-cat'); hs.value=''; hs._catId=cid; $('hdrop').classList.remove('on'); renderLook(cid);
+  });
+  /* close the price-lookup result card */
+  $('lookResult').addEventListener('click',function(e){ if(e.target.closest('#lookClose')){ hs.value=''; hs._catId=null; $('hdrop').classList.remove('on'); $('lookResult').innerHTML=''; } });
 
   /* settings */
   $('exportBtn').onclick=exportData;
