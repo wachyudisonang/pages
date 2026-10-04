@@ -294,7 +294,9 @@ function renderHistory(){
   var box=$('histBox'); box.innerHTML='';
   if(!PURCH.length){ box.innerHTML='<div class="empty"><span class="big"><svg viewBox="0 0 512 512"><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9L0 168c0 13.3 10.7 24 24 24l110.1 0c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75z"/></svg></span>Belum ada pembelian.</div>'; return; }
   var byMonth={}; PURCH.forEach(function(it){ var k=monthKey(it.ts); (byMonth[k]=byMonth[k]||[]).push(it); });
-  Object.keys(byMonth).sort().reverse().forEach(function(k){
+  var monthKeys=Object.keys(byMonth).sort().reverse();
+  var curKey=monthKey(Date.now());
+  monthKeys.forEach(function(k,idx){
     var arr=byMonth[k].sort(function(a,b){ return b.ts-a.ts; });
     var tot=arr.reduce(function(s,x){ return s+(x.price||0); },0);
     var m=document.createElement('div'); m.className='month';
@@ -312,10 +314,22 @@ function renderHistory(){
       }).join('');
       return head+rows;
     }).join('');
-    m.innerHTML='<h3><span>'+monthLabel(k)+' <span style="color:var(--muted);font-weight:600;font-size:12px">('+arr.length+')</span></span><span class="mtot">'+money(tot)+'</span></h3>'+body;
+    /* collapsible month: default — the current month (and, if we are early in a
+       new month, the newest block) stays open, older months start collapsed so
+       the list is short. User toggles persist in localStorage, keyed by month. */
+    var saved=getMonthCollapse(k);
+    var collapsed = (saved!=null) ? saved : !(k===curKey || idx===0);
+    var chev='<svg class="mchev" viewBox="0 0 448 512" width="12" height="12" fill="currentColor"><path d="M201.4 342.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 274.7 86.6 137.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>';
+    m.className='month'+(collapsed?' collapsed':'');
+    m.setAttribute('data-month',k);
+    m.innerHTML='<h3 class="mhead" data-mtoggle="'+k+'">'+chev+'<span class="mttl">'+monthLabel(k)+' <span style="color:var(--muted);font-weight:600;font-size:12px">('+arr.length+')</span></span><span class="mtot">'+money(tot)+'</span></h3><div class="mbody">'+body+'</div>';
     box.appendChild(m);
   });
 }
+/* collapsible-month persistence: localStorage map {monthKey: true(collapsed)} */
+function getMonthCollapseMap(){ try{ return JSON.parse(localStorage.getItem('grocery_hist_collapse'))||{}; }catch(e){ return {}; } }
+function getMonthCollapse(k){ var m=getMonthCollapseMap(); return (k in m)?!!m[k]:null; }
+function setMonthCollapse(k,collapsed){ var m=getMonthCollapseMap(); m[k]=!!collapsed; try{ localStorage.setItem('grocery_hist_collapse',JSON.stringify(m)); }catch(e){} }
 function renderLook(catId){
   var out=$('lookResult'); var c=catById(catId);
   if(!c){ out.innerHTML=''; return; }
@@ -384,11 +398,190 @@ function importData(file){
 }
 function clearAll(){
   var n=CAT.length, np=PURCH.length;
-  confirmSheet('Hapus semua data?', n+' item dan '+np+' pembelian akan dihapus PERMANEN. Tindakan ini tidak bisa dibatalkan. Disarankan cadangkan dulu.', 'Ya, hapus semua', function(){
+  confirmSheet('Hapus semua data?', n+' item dan '+np+' pembelian akan dihapus PERMANEN dari perangkat ini. Tindakan ini tidak bisa dibatalkan. Disarankan cadangkan dulu. Riwayat yang sudah disinkronkan ke cloud TIDAK ikut terhapus — tetap aman di sana.', 'Ya, hapus semua', function(){
     Promise.all([clearStore('catalog'),clearStore('prices'),clearStore('purchases')]).then(function(){
       OPEN_ID=null; CHECK_ID=null; toast('Semua data dihapus'); ACTIVE='wish'; applyTab(); return refresh();
     }).catch(function(){ toast('Gagal menghapus'); });
   });
+}
+
+/* ================= cloud sync (shared household history) =================
+   OPTIONAL + LAZY. The Firebase SDK is dynamically imported ONLY when the
+   user presses "Sinkron ke cloud" — it is NEVER loaded at startup, so the app
+   stays instant and fully usable offline (local-first). If the CDN is blocked
+   or offline, sync just fails for that session; the local app is unaffected.
+   This is the recorded invariant (see grocery DECISIONS 2026-10-04): never load
+   the SDK synchronously / never block startup on it.
+
+   Direction is one-way UP: local purchases -> /grocery/purchases in RTDB.
+   Nothing is pulled back into the device and nothing local is ever deleted.
+   Dedup: a local purchase is pushed only if an equivalent record (same
+   name|qty|unitPrice|date) is not already in the cloud — so receipt-seeded rows
+   and a prior sync are never duplicated, while genuinely new purchases are sent.
+   Wishlist/basket (catalog state) never touch the cloud. */
+var FB_CONFIG={
+  apiKey:"AIzaSyBQdamLRWTYTQpjSepouJbMaL8h-o4UJw8",
+  authDomain:"bigown-shared.firebaseapp.com",
+  databaseURL:"https://bigown-shared-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"bigown-shared",
+  storageBucket:"bigown-shared.firebasestorage.app",
+  messagingSenderId:"557611644013",
+  appId:"1:557611644013:web:b4da2b79686c6c5158bb64"
+};
+var FB_VER="10.12.2";                       // CDN SDK version (matches firebase-shared/firebase-config.js)
+var SYNC_META_KEY='grocery_last_sync';      // localStorage: {ts, pushed, total} of the last successful sync
+var _fb=null;                               // cached SDK handles after first lazy load
+
+/* YYYY-MM-DD from a purchase timestamp (local time) — the cloud "date" field,
+   matching the receipt-seeded rows. */
+function purchDate(ts){ var d=new Date(ts); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+/* canonical dedup key for a cloud record shape {name,qty,unitPrice,date} */
+function cloudKey(name,qty,unitPrice,date){ return normName(name)+'|'+qty+'|'+unitPrice+'|'+date; }
+
+/* dynamically import the two Firebase modules we need, once, and sign in
+   anonymously (the rules allow create-only writes for any authed user). */
+function loadFirebase(){
+  if(_fb) return Promise.resolve(_fb);
+  var base='https://www.gstatic.com/firebasejs/'+FB_VER+'/';
+  return Promise.all([
+    import(base+'firebase-app.js'),
+    import(base+'firebase-database.js'),
+    import(base+'firebase-auth.js')
+  ]).then(function(m){
+    var appM=m[0], dbM=m[1], authM=m[2];
+    var app=appM.initializeApp(FB_CONFIG);
+    var db=dbM.getDatabase(app);
+    var auth=authM.getAuth(app);
+    return authM.signInAnonymously(auth).then(function(){
+      _fb={ db:db, auth:auth, ref:dbM.ref, get:dbM.get, push:dbM.push, child:dbM.child };
+      return _fb;
+    });
+  });
+}
+
+/* the sync button handler: push unsynced local purchases to the cloud, deduped. */
+function syncToCloud(){
+  if(!PURCH.length){ toast('Belum ada pembelian untuk disinkronkan'); return; }
+  var btn=$('syncBtn'); if(btn){ btn.disabled=true; btn.textContent='☁ Menyinkronkan…'; }
+  loadFirebase().then(function(fb){
+    var pref=fb.ref(fb.db,'grocery/purchases');
+    // Push every local purchase NOT YET synced from THIS device (no cloudId yet).
+    // Tracking per-row (not value-dedup) keeps genuine same-day repeats — two
+    // identical lines are two rows, each gets its own push-id. A purchase that
+    // was imported FROM the cloud already carries a cloudId, so it is never
+    // re-pushed. Idempotent: a row synced once is skipped forever after.
+    var toPush=PURCH.filter(function(p){ return !p.cloudId; });
+    if(!toPush.length){
+      saveSyncMeta(0, PURCH.length);
+      toast('Sudah sinkron — tidak ada yang baru'); updateSyncStat(); return;
+    }
+    var pushed=0, chain=Promise.resolve();
+    toPush.forEach(function(p){
+      chain=chain.then(function(){
+        var rec={ name:p.name, qty:(p.qty||1), unitPrice:(p.unit!=null?p.unit:p.price), date:purchDate(p.ts), ts:p.ts };
+        return fb.push(pref, rec).then(function(ref){
+          // stamp the cloud push-id back onto the local row so it is never re-pushed
+          var key=(ref && ref.key) ? ref.key : null;
+          if(key){ p.cloudId=key; return put('purchases', p).then(function(){ pushed++; }); }
+          pushed++;
+        });
+      });
+    });
+    return chain.then(function(){
+      saveSyncMeta(pushed, PURCH.length);
+      toast('✓ '+pushed+' pembelian dikirim ke cloud'); updateSyncStat(); return reload();
+    });
+  }).catch(function(err){
+    toast('Gagal sinkron: '+((err&&err.message)||'periksa koneksi'));
+  }).then(function(){
+    var b=$('syncBtn'); if(b){ b.disabled=false; b.textContent='☁ Sinkron ke cloud'; }
+  });
+}
+
+/* Pull the shared household history DOWN from the cloud and rebuild this
+   device's catalog + purchase history (Riwayat) + price observations, so a new
+   device (or one recovering from "Hapus semua data") sees the real history and
+   price-comparison lookups work immediately. WINDOWED to the retention setting
+   (getRetain: 3 or 6 months): older rows are skipped because the app auto-purges
+   them on open anyway. DEDUPED by the cloud PUSH-ID (the record's own key),
+   stored locally as `cloudId` — so genuine same-day repeat purchases (two Kapal
+   Api lines on one receipt = two distinct push-ids) are BOTH kept, while a
+   re-pull of a row already imported (same push-id) is skipped. Safe to press
+   repeatedly. Cloud rows store date as a day, so a rebuilt purchase is stamped
+   at that day's start (day-grouping stays correct; only intra-day order is
+   lost). Reads the public node (no auth). */
+function importCatalogFromCloud(){
+  var btn=$('catalogBtn'); if(btn){ btn.disabled=true; btn.textContent='⬇ Mengambil…'; }
+  loadFirebase().then(function(fb){
+    var pref=fb.ref(fb.db,'grocery/purchases');
+    return fb.get(pref).then(function(snap){
+      var val=snap.exists()?snap.val():{};
+      var cut=new Date(); cut.setMonth(cut.getMonth()-getRetain()); cut.setHours(0,0,0,0);
+      var cutMs=cut.getTime();
+      // push-ids already imported on this device (skip only exact re-pulls)
+      var haveCloud={}; PURCH.forEach(function(p){ if(p.cloudId) haveCloud[p.cloudId]=true; });
+      // UN-synced local purchases indexed by value, so a cloud row that equals a
+      // local row this device recorded itself (no cloudId yet — e.g. matching the
+      // CLI-seeded receipt rows) back-LINKS that local row instead of creating a
+      // duplicate in Riwayat. Each value-slot is consumed once (array of rows).
+      var localByVal={};
+      PURCH.forEach(function(p){
+        if(p.cloudId) return;
+        var vk=cloudKey(p.name,(p.qty||1),(p.unit!=null?p.unit:p.price),purchDate(p.ts));
+        (localByVal[vk]=localByVal[vk]||[]).push(p);
+      });
+      var catId={}; CAT.forEach(function(c){ catId[c.nameKey]=c.id; });
+      var rows=[], relink=[];
+      Object.keys(val).forEach(function(k){
+        if(haveCloud[k]) return;                              // this exact cloud row already here
+        var r=val[k]; if(!r||r.name==null||!r.date) return;
+        var ts=new Date(r.date+'T00:00:00').getTime();
+        if(isNaN(ts)||ts<cutMs) return;                       // outside retention window
+        var qty=r.qty||1, unit=(r.unitPrice!=null?r.unitPrice:0);
+        // if an un-synced local row matches by value, claim it (back-link) — no new row
+        var vk=cloudKey(r.name,qty,unit,r.date);
+        var slot=localByVal[vk];
+        if(slot && slot.length){ var lp=slot.shift(); lp.cloudId=k; relink.push(lp); return; }
+        rows.push({cloudId:k,name:(r.name+'').trim(),nameKey:normName(r.name),qty:qty,unit:unit,ts:ts});
+      });
+      if(!rows.length && !relink.length){ toast('Riwayat cloud sudah lengkap — tidak ada yang baru'); return; }
+      var added=0, chain=Promise.resolve();
+      // persist back-links first (claims existing local rows to their cloud push-id)
+      relink.forEach(function(lp){ chain=chain.then(function(){ return put('purchases', lp); }); });
+      rows.forEach(function(rec){
+        chain=chain.then(function(){
+          var ensure=(catId[rec.nameKey]!=null)
+            ? Promise.resolve(catId[rec.nameKey])
+            : add('catalog',{name:rec.name,nameKey:rec.nameKey,category:'',state:'idle'}).then(function(nid){ catId[rec.nameKey]=nid; return nid; });
+          return ensure.then(function(cid){
+            var line=rec.unit*rec.qty;
+            return Promise.all([
+              add('purchases',{catId:cid,name:rec.name,price:line,unit:rec.unit,qty:rec.qty,ts:rec.ts,cloudId:rec.cloudId}),
+              add('prices',{catId:cid,price:rec.unit,ts:rec.ts})
+            ]).then(function(){ added++; });
+          });
+        });
+      });
+      return chain.then(function(){ var msg='✓ '+added+' pembelian dari cloud ('+getRetain()+' bln terakhir)'; if(relink.length) msg+=', '+relink.length+' dicocokkan'; toast(msg); return refresh(); });
+    });
+  }).catch(function(err){
+    toast('Gagal mengambil: '+((err&&err.message)||'periksa koneksi'));
+  }).then(function(){
+    var b=$('catalogBtn'); if(b){ b.disabled=false; b.textContent='⬇ Ambil riwayat dari cloud'; }
+  });
+}
+
+function saveSyncMeta(pushed, total){
+  try{ localStorage.setItem(SYNC_META_KEY, JSON.stringify({ts:Date.now(), pushed:pushed, total:total})); }catch(e){}
+}
+function getSyncMeta(){ try{ return JSON.parse(localStorage.getItem(SYNC_META_KEY))||null; }catch(e){ return null; } }
+function updateSyncStat(){
+  var el=$('syncStat'); if(!el) return;
+  var m=getSyncMeta();
+  if(!m){ el.textContent='Belum pernah disinkronkan'; return; }
+  var d=new Date(m.ts);
+  var when=d.getDate()+' '+MONTHS[d.getMonth()].slice(0,3)+' '+d.getFullYear()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  el.textContent='Terakhir sinkron: '+when;
 }
 
 /* ================= render + tabs ================= */
@@ -604,6 +797,8 @@ function bind(){
   $('lookResult').addEventListener('click',function(e){ if(e.target.closest('#lookClose')){ hs.value=''; hs._catId=null; $('hdrop').classList.remove('on'); $('lookResult').innerHTML=''; } });
 
   /* settings */
+  $('syncBtn').onclick=syncToCloud;
+  $('catalogBtn').onclick=importCatalogFromCloud;
   $('exportBtn').onclick=exportData;
   $('importBtn').onclick=function(){ $('importFile').click(); };
   $('importFile').addEventListener('change',function(e){ if(e.target.files[0]) importData(e.target.files[0]); e.target.value=''; });
@@ -611,6 +806,8 @@ function bind(){
 
   /* delete a single purchase from history (and its matching price observation) */
   $('histBox').addEventListener('click',function(e){
+    var mt=e.target.closest('[data-mtoggle]');
+    if(mt){ var mk=mt.getAttribute('data-mtoggle'); var sec=mt.closest('.month'); if(sec){ var nowCollapsed=sec.classList.toggle('collapsed'); setMonthCollapse(mk,nowCollapsed); } return; }
     var b=e.target.closest('[data-hdel]'); if(!b)return;
     var pid=+b.getAttribute('data-hdel'); var it=PURCH.filter(function(x){ return x.id===pid; })[0]; if(!it)return;
     confirmSheet('Hapus pembelian ini?', '“'+it.name+'” ('+money(it.price)+') akan dihapus dari riwayat, termasuk catatan harganya. Tindakan ini tidak bisa dibatalkan.', 'Ya, hapus', function(){
@@ -661,6 +858,6 @@ function bind(){
     .then(reload)
     .then(syncHistoryNames)
     .then(reload)
-    .then(function(){ applyTheme(getTheme()); bind(); applyTab(); renderWish(); renderBasket(); renderHistory(); updateStat(); })
+    .then(function(){ applyTheme(getTheme()); bind(); applyTab(); renderWish(); renderBasket(); renderHistory(); updateStat(); updateSyncStat(); })
     .catch(function(err){ document.querySelector('main').innerHTML='<div class="empty">Gagal membuka penyimpanan.<br>'+esc(err&&err.message||err)+'</div>'; });
 })();
