@@ -271,9 +271,9 @@
   .fab:active{transform:translateX(-50%) scale(.9)}
 
   /* ---- modal (add wish) ---- */
-  .modal-bg{position:fixed;left:0;top:0;right:0;height:var(--vvh,100dvh);z-index:40;background:rgba(20,30,40,.4);display:none;align-items:flex-end;justify-content:center}
+  .modal-bg{position:fixed;left:0;top:0;right:0;bottom:0;height:var(--vvh,100dvh);z-index:40;background:rgba(10,16,24,.66);display:none;align-items:flex-end;justify-content:center}
   .modal-bg.on{display:flex}
-  .modal{background:var(--card);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + var(--safe-b));animation:up .2s ease;max-height:var(--vvh,88dvh);overflow-y:auto}
+  .modal{background:var(--card);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + var(--safe-b));animation:up .2s ease;min-height:220px;max-height:var(--vvh,88dvh);overflow-y:auto}
   @keyframes up{from{transform:translateY(100%)}to{transform:none}}
   .modal h2{margin:0 0 12px;font-size:16px}
   .modal .x{float:right;background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:0 4px}
