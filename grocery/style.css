@@ -83,11 +83,11 @@
   }
   .drop.on{display:block}
   .drop.static{position:static;box-shadow:none;margin-top:8px;max-height:52dvh;overflow-y:auto}
-  .opt{padding:11px 13px;display:flex;align-items:center;gap:8px;cursor:pointer;border-bottom:1px solid var(--border)}
+  .opt{padding:11px 13px;display:flex;align-items:flex-start;gap:8px;cursor:pointer;border-bottom:1px solid var(--border)}
   .opt:last-child{border-bottom:none}
   .opt:active{background:var(--chip)}
-  .opt .nm{flex:1;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .opt .op{margin-left:auto;text-align:right;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .opt .nm{flex:1;min-width:0;font-weight:600;overflow-wrap:anywhere;word-break:break-word;line-height:1.3}
+  .opt .op{margin-left:auto;text-align:right;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none}
   .optdel{flex:none;background:none;border:none;color:var(--muted-2);cursor:pointer;padding:5px;display:flex;align-items:center;margin-left:2px}
   .optdel svg{width:15px;height:15px;fill:currentColor}
   .optdel:active{color:var(--danger)}
