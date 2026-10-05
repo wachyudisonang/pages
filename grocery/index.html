@@ -8,18 +8,18 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Belanja">
-<link rel="icon" type="image/png" href="icon.png?v=202610051000">
-<link rel="apple-touch-icon" href="icon.png?v=202610051000">
+<link rel="icon" type="image/png" href="icon.png?v=202610051122">
+<link rel="apple-touch-icon" href="icon.png?v=202610051122">
 <link rel="manifest" href="manifest.json">
 <title>Daftar Belanja</title>
-<meta name="app-version" content="202610051000" />
+<meta name="app-version" content="202610051122" />
 <script>
   /* Apply saved theme BEFORE first paint to avoid a light/dark flash.
      Values: 'light' | 'dark' | 'system' (default). 'system' leaves no
      data-theme attribute so the prefers-color-scheme @media rule governs. */
   (function(){ try{ var t=localStorage.getItem('grocery_theme'); if(t==='light'||t==='dark'){ document.documentElement.setAttribute('data-theme',t); } }catch(e){} })();
 </script>
-<link rel="stylesheet" href="style.css?v=202610051000">
+<link rel="stylesheet" href="style.css?v=202610051122">
 </head>
 <body>
 <div class="app">
@@ -49,6 +49,7 @@
         <input id="hsearch" placeholder="Cari item untuk lihat riwayat harga…" autocomplete="off">
         <div class="drop" id="hdrop"></div>
       </div>
+      <div class="dropmask" id="hdropMask"></div>
       <div id="lookResult"></div>
       <div class="sectitle" style="margin-top:14px">Riwayat belanja</div>
       <div id="histBox"></div>
@@ -141,6 +142,6 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=202610051000"></script>
+<script src="app.js?v=202610051122"></script>
 </body>
 </html>

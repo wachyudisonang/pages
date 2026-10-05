@@ -84,22 +84,25 @@ function buildOptions(q){
     .sort(function(a,b){ if(nk){ var as=a.nameKey.indexOf(nk),bs=b.nameKey.indexOf(nk); if(as!==bs) return as-bs; } return a.name.localeCompare(b.name); })
     .slice(0,40);
 }
-function renderDrop(dropEl,q,allowNew,newFirst){
+function renderDrop(dropEl,q,allowNew,newFirst,plain){
   var typed=q.trim();
   var newOpt = (allowNew && typed && !CAT.some(function(c){ return c.nameKey===normName(typed); }))
     ? '<div class="opt new" data-new="'+esc(typed)+'">+ Tambah baru: “'+esc(typed)+'”</div>' : '';
-  var list=''; buildOptions(q).forEach(function(c){ var lp=lowestPrice(c.id);
-    list+='<div class="opt" data-cat="'+c.id+'"><span class="nm">'+esc(c.name)+'</span><span class="op">'+(lp?money(lp.price):'—')+'</span><button class="optedit" data-catedit="'+c.id+'" title="Ubah nama"><svg viewBox="0 0 512 512"><path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.3 22.5-9.6 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg></button><button class="optdel" data-catdel="'+c.id+'" title="Hapus dari daftar"><svg viewBox="0 0 448 512"><path d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0L284.2 0c12.1 0 23.2 6.8 28.6 17.7L320 32l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 96C14.3 96 0 81.7 0 64S14.3 32 32 32l96 0 7.2-14.3zM32 128l384 0 0 320c0 35.3-28.7 64-64 64L96 512c-35.3 0-64-28.7-64-64l0-320zm96 64c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16z"/></svg></button></div>'; });
+  var list='';
+  if(plain){
+    // LOOKUP mode (History price search): a bare, clickable name only — no lowest
+    // price, no edit/delete controls. Those belong to the + FAB add dropdown.
+    buildOptions(q).forEach(function(c){
+      list+='<div class="opt" data-cat="'+c.id+'"><span class="nm">'+esc(c.name)+'</span></div>';
+    });
+  } else {
+    // ADD mode (+ FAB): name + lowest-price hint + rename/delete controls.
+    buildOptions(q).forEach(function(c){ var lp=lowestPrice(c.id);
+      list+='<div class="opt" data-cat="'+c.id+'"><span class="nm">'+esc(c.name)+'</span><span class="op">'+(lp?money(lp.price):'—')+'</span><button class="optedit" data-catedit="'+c.id+'" title="Ubah nama"><svg viewBox="0 0 512 512"><path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.3 22.5-9.6 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg></button><button class="optdel" data-catdel="'+c.id+'" title="Hapus dari daftar"><svg viewBox="0 0 448 512"><path d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0L284.2 0c12.1 0 23.2 6.8 28.6 17.7L320 32l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 96C14.3 96 0 81.7 0 64S14.3 32 32 32l96 0 7.2-14.3zM32 128l384 0 0 320c0 35.3-28.7 64-64 64L96 512c-35.3 0-64-28.7-64-64l0-320zm96 64c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16z"/></svg></button></div>'; });
+  }
   var html = newFirst ? (newOpt+list) : (list+newOpt);
-  if(!html) html='<div class="opt" style="color:var(--muted)">Ketik nama baru untuk menambah</div>';
+  if(!html) html='<div class="opt" style="color:var(--muted)">'+(plain?'Tidak ada item cocok':'Ketik nama baru untuk menambah')+'</div>';
   dropEl.innerHTML=html; dropEl.classList.add('on');
-}
-
-/* add an item from the History tab's search. addWish() switches to the Wishlist
-   itself; here we just clear the History search + any open lookup. */
-function addFromHistory(name){
-  var hs=$('hsearch'); hs.value=''; hs._catId=null; $('hdrop').classList.remove('on'); $('lookResult').innerHTML='';
-  addWish(name);
 }
 
 /* ================= wishlist ================= */
@@ -522,8 +525,12 @@ function importCatalogFromCloud(){
       var val=snap.exists()?snap.val():{};
       var cut=new Date(); cut.setMonth(cut.getMonth()-getRetain()); cut.setHours(0,0,0,0);
       var cutMs=cut.getTime();
-      // push-ids already imported on this device (skip only exact re-pulls)
-      var haveCloud={}; PURCH.forEach(function(p){ if(p.cloudId) haveCloud[p.cloudId]=true; });
+      // push-ids already imported on this device. We no longer merely SKIP these:
+      // an admin may have approved a name-change in the cloud, so on re-pull we
+      // REFRESH the local copy's name (and qty/unit) from the cloud for rows we
+      // already have — keyed by cloudId. Cloud wins for shared fields; `ts` stays
+      // local. Map cloudId -> the local purchase row so we can update it in place.
+      var haveCloud={}; PURCH.forEach(function(p){ if(p.cloudId){ haveCloud[p.cloudId]=p; } });
       // UN-synced local purchases indexed by value, so a cloud row that equals a
       // local row this device recorded itself (no cloudId yet — e.g. matching the
       // CLI-seeded receipt rows) back-LINKS that local row instead of creating a
@@ -535,23 +542,45 @@ function importCatalogFromCloud(){
         (localByVal[vk]=localByVal[vk]||[]).push(p);
       });
       var catId={}; CAT.forEach(function(c){ catId[c.nameKey]=c.id; });
-      var rows=[], relink=[];
+      var rows=[], relink=[], refreshed=[];
       Object.keys(val).forEach(function(k){
-        if(haveCloud[k]) return;                              // this exact cloud row already here
         var r=val[k]; if(!r||r.name==null||!r.date) return;
+        if(haveCloud[k]){
+          // already imported — but the cloud name may have been corrected by an
+          // approved moderation. Update the local purchase row's frozen name (and
+          // qty/unit) in place when the cloud differs, so an approved rename lands.
+          var lp=haveCloud[k];
+          var cn=(r.name+'').trim(), cq=r.qty||1, cu=(r.unitPrice!=null?r.unitPrice:(lp.unit!=null?lp.unit:lp.price));
+          if(lp.name!==cn || (lp.qty||1)!==cq || (lp.unit!=null?lp.unit:lp.price)!==cu){
+            lp.name=cn; lp.qty=cq; lp.unit=cu;
+            refreshed.push(lp);
+          }
+          return;                                            // never a NEW row for an existing push-id
+        }
         var ts=new Date(r.date+'T00:00:00').getTime();
         if(isNaN(ts)||ts<cutMs) return;                       // outside retention window
         var qty=r.qty||1, unit=(r.unitPrice!=null?r.unitPrice:0);
         // if an un-synced local row matches by value, claim it (back-link) — no new row
         var vk=cloudKey(r.name,qty,unit,r.date);
         var slot=localByVal[vk];
-        if(slot && slot.length){ var lp=slot.shift(); lp.cloudId=k; relink.push(lp); return; }
+        if(slot && slot.length){ var lp2=slot.shift(); lp2.cloudId=k; relink.push(lp2); return; }
         rows.push({cloudId:k,name:(r.name+'').trim(),nameKey:normName(r.name),qty:qty,unit:unit,ts:ts});
       });
-      if(!rows.length && !relink.length){ toast('Riwayat cloud sudah lengkap — tidak ada yang baru'); return; }
+      if(!rows.length && !relink.length && !refreshed.length){ toast('Riwayat cloud sudah lengkap — tidak ada yang baru'); return; }
       var added=0, chain=Promise.resolve();
       // persist back-links first (claims existing local rows to their cloud push-id)
       relink.forEach(function(lp){ chain=chain.then(function(){ return put('purchases', lp); }); });
+      // persist name/price refreshes from approved moderation; also rename the
+      // matching CATALOG item so the corrected name shows in wishlist + dropdowns,
+      // not only in the History rows.
+      refreshed.forEach(function(lp){
+        chain=chain.then(function(){
+          var p=put('purchases', lp);
+          var c=lp.catId!=null ? catById(lp.catId) : null;
+          if(c && c.name!==lp.name){ c.name=lp.name; c.nameKey=normName(lp.name); return Promise.all([p, put('catalog', c)]); }
+          return p;
+        });
+      });
       rows.forEach(function(rec){
         chain=chain.then(function(){
           var ensure=(catId[rec.nameKey]!=null)
@@ -566,7 +595,7 @@ function importCatalogFromCloud(){
           });
         });
       });
-      return chain.then(function(){ var msg='✓ '+added+' pembelian dari cloud ('+getRetain()+' bln terakhir)'; if(relink.length) msg+=', '+relink.length+' dicocokkan'; toast(msg); return refresh(); });
+      return chain.then(function(){ var msg='✓ '+added+' pembelian dari cloud ('+getRetain()+' bln terakhir)'; if(relink.length) msg+=', '+relink.length+' dicocokkan'; if(refreshed.length) msg+=', '+refreshed.length+' nama diperbarui'; toast(msg); return refresh(); });
     });
   }).catch(function(err){
     toast('Gagal mengambil: '+((err&&err.message)||'periksa koneksi'));
@@ -594,7 +623,7 @@ function refresh(){ return reload().then(function(){ renderWish(); renderBasket(
    immediately (refresh() otherwise only repaints the tab lists, not the drops). */
 function refreshOpenDrops(){
   var wd=$('wdrop'); if(wd && wd.classList.contains('on')) renderDrop(wd,$('wsearch').value,true,true);
-  var hd=$('hdrop'); if(hd && hd.classList.contains('on')) renderDrop(hd,$('hsearch').value,false);
+  var hd=$('hdrop'); if(hd && hd.classList.contains('on')) renderDrop(hd,$('hsearch').value,false,false,true);
 }
 function updateStat(){ $('dataStat').textContent='Item: '+CAT.length+' · Catatan harga: '+PRICES.length+' · Pembelian: '+PURCH.length; }
 
@@ -652,15 +681,59 @@ function renameItem(catId){
     var ops=[put('catalog',c)];
     // Rewrite the frozen name on every purchase of this item so History updates too.
     // Match by catId (type-tolerant) OR by the previous name, so legacy/imported
-    // rows whose catId doesn't line up are still caught.
+    // rows whose catId doesn't line up are still caught. Collect the cloud push-ids
+    // of synced rows so a rename of an already-shared item can be PROPOSED to the
+    // cloud for the admin to moderate.
+    var cloudIds=[];
     PURCH.forEach(function(p){
       var sameId=(p.catId!=null && String(p.catId)===String(catId));
       var sameName=(p.name===oldName);
-      if((sameId||sameName) && p.name!==nm){ p.name=nm; ops.push(put('purchases',p)); }
+      if(sameId||sameName){
+        if(p.cloudId) cloudIds.push(p.cloudId);
+        if(p.name!==nm){ p.name=nm; ops.push(put('purchases',p)); }
+      }
     });
-    Promise.all(ops).then(function(){ toast('Nama diubah: '+nm); return refresh(); });
+    Promise.all(ops).then(function(){
+      toast('Nama diubah: '+nm); refresh();
+      // Only a SHARED item (has synced cloud rows) needs moderation; a purely-local
+      // item isn't in anyone else's cloud, so the local rename is enough.
+      if(cloudIds.length) proposeRename(oldName, nm, cloudIds);
+    });
   });
 }
+
+/* Submit a NAME-CHANGE proposal to grocery/pending for the admin to moderate.
+   The local rename already happened (this device shows the new name immediately);
+   this only asks the admin to apply the same name to the SHARED cloud rows so every
+   device converges on the next pull. Devices never write grocery/purchases directly
+   (rules forbid it) — they can only CREATE a pending row, which the rules allow for
+   any anonymous session. Approval (admin) is what touches the real data. */
+function proposeRename(oldName, newName, cloudIds){
+  // promptSheet requires a non-empty value, so pre-fill the saved/last proposer name
+  // (falls back to a generic label) — the family member can keep or change it.
+  var preset=getProposerName()||'Anggota keluarga';
+  promptSheet('Usul nama ini ke cloud? (nama Anda)', preset, 'Kirim usulan', function(who){
+    var by=(who||'').trim(); if(by) setProposerName(by);
+    loadFirebase().then(function(fb){
+      var pref=fb.ref(fb.db,'grocery/pending');
+      return fb.push(pref, {
+        kind:'rename',
+        oldName:(oldName||''),
+        newName:newName,
+        cloudIds:cloudIds,
+        by:(by||'(tanpa nama)'),
+        at:Date.now(),
+        status:'pending'
+      });
+    }).then(function(){
+      toast('✓ Usulan nama dikirim — menunggu persetujuan admin');
+    }).catch(function(err){
+      toast('Usulan gagal dikirim: '+((err&&err.message)||'periksa koneksi'));
+    });
+  });
+}
+function getProposerName(){ try{ return localStorage.getItem('gc_proposer')||''; }catch(e){ return ''; } }
+function setProposerName(v){ try{ localStorage.setItem('gc_proposer', v); }catch(e){} }
 
 /* ================= bind ================= */
 function bind(){
@@ -783,22 +856,32 @@ function bind(){
   });
   $('payBtn').onclick=payAll;
 
-  /* history search */
+  /* history search — LOOKUP ONLY: find an item to see its price history.
+     Adding items happens from the + FAB, not here, so no "+ Tambah baru" option
+     (allowNew=false) and no Enter-to-add. */
   var hs=$('hsearch'); hs._catId=null;
-  function hd(){ renderDrop($('hdrop'),hs.value,true); }
+  // keep the dropdown, its dim backdrop (#hdropMask) and the raised stacking
+  // context in sync, so the lookup results read as a focused layer over a
+  // darkened history.
+  function openHDrop(){
+    renderDrop($('hdrop'),hs.value,false,false,true);
+    // only dim the background when the user is actively searching (non-empty),
+    // so merely focusing the empty field doesn't darken the whole tab.
+    var active = hs.value.trim().length>0;
+    $('hdropMask').classList.toggle('on', active);
+    hs.closest('.searchbox').classList.toggle('raised', active);
+  }
+  function closeHDrop(){ $('hdrop').classList.remove('on'); $('hdropMask').classList.remove('on'); var sb=hs.closest('.searchbox'); if(sb) sb.classList.remove('raised'); }
+  function hd(){ openHDrop(); }
   hs.addEventListener('input',hd); hs.addEventListener('focus',hd);
-  hs.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); var t=hs.value.trim(); if(t) addFromHistory(t); } });
   $('hdrop').addEventListener('click',function(e){
-    var eb=e.target.closest('[data-catedit]'); if(eb){ e.stopPropagation(); renameItem(+eb.getAttribute('data-catedit')); return; }
-    var db=e.target.closest('[data-catdel]'); if(db){ e.stopPropagation(); var did=+db.getAttribute('data-catdel'); var dc=catById(did); if(!dc)return;
-      confirmSheet('Hapus “'+dc.name+'” dari daftar?','Item ini beserta riwayat harganya dihapus permanen. Tidak bisa dibatalkan.','Ya, hapus',function(){ removeItem(did).then(hd); });
-      return;
-    }
-    var nw=e.target.closest('.opt[data-new]'); if(nw){ addFromHistory(nw.getAttribute('data-new')); return; }
-    var o=e.target.closest('.opt[data-cat]'); if(!o)return; var cid=+o.getAttribute('data-cat'); hs.value=''; hs._catId=cid; $('hdrop').classList.remove('on'); renderLook(cid);
+    // lookup only: clicking an item opens its price history. No edit/delete here.
+    var o=e.target.closest('.opt[data-cat]'); if(!o)return; var cid=+o.getAttribute('data-cat'); hs.value=''; hs._catId=cid; closeHDrop(); renderLook(cid);
   });
+  // tapping the dim backdrop dismisses the lookup dropdown
+  $('hdropMask').addEventListener('click',closeHDrop);
   /* close the price-lookup result card */
-  $('lookResult').addEventListener('click',function(e){ if(e.target.closest('#lookClose')){ hs.value=''; hs._catId=null; $('hdrop').classList.remove('on'); $('lookResult').innerHTML=''; } });
+  $('lookResult').addEventListener('click',function(e){ if(e.target.closest('#lookClose')){ hs.value=''; hs._catId=null; closeHDrop(); $('lookResult').innerHTML=''; } });
 
   /* settings */
   $('syncBtn').onclick=syncToCloud;

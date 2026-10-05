@@ -82,6 +82,12 @@
     box-shadow:0 12px 30px -10px rgba(20,30,40,.28);overflow:hidden;display:none;max-height:280px;overflow-y:auto;
   }
   .drop.on{display:block}
+  /* dim overlay behind the History price-lookup dropdown, so results read as a
+     focused layer over the darkened history behind. Toggled with #hdrop.on. */
+  .dropmask{position:fixed;inset:0;background:rgba(10,16,24,.45);z-index:20;display:none}
+  .dropmask.on{display:block}
+  /* lift the search box (and its absolute dropdown) above the mask while open */
+  .searchbox.raised{z-index:31}
   .drop.static{position:static;box-shadow:none;margin-top:8px;max-height:52dvh;overflow-y:auto}
   .opt{padding:11px 13px;display:flex;align-items:flex-start;gap:8px;cursor:pointer;border-bottom:1px solid var(--border)}
   .opt:last-child{border-bottom:none}
