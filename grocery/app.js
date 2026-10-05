@@ -478,7 +478,11 @@ function syncToCloud(){
     var pushed=0, chain=Promise.resolve();
     toPush.forEach(function(p){
       chain=chain.then(function(){
-        var rec={ name:p.name, qty:(p.qty||1), unitPrice:(p.unit!=null?p.unit:p.price), date:purchDate(p.ts), ts:p.ts };
+        // Cloud record carries only the four rule-validated fields. We deliberately
+        // do NOT send `ts` — the cloud's source of truth for the day is `date`, and
+        // the pull recomputes a local `ts` from `date`. (`ts` is kept LOCALLY on the
+        // purchase row for history sort/grouping; it is just not synced up.)
+        var rec={ name:p.name, qty:(p.qty||1), unitPrice:(p.unit!=null?p.unit:p.price), date:purchDate(p.ts) };
         return fb.push(pref, rec).then(function(ref){
           // stamp the cloud push-id back onto the local row so it is never re-pushed
           var key=(ref && ref.key) ? ref.key : null;
