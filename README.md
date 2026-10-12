@@ -18,7 +18,7 @@ its own repo (`BIG_OWN/<project>`); only the runtime assets are copied here.
 pages/
 ├── index.html          landing page (cards to each site)
 ├── .nojekyll           serve files as-is, no Jekyll
-├── familytree/         web assets only (rsync'd from BIG_OWN/familytree/web)
+├── familytree/         web assets only (esbuild bundle of BIG_OWN/familytree/source — see note)
 ├── masak-apa/          web assets only (rsync'd from BIG_OWN/masak-apa/web)
 ├── sentralingua-v2/    web assets only (rsync'd from BIG_OWN/sentralingua-v2)
 └── grocery/            web assets only (rsync'd from BIG_OWN/grocery — single index.html)
@@ -71,8 +71,13 @@ Per-project local assets that get versioned:
   is left bare on purpose.
 - **sentralingua-v2** — `assets/js/typed.umd.js`, `assets/img/logo.png`,
   `assets/img/hero-bg.webp` (the `sentralingua.com` images are external).
-- **familytree** — `styles.css`, `app.js`, `debug.js` (stamped only when
-  actually deployed).
+- **familytree** — a modular ES-module engine (`source/`): `deploy_familytree`
+  runs `tools/build.js` (esbuild bundles `source/main.js` → one minified
+  `app.js` + copies `style.css`, writes `index.html`/`manifest.json`) and
+  `tools/make-icons.js` (real 192/512 PNGs) into `familytree/dist/`, then
+  rsyncs that self-contained bundle here. Source is never published. Versioned
+  local assets: `style.css`, `app.js`, `icon.png`. The gstatic Firebase SDK URL
+  inside `app.js` is external and never stamped.
 
 Confirm what's live with:
 `curl -s https://wachyudisonang.github.io/pages/grocery/ | grep app-version`.

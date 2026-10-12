@@ -5,8 +5,10 @@
 # drafts, dev tooling and source never leak into the public repo.
 #
 # Usage:
-#   ./deploy.sh            # deploy all projects
-#   ./deploy.sh masak-apa  # deploy one project
+#   ./deploy.sh                     # deploy all projects
+#   ./deploy.sh masak-apa           # deploy one project
+#   ./deploy.sh --dry-run           # PREVIEW all — builds/rsync/stamps simulated, nothing written
+#   ./deploy.sh --dry-run familytree  # preview one (flag works in either position; -n is an alias)
 #
 # After running, review `git status`, then commit + push the `pages` repo:
 #   git add -A && git commit -m "Deploy <project> web assets" && git push origin main
@@ -23,6 +25,26 @@ set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BIG_OWN="$(cd "$HERE/.." && pwd)"
 
+# --dry-run: preview everything (builds, rsync, stamps) WITHOUT writing a single file. Accepted in
+# any position (./deploy.sh --dry-run familytree  OR  ./deploy.sh familytree --dry-run). The flag is
+# stripped out of the args; whatever non-flag token remains is the TARGET (default "all").
+DRY_RUN=0
+ARGS=()
+for a in "$@"; do
+  case "$a" in
+    --dry-run|-n) DRY_RUN=1 ;;
+    *) ARGS+=("$a") ;;
+  esac
+done
+set -- "${ARGS[@]:-}"
+if [[ "$DRY_RUN" == 1 ]]; then echo "### DRY RUN — no files will be written (rsync -n, builds/stamps simulated) ###"; echo; fi
+
+# run <cmd...> — execute a write command, or in dry-run just print it. Used for the rsync itself and
+# the familytree build/icon subshell, so a dry-run shows the exact action without performing it.
+run() {
+  if [[ "$DRY_RUN" == 1 ]]; then echo "   [dry-run] would run: $*"; else "$@"; fi
+}
+
 # One cache-bust stamp per deploy run (YYYYMMDDHHMM), shared by all stamped projects.
 DEPLOY_STAMP="$(date +%Y%m%d%H%M)"
 
@@ -34,12 +56,18 @@ rsync_project() {
     return 0
   fi
   echo "==> $name  ($src  ->  pages/$name/)"
-  mkdir -p "$dest"
+  run mkdir -p "$dest"
   # Build --include args from the allow-list, exclude everything else.
   local args=()
   for f in "$@"; do args+=(--include="$f"); done
-  rsync -a --delete "${args[@]}" --exclude='*' "$src"/ "$dest"/
-  echo "   files: $(find "$dest" -type f | wc -l | tr -d ' ')"
+  # --delete-excluded (not just --delete): an rsync --exclude pattern normally PROTECTS matching
+  # dest files from deletion, so a file dropped from the allow-list (e.g. familytree's old
+  # debug.js/styles.css from the pre-bundle web/ deploy) would linger forever. --delete-excluded
+  # makes the allow-list authoritative — the dest ends up as EXACTLY the listed files, nothing stale.
+  # In dry-run, rsync's own -n lists what WOULD transfer/delete, changing nothing.
+  local dry=(); [[ "$DRY_RUN" == 1 ]] && dry=(-n -v)
+  rsync -a --delete --delete-excluded ${dry[@]+"${dry[@]}"} "${args[@]}" --exclude='*' "$src"/ "$dest"/
+  if [[ "$DRY_RUN" != 1 ]]; then echo "   files: $(find "$dest" -type f | wc -l | tr -d ' ')"; fi
 }
 
 # stamp_version <project> — bake a deploy timestamp into a single-file app so every
@@ -49,6 +77,7 @@ rsync_project() {
 # macOS/BSD sed (-i '') is used; the source file is never touched, only pages/<p>/.
 stamp_version() {
   local name="$1" ver="$2"
+  if [[ "$DRY_RUN" == 1 ]]; then echo "   [dry-run] would stamp v=$ver (meta in pages/$name/index.html + hub link)"; return 0; fi
   local file="$HERE/$name/index.html"
   [[ -f "$file" ]] || { echo "   !! stamp skipped — $file missing"; return 0; }
   # 1) Inject/replace a version meta right after the <title> in the DEPLOYED copy.
@@ -73,6 +102,7 @@ stamp_version() {
 # local path, never an absolute http(s):// URL (those are external, left alone).
 stamp_asset() {
   local file="$1" ref="$2" ver="$3"
+  if [[ "$DRY_RUN" == 1 ]]; then echo "   [dry-run] would version $ref?v=$ver in $(basename "$file")"; return 0; fi
   [[ -f "$file" ]] || { echo "   !! asset-stamp skipped — $file missing"; return 0; }
   # Escape regex metachars in the ref (., /) for a safe match.
   local esc; esc="$(printf '%s' "$ref" | sed -e 's/[.[\*^$/]/\\&/g')"
@@ -103,17 +133,31 @@ deploy_masak_apa() {
 }
 
 deploy_familytree() {
-  # familytree serves from web/; publish only runtime files (NOT source/, tools/, print/, node_modules/).
-  rsync_project familytree "$BIG_OWN/familytree/web" \
-    index.html styles.css app.js debug.js robots.txt
-  # Only stamp if actually deployed (index.html present). Local assets: styles.css, app.js, debug.js.
+  # familytree is a MODULAR ES-module engine (source/), NOT a flat app. The dev vhost serves source/
+  # raw; the PUBLIC hub must NOT leak source/ (pages/README.md), so we ship a MINIFIED BUNDLE instead:
+  # tools/build.js esbuilds source/main.js -> dist/{app.js,style.css,index.html,manifest.json}, and
+  # tools/make-icons.js writes real 192/512 PNGs into dist/. We then rsync dist/ as a self-contained
+  # grocery-shaped app. source/, tools/, docs/ never reach the hub.
+  local ftsrc="$BIG_OWN/familytree"
+  if [[ ! -d "$ftsrc/source" ]]; then
+    echo "!! skip familytree — source not found: $ftsrc/source"
+    return 0
+  fi
+  echo "==> familytree  (building dist/ from source/ via esbuild)"
+  run bash -c "cd '$ftsrc' && node tools/build.js && node tools/make-icons.js"
+  # Publish ONLY the self-contained bundle output (same file set as grocery).
+  rsync_project familytree "$ftsrc/dist" \
+    index.html style.css app.js manifest.json icon.png icon-512.png
+  # Cache-bust: meta + hub link, then version every LOCAL asset ref so a stale app.js/style.css/icon
+  # can't be served from the browser cache. (The gstatic Firebase SDK URL inside app.js is external
+  # and never stamped — stamp_asset only touches quoted/paren'd local refs, never http(s):// URLs.)
   if [[ -f "$HERE/familytree/index.html" ]]; then
     stamp_version familytree "$DEPLOY_STAMP"
     local d="$HERE/familytree"
-    stamp_asset "$d/index.html" styles.css "$DEPLOY_STAMP"
-    stamp_asset "$d/index.html" app.js     "$DEPLOY_STAMP"
-    stamp_asset "$d/index.html" debug.js   "$DEPLOY_STAMP"
-    echo "   assets versioned: styles.css, app.js, debug.js"
+    stamp_asset "$d/index.html" style.css "$DEPLOY_STAMP"
+    stamp_asset "$d/index.html" app.js    "$DEPLOY_STAMP"
+    stamp_asset "$d/index.html" icon.png  "$DEPLOY_STAMP"
+    echo "   assets versioned: style.css, app.js, icon.png"
   fi
 }
 
@@ -164,5 +208,9 @@ case "$TARGET" in
 esac
 
 echo
-echo "Done. Review changes, then in $HERE:"
-echo "  git add -A && git commit -m \"Deploy $TARGET web assets\" && git push origin main"
+if [[ "$DRY_RUN" == 1 ]]; then
+  echo "### DRY RUN complete — nothing was written. Re-run without --dry-run to apply. ###"
+else
+  echo "Done. Review changes, then in $HERE:"
+  echo "  git add -A && git commit -m \"Deploy $TARGET web assets\" && git push origin main"
+fi

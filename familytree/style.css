@@ -1,0 +1,752 @@
+/* styles.css — cosmetic layer for the family-tree new modular engine.
+   ARCHITECTURE rule 7: every value is a --ft-* custom property.
+   Zero literal colors/sizes in rules — all come from var(--ft-*),
+   injected from core/tokens.js by main.js at boot. The stylesheet
+   and the JS layout share ONE source of truth for every number.
+
+   Rule 10: cosmetic = CSS only, never fed back into layout.                */
+
+/* --- Google Fonts: the Control-card font picker options (default + highlighted names) ---
+   Soft CDN fetch; degrades to the generic serif/sans fallbacks offline, so the
+   zero-runtime-dependency invariant still holds. */
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Libre+Caslon+Display&family=Cinzel:wght@400;600;700&family=Playfair+Display:wght@600;700;800&family=Lora:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Great+Vibes&family=Rochester&display=swap');
+
+/* --- Stage --- */
+.ft-stage { position: relative; }
+
+/* --- Base node --- */
+.ft-node {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	box-sizing: border-box;
+	border: var(--ft-box-border) solid var(--ft-color-nodeBorder);
+	border-radius: var(--ft-box-radius);
+	background: var(--ft-color-nodeBg);
+	padding: var(--ft-box-padY) var(--ft-box-padX);
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+	font-size: var(--ft-font-name);
+	color: var(--ft-color-nodeText);
+	cursor: pointer;
+}
+
+/* --- Avatar circle (emoji) ---
+   Shown only in avatars-on mode (see the .ft-avatars-on block below). Holds the gender
+   emoji; sized by --ft-av-size. In the default (avatars-off) mode this is display:none and
+   the node is a plain bordered name box. */
+.ft-av {
+	width: var(--ft-av-size);
+	height: var(--ft-av-size);
+	border-radius: 50%;
+	background: var(--ft-color-avBg);
+	color: var(--ft-color-avText);
+	font-size: var(--ft-font-avatar);
+	font-weight: 700;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0 auto 3px;
+	flex-shrink: 0;
+}
+
+/* --- Name label --- */
+.ft-nm {
+	font-family: var(--ft-font-default-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif);
+	line-height: var(--ft-font-line);
+	text-align: center;
+	word-break: break-word;
+	text-transform: capitalize;
+}
+
+/* --- Role: KEY person (gold highlight) --- */
+.ft-node--key {
+	border-color: var(--ft-color-key);
+	background: var(--ft-color-keyBg);
+	box-shadow: 0 0 0 2px color-mix(in srgb, var(--ft-color-key) 25%, transparent);
+}
+.ft-node--key .ft-av {
+	background: var(--ft-color-key);
+	color: var(--ft-color-nodeBg);
+}
+.ft-node--key .ft-nm {
+	font-weight: 700;
+	color: var(--ft-color-keyText);
+}
+
+/* --- Role: ANCESTOR (row-0 grandparents + row-1 parents) --- */
+.ft-node--ancestor {
+	border-color: var(--ft-color-ancBorder);
+	background: var(--ft-color-ancBg);
+}
+.ft-node--ancestor .ft-av {
+	background: var(--ft-color-avAncBg);
+	color: var(--ft-color-nodeBg);
+}
+
+/* --- Highlighted name (template-decided, NOT role-bound) ---
+   Applied to .ft-nm when node.highlight is set. Used for:
+     • vertical-gen-no-spouse: the ancestor names
+     • any OTHER template: the key person + its spouses
+   The Playfair serif + larger size is the "highlight" look, independent of layout role. */
+.ft-nm.ft-highlighted {
+	font-family: var(--ft-font-highlight-family, 'Playfair Display', Georgia, 'Times New Roman', serif);
+	font-weight: 700;
+	font-size: var(--ft-font-highlight);
+	color: var(--ft-color-ancText);
+}
+
+/* --- Vertical-list flex column (row-2 cousin lists) --- */
+.ft-vlist {
+	display: flex;
+	flex-direction: column;
+}
+
+/* --- Connectors (SVG paths) --- */
+.ft-connector {
+	stroke: var(--ft-color-line);
+	stroke-width: 1.5;
+	fill: none;
+}
+
+/* --- Group data-attribute scoping (screen.js annotates nodes, no DOM wrappers).
+   Scope with selectors like .ft-node[data-group="spouse-bloodline"] { ... } --- */
+
+/* Co-spouse (ancestor co-wife, e.g. Romla) — dashed border to separate from the primary
+   bloodline. Scoped to ANCESTOR nodes: a co-spouse in the key generation (e.g. Agustini in
+   default-tree) is NOT dashed — only ancestors of the key person read as dashed co-spouses. */
+.ft-node--ancestor[data-group="spouse-bloodline"] {
+	border-style: dashed;
+	opacity: 0.85;
+}
+
+/* --- AVATAR MODE (Show avatar ON) — matches familytree-old exactly ---
+   The node becomes a circular emoji avatar with the name stacked beneath it: the rect box
+   border/background/padding are dropped so only the circle + name show. The emoji circle is a
+   lavender surface with a dark ring; the KEY person's circle gets the gold ring + gold name,
+   ancestors a larger circle. This is COSMETIC ONLY (rule 10) — the node's measured bounding
+   box is unchanged, so every connector still attaches to the same place. In the default
+   (avatars-off) mode the .ft-av is hidden and the node is a plain bordered name box. */
+.ft-stage:not(.ft-avatars-on) .ft-av { display: none; }
+
+.ft-avatars-on .ft-node {
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+	padding: 0;
+	align-items: center;
+	/* Top-anchor the circle so every avatar in a row shares one baseline. The uniform
+	   row-height pass grows each box to the tallest name's height; without this, the base
+	   justify-content:center would float a short-name node's circle downward (Painah lower
+	   than the 2-line Mulyono). flex-start pins all circles to the top; the extra grown
+	   height is absorbed below the name. */
+	justify-content: flex-start;
+}
+.ft-avatars-on .ft-av {
+	border: 3px solid var(--ft-color-nodeBorder);
+	box-shadow: 0 2px 6px rgba(0, 0, 0, .15);
+	margin: 0 auto 4px;
+}
+.ft-avatars-on .ft-nm {
+	color: var(--ft-color-ancText);
+	font-weight: 700;
+}
+/* KEY person — gold ring on the circle + gold name (the ★ marker stays in the name). */
+.ft-avatars-on .ft-node--key {
+	box-shadow: none;
+}
+.ft-avatars-on .ft-node--key .ft-av {
+	background: var(--ft-color-avBg);
+	border-color: var(--ft-color-key);
+	box-shadow: 0 0 0 4px color-mix(in srgb, var(--ft-color-key) 28%, transparent), 0 2px 6px rgba(0, 0, 0, .15);
+}
+.ft-avatars-on .ft-node--key .ft-nm {
+	color: var(--ft-color-keyText);
+}
+/* Ancestor avatar circles share the uniform circle size (--ft-av-size); only their
+   background/border differs. Name uses the ancestor serif only where the template already
+   set .ft-highlighted — avatar mode doesn't change that. */
+.ft-avatars-on .ft-node--ancestor .ft-av {
+	background: var(--ft-color-avBg);
+	border-color: var(--ft-color-nodeBorder);
+}
+/* A dashed co-spouse circle keeps the dashed ring in avatar mode too. */
+.ft-avatars-on .ft-node--ancestor[data-group="spouse-bloodline"] {
+	opacity: 0.85;
+}
+.ft-avatars-on .ft-node--ancestor[data-group="spouse-bloodline"] .ft-av {
+	border-style: dashed;
+}
+
+/* --- Page-level styling --- */
+body {
+	margin: 20px;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+	background: var(--ft-color-pageBg);
+	color: var(--ft-color-nodeText);
+}
+/* Mobile surface: no body margin, so a section can paint its background to the true screen edge.
+   The 20px breathing room is restored as inset on the header + sections (which carry their own
+   horizontal padding), so content stays inset while section backgrounds bleed edge-to-edge. */
+.ft-surface-mobile body { margin: 0; }
+.ft-surface-mobile #ft-header { padding: 20px 20px 14px; }
+/* --- Brand header: logo + "Family Tree" title with a surname eyebrow on the left (an <a href="/">
+   home link), and a circular burger menu button on the right (TODO placeholder). Hairline divider
+   underneath. --- */
+#ft-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin: 0 0 18px;
+	padding: 0 0 14px;
+	border-bottom: 1px solid color-mix(in srgb, var(--ft-color-ancText, #333) 14%, transparent);
+}
+#ft-home {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	text-decoration: none;
+	color: inherit;
+	min-width: 0;              /* allow the brand text to shrink/ellipsis before the burger */
+}
+#ft-logo {
+	flex: 0 0 auto;
+	width: 44px;
+	height: 44px;
+	stroke: var(--ft-color-key, #d4a017);
+	stroke-width: 2.2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	fill: none;
+}
+/* Leaf-circles filled with a soft gold wash so the crown reads as foliage, trunk/branches stay line. */
+#ft-logo circle { fill: color-mix(in srgb, var(--ft-color-key, #d4a017) 16%, transparent); }
+#ft-home:hover { opacity: 0.8; }
+#ft-brandtext { min-width: 0; }
+#ft-title {
+	display: block;
+	font-family: 'Playfair Display', Georgia, serif;
+	font-size: 24px;
+	font-weight: 700;
+	letter-spacing: 0.01em;
+	line-height: 1.1;
+	margin: 0;
+	color: var(--ft-color-ancText, #333);
+}
+#ft-subtitle {
+	display: block;
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--ft-color-subtitle, #888);
+	margin: 1px 0 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+/* Burger menu — circular outlined button, right side. TODO: content inserted later. */
+#ft-menu {
+	flex: 0 0 auto;
+	width: 46px;
+	height: 46px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border: 1px solid color-mix(in srgb, var(--ft-color-ancText, #333) 18%, transparent);
+	border-radius: 50%;
+	background: transparent;
+	color: var(--ft-color-ancText, #333);
+	cursor: pointer;
+	transition: background 0.15s ease, border-color 0.15s ease;
+}
+#ft-menu:hover { background: color-mix(in srgb, var(--ft-color-ancText, #333) 6%, transparent); }
+#ft-menu svg {
+	width: 20px;
+	height: 20px;
+	stroke: currentColor;
+	stroke-width: 1.8;
+	stroke-linecap: round;
+	fill: none;
+}
+
+/* --- Control cards (card-controls + card-debug), old-engine UI look ---
+   Drawn from state (ARCHITECTURE rule 6). Uses existing --ft-* vars only, no new tokens.
+   Shared chrome: .card / .card-head / .card-body (card-shell.js).
+   Per card: .card-controls (.ctl-*)  .card-debug (.dbg-*).
+   Cards float top-right, side by side, absolutely positioned so they take NO flow space. */
+#ft-controls {
+	/* fixed (not absolute) so the cards stay pinned to the VIEWPORT top-right.
+	   With absolute, a tree wider than the viewport widens the document and the
+	   cards anchor to the document's right edge — scrolling right scrolls them
+	   off-screen. fixed keeps them in view at every horizontal scroll offset. */
+	position: fixed;
+	top: 12px;
+	right: 12px;
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	gap: 10px;
+	z-index: 10;
+	/* The container spans the full width/height of all three cards, including the empty gaps
+	   between and below them. Without this, that empty area would intercept clicks on tree
+	   nodes sitting underneath (e.g. Agustini, right-side cousins). Make the container itself
+	   click-through; each .card re-enables pointer events so only the real card chrome blocks. */
+	pointer-events: none;
+}
+.card {
+	pointer-events: auto;
+	width: fit-content;
+	min-width: 200px;
+	max-width: 240px;
+	margin: 0;
+	padding: 8px 10px;
+	border: 1px solid var(--ft-color-nodeBorder);
+	border-radius: 8px;
+	background: var(--ft-color-nodeBg);
+	color: var(--ft-color-nodeText);
+	font-size: 11px;
+	box-shadow: 0 1px 3px color-mix(in srgb, var(--ft-color-nodeText) 12%, transparent);
+}
+.card-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 6px;
+	cursor: pointer;
+	user-select: none;
+	/* Negative-margin + padding so the hover highlight spans the card's inner width. */
+	margin: -2px -4px 4px;
+	padding: 2px 4px;
+	border-radius: 5px;
+}
+.card-head:hover { background: color-mix(in srgb, var(--ft-color-ancBorder) 25%, transparent); }
+.card-title {
+	font-weight: 700;
+	font-size: 10px;
+	letter-spacing: 0.5px;
+	color: var(--ft-color-subtitle);
+}
+.card-toggle {
+	width: 20px; height: 20px;
+	line-height: 1;
+	border: 1px solid var(--ft-color-nodeBorder);
+	border-radius: 5px;
+	background: var(--ft-color-pageBg);
+	color: var(--ft-color-nodeText);
+	font-size: 13px;
+	/* Indicator only — the whole .card-head is the click target. Let clicks fall through to
+	   the header so there is a single toggle handler and no double-fire. */
+	pointer-events: none;
+}
+.card-body { display: flex; flex-direction: column; gap: 6px; }
+
+/* CONTROLS card rows: blue checkbox + bold label + gray hint */
+.ctl-row { display: flex; align-items: center; gap: 7px; }
+.ctl-toggle { cursor: pointer; }
+.ctl-check { width: 14px; height: 14px; accent-color: #2f6fed; cursor: pointer; flex-shrink: 0; }
+.ctl-toggle b { font-weight: 700; }
+.ctl-hint { color: var(--ft-color-subtitle); font-weight: 400; }
+.ctl-disabled { opacity: 0.45; cursor: not-allowed; }
+.ctl-disabled .ctl-check { cursor: not-allowed; }
+.ctl-keywrap { display: flex; flex-direction: column; gap: 3px; }
+.ctl-keylabel { font-weight: 700; font-size: 10px; color: var(--ft-color-subtitle); }
+.ctl-select {
+	font: inherit;
+	color: var(--ft-color-nodeText);
+	background: var(--ft-color-pageBg);
+	border: 1px solid var(--ft-color-nodeBorder);
+	border-radius: 6px;
+	padding: 4px 6px;
+}
+.ctl-key { width: 100%; }
+
+/* DEBUG card specifics */
+.dbg-engine { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.dbg-englabel { font-weight: 700; }
+.dbg-engine label { margin-right: 4px; }
+.dbg-section {
+	font-weight: 700; font-size: 10px; letter-spacing: 0.5px;
+	color: var(--ft-color-subtitle); margin-top: 2px;
+}
+.dbg-readout {
+	padding: 7px 9px;
+	border-radius: 6px;
+	background: color-mix(in srgb, var(--ft-color-ancBorder) 30%, var(--ft-color-nodeBg));
+	color: #8a2b2b;
+	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+	font-size: 10px;
+	line-height: 1.45;
+}
+.dbg-hr { border: none; border-top: 1px solid var(--ft-color-nodeBorder); margin: 4px 0; width: 100%; }
+.dbg-dial { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.dbg-dial > span { display: flex; align-items: center; gap: 6px; }
+.dbg-dial b { font-weight: 700; }
+.dbg-code {
+	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+	font-size: 9px;
+	padding: 1px 5px;
+	border-radius: 4px;
+	background: color-mix(in srgb, var(--ft-color-ancBorder) 30%, var(--ft-color-nodeBg));
+	color: #8a2b2b;
+}
+.dbg-num {
+	width: 56px;
+	font: inherit;
+	text-align: right;
+	color: var(--ft-color-nodeText);
+	background: var(--ft-color-pageBg);
+	border: 1px solid var(--ft-color-nodeBorder);
+	border-radius: 6px;
+	padding: 4px 6px;
+}
+.dbg-reset {
+	width: 100%;
+	font: inherit; font-weight: 700;
+	padding: 7px;
+	border: 1px solid var(--ft-color-nodeBorder);
+	border-radius: 6px;
+	background: var(--ft-color-pageBg);
+	color: var(--ft-color-nodeText);
+	cursor: pointer;
+}
+
+/* --- PRINT card (card-print.js) --- */
+.ft-print-btn {
+	width: 100%;
+	font: inherit; font-weight: 700;
+	padding: 7px;
+	border: 1px solid var(--ft-color-nodeBorder);
+	border-radius: 6px;
+	background: var(--ft-color-pageBg);
+	color: var(--ft-color-nodeText);
+	cursor: pointer;
+}
+.ft-print-note {
+	margin: 2px 0 4px;
+	font-size: 10px;
+	line-height: 1.4;
+	color: var(--ft-color-subtitle);
+}
+.ft-print-note code {
+	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+	font-size: 9px;
+	padding: 0 3px;
+	border-radius: 3px;
+	background: color-mix(in srgb, var(--ft-color-ancBorder) 30%, var(--ft-color-nodeBg));
+}
+.ft-print-opts { display: flex; flex-direction: column; gap: 7px; margin: 0 0 6px; }
+/* Label pinned left at a fixed width (flex:0 0) + NO wrap, so the control stays inline on the
+   label's line — the old-engine layout (a wrapping row stacked the control under the label). */
+.ft-print-optrow { display: flex; align-items: center; gap: 12px; }
+.ft-print-optlbl { flex: 0 0 52px; font-weight: 700; font-size: 10px; color: var(--ft-color-subtitle); }
+/* Tile / Cohort checkbox rows — the live page-mode options. */
+.ft-print-optchk { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; color: var(--ft-color-subtitle); cursor: pointer; user-select: none; }
+.ft-print-optchk input { cursor: pointer; }
+.ft-print-cmd {
+	display: block;
+	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+	font-size: 9px;
+	line-height: 1.4;
+	padding: 6px 8px;
+	border-radius: 6px;
+	word-break: break-all;
+	background: color-mix(in srgb, var(--ft-color-ancBorder) 30%, var(--ft-color-nodeBg));
+	color: #8a2b2b;
+}
+
+/* --- @media print: the PRINT card's "Print current view" button (browser print) ---
+   Hides the floating cards + title so the browser prints only the tree. (The CLI's PDF is a
+   separate, simpler path: it rasterises the faithful SVG — see tools/print-cli.js.) */
+@page { size: A4 landscape; margin: 10mm; }
+@media print {
+	#ft-controls { display: none !important; }
+	#ft-header, #ft-title, #ft-subtitle { display: none !important; }
+	body { margin: 0; background: #fff; }
+	#ft-stage { position: relative; }
+}
+
+/* --- MOBILE outline (surface==='mobile') — render/outline-mobile.js ---
+   A depth-capped indented list, NOT the measured-box tree. Indentation is driven by each row's
+   integer --depth (max 2), so it never consumes the narrow width. A row at the cap with
+   descendants shows a 👪 drill-in that opens a titled block below. Colours use the serif
+   ancestor family + the existing node palette so it reads like the rest of the app. */
+.ft-m-container {
+	max-width: 640px;
+	margin: 0 auto;
+	padding: 8px 0 48px;      /* NO horizontal padding — sections carry their own inset so a
+	                             section can paint a solid background to the screen edge */
+	box-sizing: border-box;
+}
+/* Section headers that separate the parents box tree (section 1) from the spouses outline. */
+.ft-m-section-title {
+	font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+	font-weight: 700;
+	font-size: 17px;
+	letter-spacing: 0.01em;
+	color: var(--ft-color-ancText, #333);
+	margin: 4px 0 4px;
+}
+/* "Spouses & Children" (section 2) is centered; the "Bloodline" title (section 1) stays left. */
+.ft-m-section2 .ft-m-section-title { text-align: center; margin-bottom: 20px }
+/* Mobile surface hides the floating Controls card (the mobile view has its own bottom action bar). */
+.ft-surface-mobile #ft-controls { display: none !important; }
+/* Swipe hint under the Bloodline title: a small finger-swipe icon + short, soft instruction. */
+.ft-m-section-hint {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12px;
+	color: var(--ft-color-subtitle, #888);
+	margin: 0 0 10px;
+}
+.ft-m-hint-icon {
+	flex: 0 0 auto;
+	width: 16px;
+	height: 16px;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+	/* Same swipe-finger glyph as the section-1 edge buttons (.ft-m-sibarrow-swipe), for consistency. */
+	background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='1.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 12V7.5a1.5 1.5 0 0 1 3 0V11m0-4.5a1.5 1.5 0 0 1 3 0V11m0-3a1.5 1.5 0 0 1 3 0v4m0-2a1.5 1.5 0 0 1 3 0v4c0 4.5-2.8 7-7 7h-1.2c-2.1 0-3.5-.8-4.8-2.4L3.8 15a1.6 1.6 0 0 1 2.3-2.2L8 14.2'/%3E%3Cpath d='M3 7H1m4-4L3.5 1.5M5 11H2'/%3E%3C/svg%3E");
+}
+/* Base section: full-bleed (no horizontal inset of its own) so a section background reaches the
+   screen edge. The inner wrapper carries the content inset. */
+.ft-m-section { padding-left: 15px; padding-right: 15px; }
+.ft-m-section-inner { padding: 0 15px; }
+.ft-m-section1 { position: relative; }   /* anchors the full-width nav overlay */
+/* Section 2 "Spouses & Children" gets a warm cream-gold wash; its inner wrapper is a LIGHTER
+   near-white panel framed by a soft gold border. Background only — fonts/colours unchanged.
+   position:relative anchors the ::before connector dot; margin-bottom:0 keeps it tight to the
+   closing tagline banner (section 3). */
+.ft-m-section2 {
+	position: relative;
+	margin-bottom: 0;
+	background: color-mix(in srgb, var(--ft-color-key, #d4a017) 10%, #fff);
+	padding-top: 16px;
+	padding-bottom: 20px;
+}
+.ft-m-section2 .ft-m-section-inner {
+	background: color-mix(in srgb, var(--ft-color-key, #d4a017) 4%, #fff);
+	border: 1px solid color-mix(in srgb, var(--ft-color-key, #d4a017) 30%, transparent);
+	border-radius: 8px;
+	padding-top: 14px;
+	padding-bottom: 14px;
+}
+/* Section 3: closing tagline banner — dark-green full-bleed background, centred gold tree glyph
+   over a light serif tagline. Decorative. Carries the action-bar bottom clearance (72px) since
+   it is now the last section. */
+.ft-m-section3 {
+	background: #1f3d33;
+	padding-top: 25px;
+	padding-bottom: 40px;
+	margin-bottom: 0;      /* clear the fixed bottom action bar */
+	text-align: center;
+}
+.ft-m-tagline-logo {
+	display: block;
+	width: 28px;
+	height: 28px;
+	margin: 0 auto 4px;
+	stroke: var(--ft-color-key, #d4a017);
+	stroke-width: 2.2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	fill: none;
+}
+.ft-m-tagline-logo circle { fill: color-mix(in srgb, var(--ft-color-key, #d4a017) 16%, transparent); }
+.ft-m-tagline {
+	margin: 0;
+	font-family: 'Libre Caslon Display', 'Playfair Display', Georgia, 'Times New Roman', serif;
+	font-size: 20px;
+	font-weight: 500;
+	color: #f3efe4;
+}
+/* Fixed bottom action bar: Edit Family (left) + Show Tree (right), pinned to the screen edge. */
+.ft-m-actionbar {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: flex;
+	gap: 10px;
+	padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+	background: var(--ft-color-nodeBg, #fff);
+	border-top: 1px solid rgba(107, 107, 123, 0.2);
+	box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+	z-index: 60;
+}
+.ft-m-action {
+	flex: 1 1 0;
+	appearance: none;
+	border: 1px solid rgba(107, 107, 123, 0.35);
+	border-radius: 8px;
+	padding: 12px 10px;
+	font-size: 15px;
+	font-weight: 600;
+	cursor: pointer;
+	background: #fafaf8;
+	color: #333;
+}
+.ft-m-action--tree {
+	background: var(--ft-color-key, #d4a017);
+	border-color: var(--ft-color-key, #d4a017);
+	color: #fff;
+}
+.ft-m-action:active { transform: scale(0.98); }
+/* The box stage hosts renderScreen's absolute-positioned node boxes AND the sibling-nav arrow
+   overlay (.ft-m-navlayer), so it is the positioning context for both. overflow:visible so the
+   edge arrows are never clipped. renderScreen sets an explicit pixel width = content width, so
+   margin:0 auto CENTERS the whole spine within the full-width section. */
+.ft-m-boxstage {
+	position: relative;
+	overflow: visible;
+	margin: 20px auto 0;
+}
+/* In the mobile bloodline spine, EVERY node (grands, parent, key) gets the SAME thin neutral
+   card border + radius — a 1px #ccc frame — so the whole section reads as a uniform set of cards.
+   This overrides the ancestor gold border and the key's gold border; the key keeps its soft fill
+   + bold gold NAME for emphasis, just not a different border. */
+.ft-m-boxstage .ft-node--ancestor,
+.ft-m-boxstage .ft-node--key {
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	padding: var(--ft-box-padY) var(--ft-box-padX);
+}
+.ft-m-boxstage .ft-node--ancestor { background: var(--ft-color-keyBg); }
+/* key box keeps its soft highlight fill + box-shadow accent removed (border is now neutral). */
+.ft-m-boxstage .ft-node--key { box-shadow: none; }
+/* ALL section-1 names are rendered .ft-highlighted (set in the template: every node highlight:true),
+   so they inherit the Playfair serif + highlight size from the shared .ft-nm.ft-highlighted rule. */
+/* Mobile section-1 spine: connectors are SOLID, THIN (1px) neutral-gray lines drawn by
+   renderScreen (the SAME path the desktop tree uses) — no leaf ornaments. Scoped to the mobile
+   box stage so the desktop tree's own stroke is unaffected. The SVG layer is pinned BEHIND the
+   node boxes (z-index) and the boxes are given a stacking context (position + z-index) so a
+   single-parent drop (which leaves the parent's centre) is hidden by the opaque box instead of
+   drawing a line through it. */
+.ft-m-boxstage .ft-connectors { z-index: 0; }
+.ft-m-boxstage .ft-node { position: absolute; z-index: 1; }
+.ft-m-boxstage .ft-connector {
+	stroke: #c9c9c9;
+	stroke-width: 1;
+	stroke-linecap: round;
+}
+/* The BRIDGE: a SOLID thin gray line continuing from the key box down past the bottom of
+   section 1, so the bloodline spine flows into section 2. Plain line, no ornament. */
+.ft-m-spinebridge {
+	position: absolute;
+	width: 1px;
+	height: 46px;                 /* reaches down into the gap toward the Spouses & Children header */
+	transform: translateX(-50%);
+	pointer-events: none;
+	z-index: 1;
+	background: #c9c9c9;
+}
+/* Decorative connector dot: 10px (r=5) gold circle centred ON the top edge of a box (section 1,
+   placed by JS from measured rects) — left/top are set inline to the box's top-centre. */
+.ft-m-topdot {
+	position: absolute;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: var(--ft-color-key, #d4a017);
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+	z-index: 2;
+}
+/* The connector dot centred on the TOP edge of section 2, where the spine bridge meets it.
+   (section 2's position:relative is set in its main block above.) */
+.ft-m-section2::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 50%;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: var(--ft-color-key, #d4a017);
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+	z-index: 2;
+}
+.ft-m-outline {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	/* All section-2 rows (couple labels + child names) use the Control card's "default name" font
+	   pick (--ft-font-default-family). The "Spouses & Children" title keeps its Playfair serif. */
+	font-family: var(--ft-font-default-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif);
+}
+.ft-m-row {
+	/* --depth is 0..MAX_DEPTH; 20px per level of indent. */
+	padding: 7px 4px 7px calc(2px + var(--depth, 0) * 20px);
+	display: flex;
+	align-items: baseline;
+	gap: 6px;
+	line-height: 1.3;
+	border-bottom: 1px solid rgba(107, 107, 123, 0.14);
+}
+.ft-m-branch {
+	color: #6b6b7b;
+	font-size: 13px;
+	flex: 0 0 auto;
+	opacity: 0.7;
+}
+.ft-m-label {
+	flex: 1 1 auto;
+	cursor: pointer;         /* tap to refocus (shared data-id delegation) */
+	color: #222;
+	font-size: 15px;
+}
+.ft-m-row.ft-m-key > .ft-m-label {
+	font-weight: 700;
+	color: #8b6914;          /* key palette (color.keyText) */
+}
+/* Space BETWEEN couple groups: each union row (except the first) gets extra top margin so one
+   spouse's children don't crowd the next spouse's label. */
+.ft-m-union:not(:first-child) { margin-top: 18px; }
+/* The key person's own couple row is not a refocus target — no pointer, no hover affordance. */
+.ft-m-label.ft-m-static {
+	cursor: default;
+}
+/* --- Section-1 sibling navigation: a prev/next BUTTON pinned to the section's left/right SCREEN
+   edge (positioned absolutely in the full-width section, vertical top set inline from the target
+   box's measured row), PLUS the box's own horizontal swipe (pan-y keeps vertical page scroll).
+   Each button holds only the swipe-finger icon; direction is set by the CSS mirror below. --- */
+.ft-node.ft-m-sibnav { touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+/* The key box in section 1 is already focused — not a refocus target, so no pointer. */
+.ft-node.ft-m-static { cursor: default; }
+.ft-m-sibarrow {
+	position: absolute;
+	transform: translateY(-50%);   /* vertical centre on the target box's row (top set inline) */
+	display: inline-flex;
+	align-items: center;
+	pointer-events: auto;
+	appearance: none;
+	border: none;
+	background: none;
+	padding: 6px;
+	cursor: pointer;
+	z-index: 50;
+	color: #6b6b7b;
+}
+.ft-m-sibarrow--older   { left: 50px; }    /* pinned to the LEFT screen edge of the section */
+.ft-m-sibarrow--younger { right: 50px; }   /* pinned to the RIGHT screen edge of the section */
+/* parent-row buttons tinted gold so the two generations read as distinct */
+.ft-m-sibarrow--parent { color: var(--ft-color-key, #c99a1e); }
+.ft-m-sibarrow:active { transform: translateY(-50%) scale(0.88); }
+/* the swipe-finger icon — a pointing hand with a directional swipe-trail arrow. It points LEFT
+   by default (used for the older/prev button); the younger/next button mirrors it with scaleX. */
+.ft-m-sibarrow-swipe {
+	width: 24px;
+	height: 24px;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+	background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 24 24' fill='none' stroke='%23cccccc' stroke-width='1.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 12V7.5a1.5 1.5 0 0 1 3 0V11m0-4.5a1.5 1.5 0 0 1 3 0V11m0-3a1.5 1.5 0 0 1 3 0v4m0-2a1.5 1.5 0 0 1 3 0v4c0 4.5-2.8 7-7 7h-1.2c-2.1 0-3.5-.8-4.8-2.4L3.8 15a1.6 1.6 0 0 1 2.3-2.2L8 14.2'/%3E%3Cpath d='M3 7H1m4-4L3.5 1.5M5 11H2'/%3E%3C/svg%3E");
+}
+/* The icon's motion lines read as a LEFT swipe as drawn. Reverse the mirror from natural reading:
+   the LEFT/prev button is flipped (points right), the RIGHT/next button keeps the drawn
+   left-pointing motion — per the requested direction. */
+.ft-m-sibarrow--older .ft-m-sibarrow-swipe { transform: scaleX(-1); }
