@@ -193,6 +193,7 @@ body {
    home link), and a circular burger menu button on the right (TODO placeholder). Hairline divider
    underneath. --- */
 #ft-header {
+	position: relative;   /* anchor for the burger-menu dropdown (.ft-menu-panel) */
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -750,3 +751,178 @@ body {
    the LEFT/prev button is flipped (points right), the RIGHT/next button keeps the drawn
    left-pointing motion — per the requested direction. */
 .ft-m-sibarrow--older .ft-m-sibarrow-swipe { transform: scaleX(-1); }
+
+/* -------------------------------------------------------------------------
+   Initial popup — visitor onboarding modal (render/initial-popup.js).
+   A full-screen overlay with a centred card. Colours reuse the same --ft-*
+   tokens as the tree/cards (rule 7); each carries a safe fallback like the
+   header rules, so the modal is readable even before tokens are injected.
+   ------------------------------------------------------------------------- */
+.ip-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	background: color-mix(in srgb, var(--ft-color-ancText, #222) 55%, transparent);
+	backdrop-filter: blur(2px);
+}
+.ip-panel {
+	width: 100%;
+	max-width: 440px;
+	max-height: calc(100vh - 40px);
+	overflow-y: auto;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	padding: 26px 26px 24px;
+	background: var(--ft-color-pageBg, #fff);
+	color: var(--ft-color-nodeText, #222);
+	border: 1px solid var(--ft-color-nodeBorder, #ccc);
+	border-radius: 12px;
+	box-shadow: 0 12px 40px color-mix(in srgb, var(--ft-color-ancText, #000) 30%, transparent);
+}
+.ip-title {
+	margin: 0;
+	font-family: var(--ft-font-highlight-family, 'Playfair Display', Georgia, serif);
+	font-size: 24px;
+	font-weight: 800;
+	color: var(--ft-color-ancText, #222);
+}
+.ip-lede {
+	margin: 0;
+	font-size: 13px;
+	line-height: 1.45;
+	color: var(--ft-color-subtitle, #777);
+}
+.ip-field { display: flex; flex-direction: column; gap: 6px; }
+.ip-step {
+	font-weight: 700;
+	font-size: 13px;
+	color: var(--ft-color-nodeText, #222);
+}
+.ip-select {
+	width: 100%;
+	box-sizing: border-box;
+	padding: 9px 10px;
+	font-size: 14px;
+	color: var(--ft-color-nodeText, #222);
+	background: var(--ft-color-nodeBg, #fff);
+	border: 1px solid var(--ft-color-nodeBorder, #ccc);
+	border-radius: 7px;
+	cursor: pointer;
+}
+.ip-select:focus {
+	outline: none;
+	border-color: var(--ft-color-key, #d4a017);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--ft-color-key, #d4a017) 25%, transparent);
+}
+.ip-summary {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	padding: 14px 16px;
+	background: color-mix(in srgb, var(--ft-color-key, #d4a017) 9%, transparent);
+	border: 1px solid color-mix(in srgb, var(--ft-color-key, #d4a017) 30%, transparent);
+	border-radius: 8px;
+}
+.ip-sum-title {
+	font-weight: 700;
+	font-size: 12px;
+	margin-bottom: 2px;
+	color: var(--ft-color-ancText, #222);
+}
+.ip-sum-row { display: flex; gap: 6px; font-size: 13px; line-height: 1.4; }
+.ip-sum-label { font-weight: 700; color: var(--ft-color-subtitle, #777); white-space: nowrap; }
+.ip-sum-value {
+	color: var(--ft-color-ancText, #222);
+	font-family: var(--ft-font-highlight-family, 'Playfair Display', Georgia, serif);
+}
+.ip-sum-note { font-size: 12.5px; line-height: 1.4; color: var(--ft-color-subtitle, #777); font-style: italic; }
+.ip-explore {
+	margin-top: 4px;
+	padding: 12px 16px;
+	font-size: 15px;
+	font-weight: 700;
+	color: var(--ft-color-keyText, #fff);
+	background: var(--ft-color-key, #d4a017);
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+}
+.ip-explore:hover { filter: brightness(1.06); }
+.ip-explore:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* --- Combobox (type-to-filter dropdown) used by the initial popup's two choosers.
+   The input reuses .ip-select look; the popup list floats below it (position:relative
+   wrapper). Colours are the same --ft-* tokens with safe fallbacks. --- */
+.ip-combo { position: relative; }
+.ip-combo-input { cursor: text; }
+.ip-combo-list {
+	position: absolute;
+	top: calc(100% + 4px);
+	left: 0;
+	right: 0;
+	z-index: 20;
+	max-height: 220px;
+	overflow-y: auto;
+	background: var(--ft-color-nodeBg, #fff);
+	border: 1px solid var(--ft-color-nodeBorder, #ccc);
+	border-radius: 7px;
+	box-shadow: 0 8px 24px color-mix(in srgb, var(--ft-color-ancText, #000) 22%, transparent);
+}
+.ip-combo-opt {
+	padding: 8px 10px;
+	font-size: 14px;
+	color: var(--ft-color-nodeText, #222);
+	cursor: pointer;
+}
+.ip-combo-opt:hover, .ip-combo-opt.is-active {
+	background: color-mix(in srgb, var(--ft-color-key, #d4a017) 18%, transparent);
+}
+.ip-combo-empty {
+	padding: 8px 10px;
+	font-size: 13px;
+	font-style: italic;
+	color: var(--ft-color-subtitle, #777);
+}
+
+/* --- Burger menu dropdown (render/menu.js). A small panel anchored under #ft-menu with
+   text links; "Who you Are" reopens the visitor popup. #ft-header is position:relative (set
+   on its main rule above) so this panel can anchor to it; the panel floats top-right. --- */
+.ft-menu-panel {
+	position: absolute;
+	top: calc(100% - 6px);
+	right: 0;
+	z-index: 30;
+	min-width: 180px;
+	padding: 6px;
+	background: var(--ft-color-pageBg, #fff);
+	border: 1px solid var(--ft-color-nodeBorder, #ccc);
+	border-radius: 10px;
+	box-shadow: 0 10px 30px color-mix(in srgb, var(--ft-color-ancText, #000) 24%, transparent);
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+.ft-menu-panel[hidden] { display: none; }
+.ft-menu-item {
+	display: block;
+	width: 100%;
+	box-sizing: border-box;
+	text-align: left;
+	padding: 9px 12px;
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--ft-color-nodeText, #222);
+	background: transparent;
+	border: none;
+	border-radius: 7px;
+	cursor: pointer;
+}
+.ft-menu-item:hover {
+	background: color-mix(in srgb, var(--ft-color-key, #d4a017) 16%, transparent);
+}
