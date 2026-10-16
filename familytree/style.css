@@ -856,6 +856,33 @@ body {
 .ip-explore:hover { filter: brightness(1.06); }
 .ip-explore:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* --- Admin family switcher: reuses .ip-panel/.ip-select/.ip-explore; a little layout only. --- */
+.af-panel { gap: 16px; }
+.af-select { margin-top: 2px; }
+.af-go { margin-top: 2px; }
+.af-foot { margin-top: 2px; opacity: 0.8; }
+.af-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 2px; }
+.af-actions .af-go { margin-top: 0; }
+.af-reset:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* --- Admin controls row INSIDE the welcome popup (admin only). --- */
+.ip-admin {
+	display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+	margin-top: 6px; padding-top: 12px;
+	border-top: 1px solid color-mix(in srgb, var(--ft-color-nodeBorder, #ccc) 60%, transparent);
+}
+.ip-admin-label {
+	font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+	color: var(--ft-color-subtitle, #888); margin-right: 2px;
+}
+.ip-admin-btn {
+	padding: 6px 12px; font-size: 13px; font-weight: 600;
+	color: var(--ft-color-nodeText, #222);
+	background: var(--ft-color-nodeBg, #fff);
+	border: 1px solid var(--ft-color-nodeBorder, #ccc); border-radius: 7px; cursor: pointer;
+}
+.ip-admin-btn:hover { border-color: var(--ft-color-key, #d4a017); }
+
 /* --- Identity gate (step 1): name input + Find button, step 2 hidden until confirmed.
    The input reuses .ip-select look; same --ft-* tokens with safe fallbacks. --- */
 .ip-name-row { display: flex; gap: 8px; align-items: stretch; }
