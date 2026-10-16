@@ -847,7 +847,7 @@ body {
 	padding: 12px 16px;
 	font-size: 15px;
 	font-weight: 700;
-	color: var(--ft-color-keyText, #fff);
+	color: #fff;
 	background: var(--ft-color-key, #d4a017);
 	border: none;
 	border-radius: 8px;
@@ -855,6 +855,66 @@ body {
 }
 .ip-explore:hover { filter: brightness(1.06); }
 .ip-explore:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* --- Identity gate (step 1): name input + Find button, step 2 hidden until confirmed.
+   The input reuses .ip-select look; same --ft-* tokens with safe fallbacks. --- */
+.ip-name-row { display: flex; gap: 8px; align-items: stretch; }
+.ip-name-input { flex: 1 1 auto; cursor: text; }
+.ip-name-input:disabled { opacity: 0.7; cursor: not-allowed; }
+.ip-find {
+	flex: 0 0 auto;
+	padding: 9px 14px;
+	font-size: 14px;
+	font-weight: 700;
+	color: #fff;
+	background: var(--ft-color-key, #d4a017);
+	border: none;
+	border-radius: 7px;
+	cursor: pointer;
+}
+.ip-find:hover { filter: brightness(1.06); }
+/* 'Change' state: visually distinct from the gold 'Find me' — a darker neutral with white text,
+   so the visitor can tell "search" from "I've found you, re-pick" at a glance. */
+.ip-find.is-change {
+	background: color-mix(in srgb, var(--ft-color-ancText, #2b2b2b) 78%, #000);
+	color: #fff;
+}
+.ip-find.is-change:hover { filter: brightness(1.12); }
+.ip-step2 { display: flex; flex-direction: column; gap: 16px; }
+.ip-step2[hidden] { display: none; }
+
+/* WhatsApp request block — shown only on the "no match" case. Centered in the popup; the button is
+   WhatsApp green with white text + a negative-white icon. The [hidden] guard beats the flex display. */
+.ip-wa { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 8px; text-align: center; }
+.ip-wa[hidden] { display: none; }
+.ip-wa-info { font-size: 12.5px; line-height: 1.45; color: var(--ft-color-nodeText, #222); margin: 0; }
+.ip-wa-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	align-self: center;
+	padding: 10px 18px;
+	font-size: 14px;
+	font-weight: 700;
+	color: #fff;
+	background: #25d366;
+	border-radius: 7px;
+	text-decoration: none;
+}
+.ip-wa-btn svg { display: block; fill: #fff; }
+.ip-wa-btn:hover { filter: brightness(1.06); }
+.ip-name-choices { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.ip-name-choice {
+	padding: 7px 12px;
+	font-size: 13px;
+	color: var(--ft-color-nodeText, #222);
+	background: var(--ft-color-nodeBg, #fff);
+	border: 1px solid var(--ft-color-nodeBorder, #ccc);
+	border-radius: 7px;
+	cursor: pointer;
+}
+.ip-name-choice:hover { border-color: var(--ft-color-key, #d4a017); }
 
 /* --- Combobox (type-to-filter dropdown) used by the initial popup's two choosers.
    The input reuses .ip-select look; the popup list floats below it (position:relative
