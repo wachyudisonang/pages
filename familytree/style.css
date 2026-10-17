@@ -1013,3 +1013,23 @@ body {
 .ft-menu-item:hover {
 	background: color-mix(in srgb, var(--ft-color-key, #d4a017) 16%, transparent);
 }
+/* Nested "Admin" group: the group button shows a caret that rotates when expanded; its children
+   sit in an indented sub-list revealed on click (render/menu.js builds .ft-menu-groupwrap). */
+.ft-menu-groupwrap { display: flex; flex-direction: column; gap: 2px; }
+.ft-menu-group::after {
+	content: '▸';
+	float: right;
+	opacity: 0.6;
+	transition: transform 0.12s ease;
+}
+.ft-menu-group[aria-expanded="true"]::after { transform: rotate(90deg); }
+.ft-menu-sub {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	margin-left: 10px;
+	padding-left: 8px;
+	border-left: 2px solid color-mix(in srgb, var(--ft-color-key, #d4a017) 30%, transparent);
+}
+.ft-menu-sub[hidden] { display: none; }
+.ft-menu-subitem { font-weight: 500; }
