@@ -1,20 +1,31 @@
-/* styles.css — cosmetic layer for the family-tree new modular engine.
-   ARCHITECTURE rule 7: every value is a --ft-* custom property.
-   Zero literal colors/sizes in rules — all come from var(--ft-*),
-   injected from core/tokens.js by main.js at boot. The stylesheet
-   and the JS layout share ONE source of truth for every number.
+/* styles.css — cosmetic layer. Every value is a --ft-* token (tokens.js, injected at boot);
+   CSS and JS layout share one source of truth. Cosmetic only — never fed back into layout. */
 
-   Rule 10: cosmetic = CSS only, never fed back into layout.                */
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Libre+Caslon+Display&family=Cinzel:wght@400;600;700&family=Playfair+Display:wght@600;700;800&family=DM+Serif+Display&family=Lora:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Great+Vibes&family=Rochester&family=Comfortaa&family=Parisienne&display=swap');
 
-/* --- Google Fonts: the Control-card font picker options (default + highlighted names) ---
-   Soft CDN fetch; degrades to the generic serif/sans fallbacks offline, so the
-   zero-runtime-dependency invariant still holds. */
-@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Libre+Caslon+Display&family=Cinzel:wght@400;600;700&family=Playfair+Display:wght@600;700;800&family=Lora:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Great+Vibes&family=Rochester&display=swap');
+/* ============================================================ RESET + BASE */
+*,
+*::before,
+*::after { box-sizing: border-box; }
 
-/* --- Stage --- */
+html { background: var(--ft-color-pageBg); }
+
+body {
+	margin: 0;
+	font-size: 1rem;
+	font-weight: 400;
+	line-height: 1.5;
+	-webkit-text-size-adjust: 100%;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+	color: var(--ft-color-nodeText);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================ TREE NODES */
 .ft-stage { position: relative; }
 
-/* --- Base node --- */
 .ft-node {
 	display: flex;
 	flex-direction: column;
@@ -30,10 +41,7 @@
 	cursor: pointer;
 }
 
-/* --- Avatar circle (emoji) ---
-   Shown only in avatars-on mode (see the .ft-avatars-on block below). Holds the gender
-   emoji; sized by --ft-av-size. In the default (avatars-off) mode this is display:none and
-   the node is a plain bordered name box. */
+/* Avatar circle — shown only in avatars-on mode; hidden otherwise. */
 .ft-av {
 	width: var(--ft-av-size);
 	height: var(--ft-av-size);
@@ -49,7 +57,6 @@
 	flex-shrink: 0;
 }
 
-/* --- Name label --- */
 .ft-nm {
 	font-family: var(--ft-font-default-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif);
 	line-height: var(--ft-font-line);
@@ -58,36 +65,23 @@
 	text-transform: capitalize;
 }
 
-/* --- Role: KEY person (gold highlight) --- */
+/* Role: KEY person (gold). */
 .ft-node--key {
 	border-color: var(--ft-color-key);
 	background: var(--ft-color-keyBg);
 	box-shadow: 0 0 0 2px color-mix(in srgb, var(--ft-color-key) 25%, transparent);
 }
-.ft-node--key .ft-av {
-	background: var(--ft-color-key);
-	color: var(--ft-color-nodeBg);
-}
-.ft-node--key .ft-nm {
-	font-weight: 700;
-	color: var(--ft-color-keyText);
-}
+.ft-node--key .ft-av { background: var(--ft-color-key); color: var(--ft-color-nodeBg); }
+.ft-node--key .ft-nm { font-weight: 700; color: var(--ft-color-keyText); }
 
-/* --- Role: ANCESTOR (row-0 grandparents + row-1 parents) --- */
+/* Role: ANCESTOR (grandparents + parents). */
 .ft-node--ancestor {
 	border-color: var(--ft-color-ancBorder);
 	background: var(--ft-color-ancBg);
 }
-.ft-node--ancestor .ft-av {
-	background: var(--ft-color-avAncBg);
-	color: var(--ft-color-nodeBg);
-}
+.ft-node--ancestor .ft-av { background: var(--ft-color-avAncBg); color: var(--ft-color-nodeBg); }
 
-/* --- Highlighted name (template-decided, NOT role-bound) ---
-   Applied to .ft-nm when node.highlight is set. Used for:
-     • vertical-gen-no-spouse: the ancestor names
-     • any OTHER template: the key person + its spouses
-   The Playfair serif + larger size is the "highlight" look, independent of layout role. */
+/* Highlighted name (template-decided, not role-bound). */
 .ft-nm.ft-highlighted {
 	font-family: var(--ft-font-highlight-family, 'Playfair Display', Georgia, 'Times New Roman', serif);
 	font-weight: 700;
@@ -95,37 +89,16 @@
 	color: var(--ft-color-ancText);
 }
 
-/* --- Vertical-list flex column (row-2 cousin lists) --- */
-.ft-vlist {
-	display: flex;
-	flex-direction: column;
-}
+.ft-vlist { display: flex; flex-direction: column; }
 
-/* --- Connectors (SVG paths) --- */
-.ft-connector {
-	stroke: var(--ft-color-line);
-	stroke-width: 1.5;
-	fill: none;
-}
+.ft-connector { stroke: var(--ft-color-line); stroke-width: 1.5; fill: none; }
 
-/* --- Group data-attribute scoping (screen.js annotates nodes, no DOM wrappers).
-   Scope with selectors like .ft-node[data-group="spouse-bloodline"] { ... } --- */
+/* Co-spouse ancestor — dashed border (scoped to ancestors only). */
+.ft-node--ancestor[data-group="spouse-bloodline"] { border-style: dashed; opacity: 0.85; }
 
-/* Co-spouse (ancestor co-wife, e.g. Romla) — dashed border to separate from the primary
-   bloodline. Scoped to ANCESTOR nodes: a co-spouse in the key generation (e.g. Agustini in
-   default-tree) is NOT dashed — only ancestors of the key person read as dashed co-spouses. */
-.ft-node--ancestor[data-group="spouse-bloodline"] {
-	border-style: dashed;
-	opacity: 0.85;
-}
-
-/* --- AVATAR MODE (Show avatar ON) — matches familytree-old exactly ---
-   The node becomes a circular emoji avatar with the name stacked beneath it: the rect box
-   border/background/padding are dropped so only the circle + name show. The emoji circle is a
-   lavender surface with a dark ring; the KEY person's circle gets the gold ring + gold name,
-   ancestors a larger circle. This is COSMETIC ONLY (rule 10) — the node's measured bounding
-   box is unchanged, so every connector still attaches to the same place. In the default
-   (avatars-off) mode the .ft-av is hidden and the node is a plain bordered name box. */
+/* ============================================================ AVATAR MODE
+   Node becomes a circular emoji avatar + stacked name; box chrome dropped.
+   Cosmetic only — the measured bounding box is unchanged. */
 .ft-stage:not(.ft-avatars-on) .ft-av { display: none; }
 
 .ft-avatars-on .ft-node {
@@ -134,73 +107,55 @@
 	box-shadow: none;
 	padding: 0;
 	align-items: center;
-	/* Top-anchor the circle so every avatar in a row shares one baseline. The uniform
-	   row-height pass grows each box to the tallest name's height; without this, the base
-	   justify-content:center would float a short-name node's circle downward (Painah lower
-	   than the 2-line Mulyono). flex-start pins all circles to the top; the extra grown
-	   height is absorbed below the name. */
-	justify-content: flex-start;
+	justify-content: flex-start;   /* pin circles to one top baseline across a row */
 }
 .ft-avatars-on .ft-av {
 	border: 3px solid var(--ft-color-nodeBorder);
 	box-shadow: 0 2px 6px rgba(0, 0, 0, .15);
 	margin: 0 auto 4px;
 }
-.ft-avatars-on .ft-nm {
-	color: var(--ft-color-ancText);
-	font-weight: 700;
-}
-/* KEY person — gold ring on the circle + gold name (the ★ marker stays in the name). */
-.ft-avatars-on .ft-node--key {
-	box-shadow: none;
-}
+.ft-avatars-on .ft-nm { color: var(--ft-color-ancText); font-weight: 700; }
+.ft-avatars-on .ft-node--key { box-shadow: none; }
 .ft-avatars-on .ft-node--key .ft-av {
 	background: var(--ft-color-avBg);
 	border-color: var(--ft-color-key);
 	box-shadow: 0 0 0 4px color-mix(in srgb, var(--ft-color-key) 28%, transparent), 0 2px 6px rgba(0, 0, 0, .15);
 }
-.ft-avatars-on .ft-node--key .ft-nm {
-	color: var(--ft-color-keyText);
-}
-/* Ancestor avatar circles share the uniform circle size (--ft-av-size); only their
-   background/border differs. Name uses the ancestor serif only where the template already
-   set .ft-highlighted — avatar mode doesn't change that. */
+.ft-avatars-on .ft-node--key .ft-nm { color: var(--ft-color-keyText); }
 .ft-avatars-on .ft-node--ancestor .ft-av {
 	background: var(--ft-color-avBg);
 	border-color: var(--ft-color-nodeBorder);
 }
-/* A dashed co-spouse circle keeps the dashed ring in avatar mode too. */
-.ft-avatars-on .ft-node--ancestor[data-group="spouse-bloodline"] {
-	opacity: 0.85;
-}
-.ft-avatars-on .ft-node--ancestor[data-group="spouse-bloodline"] .ft-av {
-	border-style: dashed;
-}
+.ft-avatars-on .ft-node--ancestor[data-group="spouse-bloodline"] { opacity: 0.85; }
+.ft-avatars-on .ft-node--ancestor[data-group="spouse-bloodline"] .ft-av { border-style: dashed; }
 
-/* --- Page-level styling --- */
-body {
-	margin: 20px;
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-	background: var(--ft-color-pageBg);
-	color: var(--ft-color-nodeText);
+/* ============================================================ PAGE WRAPPERS
+   Each wrapper inset 20px from the dark pageBg html frame. Header transparent
+   (white text on dark); stage carries the light bodyBg card. */
+#ft-header-wrap { padding: 0 20px; background: none; }
+#ft-stage-wrap {
+	position: relative;
+	padding: 20px;
+	background: var(--ft-color-bodyBg);
+	box-shadow: var(--ft-tw-shadowLg, 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1));
 }
-/* Mobile surface: no body margin, so a section can paint its background to the true screen edge.
-   The 20px breathing room is restored as inset on the header + sections (which carry their own
-   horizontal padding), so content stays inset while section backgrounds bleed edge-to-edge. */
-.ft-surface-mobile body { margin: 0; }
+/* Mobile: no wrapper margin, so a section background can bleed to the screen edge. */
+.ft-surface-mobile #ft-header-wrap,
+.ft-surface-mobile #ft-stage-wrap { margin: 0; }
 .ft-surface-mobile #ft-header { padding: 20px 20px 14px; }
-/* --- Brand header: logo + "Family Tree" title with a surname eyebrow on the left (an <a href="/">
-   home link), and a circular burger menu button on the right (TODO placeholder). Hairline divider
-   underneath. --- */
+
+/* ============================================================ HEADER
+   Logo + title + surname eyebrow (home link) on the left, burger on the right. */
 #ft-header {
-	position: relative;   /* anchor for the burger-menu dropdown (.ft-menu-panel) */
+	position: relative;   /* anchors the burger dropdown */
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
-	margin: 0 0 18px;
-	padding: 0 0 14px;
-	border-bottom: 1px solid color-mix(in srgb, var(--ft-color-ancText, #333) 14%, transparent);
+	margin: 15px 0 0;
+	padding: 0 0 15px;
+	color: #fff;
+	border-bottom: 1px solid color-mix(in srgb, #fff 30%, transparent);
 }
 #ft-home {
 	display: flex;
@@ -208,7 +163,7 @@ body {
 	gap: 14px;
 	text-decoration: none;
 	color: inherit;
-	min-width: 0;              /* allow the brand text to shrink/ellipsis before the burger */
+	min-width: 0;
 }
 #ft-logo {
 	flex: 0 0 auto;
@@ -220,7 +175,6 @@ body {
 	stroke-linejoin: round;
 	fill: none;
 }
-/* Leaf-circles filled with a soft gold wash so the crown reads as foliage, trunk/branches stay line. */
 #ft-logo circle { fill: color-mix(in srgb, var(--ft-color-key, #d4a017) 16%, transparent); }
 #ft-home:hover { opacity: 0.8; }
 #ft-brandtext { min-width: 0; }
@@ -232,7 +186,7 @@ body {
 	letter-spacing: 0.01em;
 	line-height: 1.1;
 	margin: 0;
-	color: var(--ft-color-ancText, #333);
+	color: #fff;
 }
 #ft-subtitle {
 	display: block;
@@ -240,13 +194,12 @@ body {
 	font-weight: 700;
 	letter-spacing: 0.16em;
 	text-transform: uppercase;
-	color: var(--ft-color-subtitle, #888);
+	color: #fff;
 	margin: 1px 0 0;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
-/* Burger menu — circular outlined button, right side. TODO: content inserted later. */
 #ft-menu {
 	flex: 0 0 auto;
 	width: 46px;
@@ -255,14 +208,14 @@ body {
 	align-items: center;
 	justify-content: center;
 	padding: 0;
-	border: 1px solid color-mix(in srgb, var(--ft-color-ancText, #333) 18%, transparent);
+	border: 1px solid color-mix(in srgb, #fff 45%, transparent);
 	border-radius: 50%;
 	background: transparent;
-	color: var(--ft-color-ancText, #333);
+	color: #fff;
 	cursor: pointer;
 	transition: background 0.15s ease, border-color 0.15s ease;
 }
-#ft-menu:hover { background: color-mix(in srgb, var(--ft-color-ancText, #333) 6%, transparent); }
+#ft-menu:hover { background: color-mix(in srgb, #fff 14%, transparent); }
 #ft-menu svg {
 	width: 20px;
 	height: 20px;
@@ -272,17 +225,10 @@ body {
 	fill: none;
 }
 
-/* --- Control cards (card-controls + card-debug), old-engine UI look ---
-   Drawn from state (ARCHITECTURE rule 6). Uses existing --ft-* vars only, no new tokens.
-   Shared chrome: .card / .card-head / .card-body (card-shell.js).
-   Per card: .card-controls (.ctl-*)  .card-debug (.dbg-*).
-   Cards float top-right, side by side, absolutely positioned so they take NO flow space. */
+/* ============================================================ CONTROL CARDS
+   card-controls + card-debug + card-print. Float top-right, no flow space. */
 #ft-controls {
-	/* fixed (not absolute) so the cards stay pinned to the VIEWPORT top-right.
-	   With absolute, a tree wider than the viewport widens the document and the
-	   cards anchor to the document's right edge — scrolling right scrolls them
-	   off-screen. fixed keeps them in view at every horizontal scroll offset. */
-	position: fixed;
+	position: absolute;
 	top: 12px;
 	right: 12px;
 	display: flex;
@@ -290,11 +236,7 @@ body {
 	align-items: flex-start;
 	gap: 10px;
 	z-index: 10;
-	/* The container spans the full width/height of all three cards, including the empty gaps
-	   between and below them. Without this, that empty area would intercept clicks on tree
-	   nodes sitting underneath (e.g. Agustini, right-side cousins). Make the container itself
-	   click-through; each .card re-enables pointer events so only the real card chrome blocks. */
-	pointer-events: none;
+	pointer-events: none;   /* click-through gaps; each .card re-enables */
 }
 .card {
 	pointer-events: auto;
@@ -304,7 +246,7 @@ body {
 	margin: 0;
 	padding: 8px 10px;
 	border: 1px solid var(--ft-color-nodeBorder);
-	border-radius: 8px;
+	border-radius: var(--ft-tw-radLg, 8px);
 	background: var(--ft-color-nodeBg);
 	color: var(--ft-color-nodeText);
 	font-size: 11px;
@@ -314,13 +256,11 @@ body {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	margin-bottom: 6px;
 	cursor: pointer;
 	user-select: none;
-	/* Negative-margin + padding so the hover highlight spans the card's inner width. */
 	margin: -2px -4px 4px;
 	padding: 2px 4px;
-	border-radius: 5px;
+	border-radius: var(--ft-tw-radMd, 5px);
 }
 .card-head:hover { background: color-mix(in srgb, var(--ft-color-ancBorder) 25%, transparent); }
 .card-title {
@@ -333,17 +273,15 @@ body {
 	width: 20px; height: 20px;
 	line-height: 1;
 	border: 1px solid var(--ft-color-nodeBorder);
-	border-radius: 5px;
-	background: var(--ft-color-pageBg);
+	border-radius: var(--ft-tw-radMd, 5px);
+	background: var(--ft-color-bodyBg);
 	color: var(--ft-color-nodeText);
 	font-size: 13px;
-	/* Indicator only — the whole .card-head is the click target. Let clicks fall through to
-	   the header so there is a single toggle handler and no double-fire. */
-	pointer-events: none;
+	pointer-events: none;   /* the whole .card-head is the click target */
 }
 .card-body { display: flex; flex-direction: column; gap: 6px; }
 
-/* CONTROLS card rows: blue checkbox + bold label + gray hint */
+/* Controls card rows. */
 .ctl-row { display: flex; align-items: center; gap: 7px; }
 .ctl-toggle { cursor: pointer; }
 .ctl-check { width: 14px; height: 14px; accent-color: #2f6fed; cursor: pointer; flex-shrink: 0; }
@@ -356,14 +294,14 @@ body {
 .ctl-select {
 	font: inherit;
 	color: var(--ft-color-nodeText);
-	background: var(--ft-color-pageBg);
+	background: var(--ft-color-bodyBg);
 	border: 1px solid var(--ft-color-nodeBorder);
 	border-radius: 6px;
 	padding: 4px 6px;
 }
 .ctl-key { width: 100%; }
 
-/* DEBUG card specifics */
+/* Debug card. */
 .dbg-engine { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .dbg-englabel { font-weight: 700; }
 .dbg-engine label { margin-right: 4px; }
@@ -397,7 +335,7 @@ body {
 	font: inherit;
 	text-align: right;
 	color: var(--ft-color-nodeText);
-	background: var(--ft-color-pageBg);
+	background: var(--ft-color-bodyBg);
 	border: 1px solid var(--ft-color-nodeBorder);
 	border-radius: 6px;
 	padding: 4px 6px;
@@ -408,19 +346,19 @@ body {
 	padding: 7px;
 	border: 1px solid var(--ft-color-nodeBorder);
 	border-radius: 6px;
-	background: var(--ft-color-pageBg);
+	background: var(--ft-color-bodyBg);
 	color: var(--ft-color-nodeText);
 	cursor: pointer;
 }
 
-/* --- PRINT card (card-print.js) --- */
+/* Print card. */
 .ft-print-btn {
 	width: 100%;
 	font: inherit; font-weight: 700;
 	padding: 7px;
 	border: 1px solid var(--ft-color-nodeBorder);
 	border-radius: 6px;
-	background: var(--ft-color-pageBg);
+	background: var(--ft-color-bodyBg);
 	color: var(--ft-color-nodeText);
 	cursor: pointer;
 }
@@ -438,11 +376,8 @@ body {
 	background: color-mix(in srgb, var(--ft-color-ancBorder) 30%, var(--ft-color-nodeBg));
 }
 .ft-print-opts { display: flex; flex-direction: column; gap: 7px; margin: 0 0 6px; }
-/* Label pinned left at a fixed width (flex:0 0) + NO wrap, so the control stays inline on the
-   label's line — the old-engine layout (a wrapping row stacked the control under the label). */
 .ft-print-optrow { display: flex; align-items: center; gap: 12px; }
 .ft-print-optlbl { flex: 0 0 52px; font-weight: 700; font-size: 10px; color: var(--ft-color-subtitle); }
-/* Tile / Cohort checkbox rows — the live page-mode options. */
 .ft-print-optchk { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; color: var(--ft-color-subtitle); cursor: pointer; user-select: none; }
 .ft-print-optchk input { cursor: pointer; }
 .ft-print-cmd {
@@ -457,9 +392,8 @@ body {
 	color: #8a2b2b;
 }
 
-/* --- @media print: the PRINT card's "Print current view" button (browser print) ---
-   Hides the floating cards + title so the browser prints only the tree. (The CLI's PDF is a
-   separate, simpler path: it rasterises the faithful SVG — see tools/print-cli.js.) */
+/* ============================================================ @media print
+   Browser "Print current view": hide floating cards + title, print only the tree. */
 @page { size: A4 landscape; margin: 10mm; }
 @media print {
 	#ft-controls { display: none !important; }
@@ -468,19 +402,14 @@ body {
 	#ft-stage { position: relative; }
 }
 
-/* --- MOBILE outline (surface==='mobile') — render/outline-mobile.js ---
-   A depth-capped indented list, NOT the measured-box tree. Indentation is driven by each row's
-   integer --depth (max 2), so it never consumes the narrow width. A row at the cap with
-   descendants shows a 👪 drill-in that opens a titled block below. Colours use the serif
-   ancestor family + the existing node palette so it reads like the rest of the app. */
+/* ============================================================ MOBILE OUTLINE
+   Depth-capped indented list (not the measured-box tree). */
 .ft-m-container {
 	max-width: 640px;
 	margin: 0 auto;
-	padding: 8px 0 48px;      /* NO horizontal padding — sections carry their own inset so a
-	                             section can paint a solid background to the screen edge */
+	padding: 8px 0 48px;   /* no horizontal padding — sections carry their own inset */
 	box-sizing: border-box;
 }
-/* Section headers that separate the parents box tree (section 1) from the spouses outline. */
 .ft-m-section-title {
 	font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
 	font-weight: 700;
@@ -489,11 +418,8 @@ body {
 	color: var(--ft-color-ancText, #333);
 	margin: 4px 0 4px;
 }
-/* "Spouses & Children" (section 2) is centered; the "Bloodline" title (section 1) stays left. */
-.ft-m-section2 .ft-m-section-title { text-align: center; margin-bottom: 20px }
-/* Mobile surface hides the floating Controls card (the mobile view has its own bottom action bar). */
+.ft-m-section2 .ft-m-section-title { text-align: center; margin-bottom: 20px; }
 .ft-surface-mobile #ft-controls { display: none !important; }
-/* Swipe hint under the Bloodline title: a small finger-swipe icon + short, soft instruction. */
 .ft-m-section-hint {
 	display: flex;
 	align-items: center;
@@ -509,18 +435,11 @@ body {
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: contain;
-	/* Same swipe-finger glyph as the section-1 edge buttons (.ft-m-sibarrow-swipe), for consistency. */
 	background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='1.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 12V7.5a1.5 1.5 0 0 1 3 0V11m0-4.5a1.5 1.5 0 0 1 3 0V11m0-3a1.5 1.5 0 0 1 3 0v4m0-2a1.5 1.5 0 0 1 3 0v4c0 4.5-2.8 7-7 7h-1.2c-2.1 0-3.5-.8-4.8-2.4L3.8 15a1.6 1.6 0 0 1 2.3-2.2L8 14.2'/%3E%3Cpath d='M3 7H1m4-4L3.5 1.5M5 11H2'/%3E%3C/svg%3E");
 }
-/* Base section: full-bleed (no horizontal inset of its own) so a section background reaches the
-   screen edge. The inner wrapper carries the content inset. */
 .ft-m-section { padding-left: 15px; padding-right: 15px; }
 .ft-m-section-inner { padding: 0 15px; }
 .ft-m-section1 { position: relative; }   /* anchors the full-width nav overlay */
-/* Section 2 "Spouses & Children" gets a warm cream-gold wash; its inner wrapper is a LIGHTER
-   near-white panel framed by a soft gold border. Background only — fonts/colours unchanged.
-   position:relative anchors the ::before connector dot; margin-bottom:0 keeps it tight to the
-   closing tagline banner (section 3). */
 .ft-m-section2 {
 	position: relative;
 	margin-bottom: 0;
@@ -531,18 +450,15 @@ body {
 .ft-m-section2 .ft-m-section-inner {
 	background: color-mix(in srgb, var(--ft-color-key, #d4a017) 4%, #fff);
 	border: 1px solid color-mix(in srgb, var(--ft-color-key, #d4a017) 30%, transparent);
-	border-radius: 8px;
+	border-radius: var(--ft-tw-radLg, 8px);
 	padding-top: 14px;
 	padding-bottom: 14px;
 }
-/* Section 3: closing tagline banner — dark-green full-bleed background, centred gold tree glyph
-   over a light serif tagline. Decorative. Carries the action-bar bottom clearance (72px) since
-   it is now the last section. */
 .ft-m-section3 {
 	background: #1f3d33;
 	padding-top: 25px;
 	padding-bottom: 40px;
-	margin-bottom: 0;      /* clear the fixed bottom action bar */
+	margin-bottom: 0;   /* clear the fixed bottom action bar */
 	text-align: center;
 }
 .ft-m-tagline-logo {
@@ -564,7 +480,6 @@ body {
 	font-weight: 500;
 	color: #f3efe4;
 }
-/* Fixed bottom action bar: Edit Family (left) + Show Tree (right), pinned to the screen edge. */
 .ft-m-actionbar {
 	position: fixed;
 	left: 0;
@@ -582,7 +497,7 @@ body {
 	flex: 1 1 0;
 	appearance: none;
 	border: 1px solid rgba(107, 107, 123, 0.35);
-	border-radius: 8px;
+	border-radius: var(--ft-tw-radLg, 8px);
 	padding: 12px 10px;
 	font-size: 15px;
 	font-weight: 600;
@@ -596,36 +511,22 @@ body {
 	color: #fff;
 }
 .ft-m-action:active { transform: scale(0.98); }
-/* The box stage hosts renderScreen's absolute-positioned node boxes AND the sibling-nav arrow
-   overlay (.ft-m-navlayer), so it is the positioning context for both. overflow:visible so the
-   edge arrows are never clipped. renderScreen sets an explicit pixel width = content width, so
-   margin:0 auto CENTERS the whole spine within the full-width section. */
+/* Box stage: hosts absolute node boxes + the sibling-nav overlay; overflow visible for edge arrows. */
 .ft-m-boxstage {
 	position: relative;
 	overflow: visible;
 	margin: 20px auto 0;
 }
-/* In the mobile bloodline spine, EVERY node (grands, parent, key) gets the SAME thin neutral
-   card border + radius — a 1px #ccc frame — so the whole section reads as a uniform set of cards.
-   This overrides the ancestor gold border and the key's gold border; the key keeps its soft fill
-   + bold gold NAME for emphasis, just not a different border. */
+/* Uniform thin neutral card on every mobile spine node (key keeps its fill + bold name). */
 .ft-m-boxstage .ft-node--ancestor,
 .ft-m-boxstage .ft-node--key {
-	border: 1px solid #ccc;
-	border-radius: 8px;
+	border: 1px solid var(--ft-color-border, #e5e7eb);
+	border-radius: var(--ft-tw-radLg, 8px);
 	padding: var(--ft-box-padY) var(--ft-box-padX);
 }
 .ft-m-boxstage .ft-node--ancestor { background: var(--ft-color-keyBg); }
-/* key box keeps its soft highlight fill + box-shadow accent removed (border is now neutral). */
 .ft-m-boxstage .ft-node--key { box-shadow: none; }
-/* ALL section-1 names are rendered .ft-highlighted (set in the template: every node highlight:true),
-   so they inherit the Playfair serif + highlight size from the shared .ft-nm.ft-highlighted rule. */
-/* Mobile section-1 spine: connectors are SOLID, THIN (1px) neutral-gray lines drawn by
-   renderScreen (the SAME path the desktop tree uses) — no leaf ornaments. Scoped to the mobile
-   box stage so the desktop tree's own stroke is unaffected. The SVG layer is pinned BEHIND the
-   node boxes (z-index) and the boxes are given a stacking context (position + z-index) so a
-   single-parent drop (which leaves the parent's centre) is hidden by the opaque box instead of
-   drawing a line through it. */
+/* Spine connectors: solid thin gray, behind the opaque boxes. */
 .ft-m-boxstage .ft-connectors { z-index: 0; }
 .ft-m-boxstage .ft-node { position: absolute; z-index: 1; }
 .ft-m-boxstage .ft-connector {
@@ -633,19 +534,17 @@ body {
 	stroke-width: 1;
 	stroke-linecap: round;
 }
-/* The BRIDGE: a SOLID thin gray line continuing from the key box down past the bottom of
-   section 1, so the bloodline spine flows into section 2. Plain line, no ornament. */
+/* Bridge line from the key box down into section 2. */
 .ft-m-spinebridge {
 	position: absolute;
 	width: 1px;
-	height: 46px;                 /* reaches down into the gap toward the Spouses & Children header */
+	height: 46px;
 	transform: translateX(-50%);
 	pointer-events: none;
 	z-index: 1;
 	background: #c9c9c9;
 }
-/* Decorative connector dot: 10px (r=5) gold circle centred ON the top edge of a box (section 1,
-   placed by JS from measured rects) — left/top are set inline to the box's top-centre. */
+/* Gold connector dot on a box's top edge (placed inline by JS). */
 .ft-m-topdot {
 	position: absolute;
 	width: 10px;
@@ -656,8 +555,6 @@ body {
 	pointer-events: none;
 	z-index: 2;
 }
-/* The connector dot centred on the TOP edge of section 2, where the spine bridge meets it.
-   (section 2's position:relative is set in its main block above.) */
 .ft-m-section2::before {
 	content: '';
 	position: absolute;
@@ -675,52 +572,28 @@ body {
 	list-style: none;
 	margin: 0;
 	padding: 0;
-	/* All section-2 rows (couple labels + child names) use the Control card's "default name" font
-	   pick (--ft-font-default-family). The "Spouses & Children" title keeps its Playfair serif. */
 	font-family: var(--ft-font-default-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif);
 }
 .ft-m-row {
-	/* --depth is 0..MAX_DEPTH; 20px per level of indent. */
-	padding: 7px 4px 7px calc(2px + var(--depth, 0) * 20px);
+	padding: 7px 4px 7px calc(2px + var(--depth, 0) * 20px);   /* --depth 0..MAX, 20px/level */
 	display: flex;
 	align-items: baseline;
 	gap: 6px;
 	line-height: 1.3;
 	border-bottom: 1px solid rgba(107, 107, 123, 0.14);
 }
-.ft-m-branch {
-	color: #6b6b7b;
-	font-size: 13px;
-	flex: 0 0 auto;
-	opacity: 0.7;
-}
-.ft-m-label {
-	flex: 1 1 auto;
-	cursor: pointer;         /* tap to refocus (shared data-id delegation) */
-	color: #222;
-	font-size: 15px;
-}
-.ft-m-row.ft-m-key > .ft-m-label {
-	font-weight: 700;
-	color: #8b6914;          /* key palette (color.keyText) */
-}
-/* Space BETWEEN couple groups: each union row (except the first) gets extra top margin so one
-   spouse's children don't crowd the next spouse's label. */
+.ft-m-branch { color: #6b6b7b; font-size: 13px; flex: 0 0 auto; opacity: 0.7; }
+.ft-m-label { flex: 1 1 auto; cursor: pointer; color: #222; font-size: 15px; }
+.ft-m-row.ft-m-key > .ft-m-label { font-weight: 700; color: #8b6914; }
 .ft-m-union:not(:first-child) { margin-top: 18px; }
-/* The key person's own couple row is not a refocus target — no pointer, no hover affordance. */
-.ft-m-label.ft-m-static {
-	cursor: default;
-}
-/* --- Section-1 sibling navigation: a prev/next BUTTON pinned to the section's left/right SCREEN
-   edge (positioned absolutely in the full-width section, vertical top set inline from the target
-   box's measured row), PLUS the box's own horizontal swipe (pan-y keeps vertical page scroll).
-   Each button holds only the swipe-finger icon; direction is set by the CSS mirror below. --- */
+.ft-m-label.ft-m-static { cursor: default; }
+
+/* Section-1 sibling navigation: prev/next button pinned to the section's screen edge + box swipe. */
 .ft-node.ft-m-sibnav { touch-action: pan-y; user-select: none; -webkit-user-select: none; }
-/* The key box in section 1 is already focused — not a refocus target, so no pointer. */
 .ft-node.ft-m-static { cursor: default; }
 .ft-m-sibarrow {
 	position: absolute;
-	transform: translateY(-50%);   /* vertical centre on the target box's row (top set inline) */
+	transform: translateY(-50%);   /* top set inline from the target box's row */
 	display: inline-flex;
 	align-items: center;
 	pointer-events: auto;
@@ -732,14 +605,13 @@ body {
 	z-index: 50;
 	color: #6b6b7b;
 }
-.ft-m-sibarrow--older   { left: 50px; }    /* pinned to the LEFT screen edge of the section */
-.ft-m-sibarrow--younger { right: 50px; }   /* pinned to the RIGHT screen edge of the section */
-/* parent-row buttons tinted gold so the two generations read as distinct */
-.ft-m-sibarrow--parent { color: var(--ft-color-key, #c99a1e); }
+.ft-m-sibarrow--older   { left: 50px; }
+.ft-m-sibarrow--younger { right: 50px; }
+.ft-m-sibarrow--parent  { color: var(--ft-color-key, #c99a1e); }
 .ft-m-sibarrow:active { transform: translateY(-50%) scale(0.88); }
-/* the swipe-finger icon — a pointing hand with a directional swipe-trail arrow. It points LEFT
-   by default (used for the older/prev button); the younger/next button mirrors it with scaleX. */
-.ft-m-sibarrow-swipe {
+
+/* Swipe-finger glyph (shared by mobile sib-nav + the form's edge arrows). Drawn as a LEFT swipe. */
+.ft-nav-swipe {
 	width: 24px;
 	height: 24px;
 	background-repeat: no-repeat;
@@ -747,17 +619,10 @@ body {
 	background-size: contain;
 	background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 24 24' fill='none' stroke='%23cccccc' stroke-width='1.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 12V7.5a1.5 1.5 0 0 1 3 0V11m0-4.5a1.5 1.5 0 0 1 3 0V11m0-3a1.5 1.5 0 0 1 3 0v4m0-2a1.5 1.5 0 0 1 3 0v4c0 4.5-2.8 7-7 7h-1.2c-2.1 0-3.5-.8-4.8-2.4L3.8 15a1.6 1.6 0 0 1 2.3-2.2L8 14.2'/%3E%3Cpath d='M3 7H1m4-4L3.5 1.5M5 11H2'/%3E%3C/svg%3E");
 }
-/* The icon's motion lines read as a LEFT swipe as drawn. Reverse the mirror from natural reading:
-   the LEFT/prev button is flipped (points right), the RIGHT/next button keeps the drawn
-   left-pointing motion — per the requested direction. */
-.ft-m-sibarrow--older .ft-m-sibarrow-swipe { transform: scaleX(-1); }
+.ft-m-sibarrow--older .ft-nav-swipe { transform: scaleX(-1); }
 
-/* -------------------------------------------------------------------------
-   Initial popup — visitor onboarding modal (render/initial-popup.js).
-   A full-screen overlay with a centred card. Colours reuse the same --ft-*
-   tokens as the tree/cards (rule 7); each carries a safe fallback like the
-   header rules, so the modal is readable even before tokens are injected.
-   ------------------------------------------------------------------------- */
+/* ============================================================ WELCOME POPUP
+   render/initial-popup.js — overlay + centred card. Tokens with safe fallbacks. */
 .ip-overlay {
 	position: fixed;
 	inset: 0;
@@ -779,31 +644,23 @@ body {
 	flex-direction: column;
 	gap: 14px;
 	padding: 26px 26px 24px;
-	background: var(--ft-color-pageBg, #fff);
+	background: var(--ft-color-bodyBg, #C2D9D9);
 	color: var(--ft-color-nodeText, #222);
-	border: 1px solid var(--ft-color-nodeBorder, #ccc);
-	border-radius: 12px;
-	box-shadow: 0 12px 40px color-mix(in srgb, var(--ft-color-ancText, #000) 30%, transparent);
+	border: 1px solid var(--ft-color-border, #e5e7eb);
+	border-radius: var(--ft-tw-radXl, 12px);
+	box-shadow: var(--ft-tw-shadowXl, 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1));
 }
 .ip-title {
 	margin: 0;
-	font-family: var(--ft-font-highlight-family, 'Playfair Display', Georgia, serif);
-	font-size: 24px;
+	font-family: 'Parisienne', cursive;
+	font-size: 2rem;
 	font-weight: 800;
 	color: var(--ft-color-ancText, #222);
+	text-align: center;
 }
-.ip-lede {
-	margin: 0;
-	font-size: 13px;
-	line-height: 1.45;
-	color: var(--ft-color-subtitle, #777);
-}
+.ip-lede { margin: 0; font-size: 13px; line-height: 1.45; color: var(--ft-color-subtitle, #777); }
 .ip-field { display: flex; flex-direction: column; gap: 6px; }
-.ip-step {
-	font-weight: 700;
-	font-size: 13px;
-	color: var(--ft-color-nodeText, #222);
-}
+.ip-step { font-weight: 700; font-size: 13px; color: var(--ft-color-nodeText, #222); }
 .ip-select {
 	width: 100%;
 	box-sizing: border-box;
@@ -811,8 +668,8 @@ body {
 	font-size: 14px;
 	color: var(--ft-color-nodeText, #222);
 	background: var(--ft-color-nodeBg, #fff);
-	border: 1px solid var(--ft-color-nodeBorder, #ccc);
-	border-radius: 7px;
+	border: 1px solid var(--ft-color-border, #e5e7eb);
+	border-radius: var(--ft-tw-radLg, 8px);
 	cursor: pointer;
 }
 .ip-select:focus {
@@ -827,14 +684,9 @@ body {
 	padding: 14px 16px;
 	background: color-mix(in srgb, var(--ft-color-key, #d4a017) 9%, transparent);
 	border: 1px solid color-mix(in srgb, var(--ft-color-key, #d4a017) 30%, transparent);
-	border-radius: 8px;
+	border-radius: var(--ft-tw-radLg, 8px);
 }
-.ip-sum-title {
-	font-weight: 700;
-	font-size: 12px;
-	margin-bottom: 2px;
-	color: var(--ft-color-ancText, #222);
-}
+.ip-sum-title { font-weight: 700; font-size: 12px; margin-bottom: 2px; color: var(--ft-color-ancText, #222); }
 .ip-sum-row { display: flex; gap: 6px; font-size: 13px; line-height: 1.4; }
 .ip-sum-label { font-weight: 700; color: var(--ft-color-subtitle, #777); white-space: nowrap; }
 .ip-sum-value {
@@ -850,13 +702,13 @@ body {
 	color: #fff;
 	background: var(--ft-color-key, #d4a017);
 	border: none;
-	border-radius: 8px;
+	border-radius: var(--ft-tw-radLg, 8px);
 	cursor: pointer;
 }
 .ip-explore:hover { filter: brightness(1.06); }
 .ip-explore:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* --- Admin family switcher: reuses .ip-panel/.ip-select/.ip-explore; a little layout only. --- */
+/* Admin family switcher (reuses .ip-panel/.ip-select/.ip-explore). */
 .af-panel { gap: 16px; }
 .af-select { margin-top: 2px; }
 .af-go { margin-top: 2px; }
@@ -865,11 +717,11 @@ body {
 .af-actions .af-go { margin-top: 0; }
 .af-reset:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* --- Admin controls row INSIDE the welcome popup (admin only). --- */
+/* Admin controls row inside the welcome popup. */
 .ip-admin {
 	display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 	margin-top: 6px; padding-top: 12px;
-	border-top: 1px solid color-mix(in srgb, var(--ft-color-nodeBorder, #ccc) 60%, transparent);
+	border-top: 1px solid color-mix(in srgb, var(--ft-color-border, #e5e7eb) 60%, transparent);
 }
 .ip-admin-label {
 	font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
@@ -879,12 +731,11 @@ body {
 	padding: 6px 12px; font-size: 13px; font-weight: 600;
 	color: var(--ft-color-nodeText, #222);
 	background: var(--ft-color-nodeBg, #fff);
-	border: 1px solid var(--ft-color-nodeBorder, #ccc); border-radius: 7px; cursor: pointer;
+	border: 1px solid var(--ft-color-border, #e5e7eb); border-radius: 7px; cursor: pointer;
 }
 .ip-admin-btn:hover { border-color: var(--ft-color-key, #d4a017); }
 
-/* --- Identity gate (step 1): name input + Find button, step 2 hidden until confirmed.
-   The input reuses .ip-select look; same --ft-* tokens with safe fallbacks. --- */
+/* Identity gate: name input + Find button (step 2 hidden until confirmed). */
 .ip-name-row { display: flex; gap: 8px; align-items: stretch; }
 .ip-name-input { flex: 1 1 auto; cursor: text; }
 .ip-name-input:disabled { opacity: 0.7; cursor: not-allowed; }
@@ -900,18 +751,12 @@ body {
 	cursor: pointer;
 }
 .ip-find:hover { filter: brightness(1.06); }
-/* 'Change' state: visually distinct from the gold 'Find me' — a darker neutral with white text,
-   so the visitor can tell "search" from "I've found you, re-pick" at a glance. */
-.ip-find.is-change {
-	background: color-mix(in srgb, var(--ft-color-ancText, #2b2b2b) 78%, #000);
-	color: #fff;
-}
+.ip-find.is-change { background: color-mix(in srgb, var(--ft-color-ancText, #2b2b2b) 78%, #000); color: #fff; }
 .ip-find.is-change:hover { filter: brightness(1.12); }
 .ip-step2 { display: flex; flex-direction: column; gap: 16px; }
 .ip-step2[hidden] { display: none; }
 
-/* WhatsApp request block — shown only on the "no match" case. Centered in the popup; the button is
-   WhatsApp green with white text + a negative-white icon. The [hidden] guard beats the flex display. */
+/* No-match WhatsApp request block. */
 .ip-wa { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 8px; text-align: center; }
 .ip-wa[hidden] { display: none; }
 .ip-wa-info { font-size: 12.5px; line-height: 1.45; color: var(--ft-color-nodeText, #222); margin: 0; }
@@ -931,21 +776,23 @@ body {
 }
 .ip-wa-btn svg { display: block; fill: #fff; }
 .ip-wa-btn:hover { filter: brightness(1.06); }
+/* Identified-but-empty: shown when a confirmed visitor has no family records yet. */
+.ip-empty { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 10px; text-align: center; }
+.ip-empty[hidden] { display: none; }
+.ip-empty-info { font-size: 13px; line-height: 1.5; color: var(--ft-color-nodeText, #222); margin: 0; }
 .ip-name-choices { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 .ip-name-choice {
 	padding: 7px 12px;
 	font-size: 13px;
 	color: var(--ft-color-nodeText, #222);
 	background: var(--ft-color-nodeBg, #fff);
-	border: 1px solid var(--ft-color-nodeBorder, #ccc);
+	border: 1px solid var(--ft-color-border, #e5e7eb);
 	border-radius: 7px;
 	cursor: pointer;
 }
 .ip-name-choice:hover { border-color: var(--ft-color-key, #d4a017); }
 
-/* --- Combobox (type-to-filter dropdown) used by the initial popup's two choosers.
-   The input reuses .ip-select look; the popup list floats below it (position:relative
-   wrapper). Colours are the same --ft-* tokens with safe fallbacks. --- */
+/* Combobox (type-to-filter) used by the popup choosers. */
 .ip-combo { position: relative; }
 .ip-combo-input { cursor: text; }
 .ip-combo-list {
@@ -957,29 +804,16 @@ body {
 	max-height: 220px;
 	overflow-y: auto;
 	background: var(--ft-color-nodeBg, #fff);
-	border: 1px solid var(--ft-color-nodeBorder, #ccc);
+	border: 1px solid var(--ft-color-border, #e5e7eb);
 	border-radius: 7px;
-	box-shadow: 0 8px 24px color-mix(in srgb, var(--ft-color-ancText, #000) 22%, transparent);
+	box-shadow: var(--ft-tw-shadowLg, 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1));
 }
-.ip-combo-opt {
-	padding: 8px 10px;
-	font-size: 14px;
-	color: var(--ft-color-nodeText, #222);
-	cursor: pointer;
-}
-.ip-combo-opt:hover, .ip-combo-opt.is-active {
-	background: color-mix(in srgb, var(--ft-color-key, #d4a017) 18%, transparent);
-}
-.ip-combo-empty {
-	padding: 8px 10px;
-	font-size: 13px;
-	font-style: italic;
-	color: var(--ft-color-subtitle, #777);
-}
+.ip-combo-opt { padding: 8px 10px; font-size: 14px; color: var(--ft-color-nodeText, #222); cursor: pointer; }
+.ip-combo-opt:hover, .ip-combo-opt.is-active { background: color-mix(in srgb, var(--ft-color-key, #d4a017) 18%, transparent); }
+.ip-combo-empty { padding: 8px 10px; font-size: 13px; font-style: italic; color: var(--ft-color-subtitle, #777); }
 
-/* --- Burger menu dropdown (render/menu.js). A small panel anchored under #ft-menu with
-   text links; "Who you Are" reopens the visitor popup. #ft-header is position:relative (set
-   on its main rule above) so this panel can anchor to it; the panel floats top-right. --- */
+/* ============================================================ BURGER MENU
+   render/menu.js — panel anchored under #ft-menu. */
 .ft-menu-panel {
 	position: absolute;
 	top: calc(100% - 6px);
@@ -987,10 +821,10 @@ body {
 	z-index: 30;
 	min-width: 180px;
 	padding: 6px;
-	background: var(--ft-color-pageBg, #fff);
-	border: 1px solid var(--ft-color-nodeBorder, #ccc);
+	background: var(--ft-color-bodyBg, #C2D9D9);
+	border: 1px solid var(--ft-color-border, #e5e7eb);
 	border-radius: 10px;
-	box-shadow: 0 10px 30px color-mix(in srgb, var(--ft-color-ancText, #000) 24%, transparent);
+	box-shadow: var(--ft-tw-shadowXl, 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1));
 	display: flex;
 	flex-direction: column;
 	gap: 2px;
@@ -1010,18 +844,9 @@ body {
 	border-radius: 7px;
 	cursor: pointer;
 }
-.ft-menu-item:hover {
-	background: color-mix(in srgb, var(--ft-color-key, #d4a017) 16%, transparent);
-}
-/* Nested "Admin" group: the group button shows a caret that rotates when expanded; its children
-   sit in an indented sub-list revealed on click (render/menu.js builds .ft-menu-groupwrap). */
+.ft-menu-item:hover { background: color-mix(in srgb, var(--ft-color-key, #d4a017) 16%, transparent); }
 .ft-menu-groupwrap { display: flex; flex-direction: column; gap: 2px; }
-.ft-menu-group::after {
-	content: '▸';
-	float: right;
-	opacity: 0.6;
-	transition: transform 0.12s ease;
-}
+.ft-menu-group::after { content: '▸'; float: right; opacity: 0.6; transition: transform 0.12s ease; }
 .ft-menu-group[aria-expanded="true"]::after { transform: rotate(90deg); }
 .ft-menu-sub {
 	display: flex;
@@ -1033,3 +858,252 @@ body {
 }
 .ft-menu-sub[hidden] { display: none; }
 .ft-menu-subitem { font-weight: 500; }
+
+/* ============================================================ ADD/EDIT FAMILY FORM
+   render/family-form.js — reuses the welcome-popup chrome (.ip-overlay/.ip-panel/.ip-select/
+   .ip-explore). Rules below add the form-only pieces: tab strip, open panel, field grid,
+   summary, deceased controls. */
+.ff-overlay { align-items: flex-start; overflow-y: auto; }   /* long form scrolls from the top */
+.ff-panel { margin: auto; }      /* same dimensions as .ip-panel (440px, gap 14px) */
+
+/* Compact tab strip: one pill per section; clicking flips the single open panel below. */
+.ff-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.ff-tab {
+	display: inline-flex; align-items: center; gap: 10px;
+	padding: 7px 12px 7px 8px;
+	font-weight: 700;
+	color: #fff;
+	border: none;
+	border-radius: var(--ft-tw-radMd, 5px);
+	cursor: pointer;
+	opacity: 0.6;
+	transition: opacity 0.15s ease, transform 0.1s ease;
+}
+.ff-tab:hover { opacity: 0.9; }
+.ff-tab-label { white-space: nowrap; }
+.ff-tab-member   { background: var(--ft-color-key, #d4a017); }
+.ff-tab-father   { background: #3b82f6; }
+.ff-tab-mother   { background: #ec4899; }
+.ff-tab-spouse   { background: #0ea371; }
+.ff-tab-children { background: #8b5cf6; }
+
+.ff-title { margin: 0 0 4px; }
+
+/* The single open section (header + body). Header carries the per-type tint. */
+.ff-openpanel {
+	position: relative;
+	border: 1px solid var(--ft-color-border, #e5e7eb);
+	border-radius: var(--ft-tw-radMd, 8px);
+	overflow: visible;                           /* edge arrows overhang the border — don't clip */
+	background: var(--ft-color-nodeBg, #fff);
+	box-shadow: var(--ft-tw-shadowMd, 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1));
+	touch-action: pan-y;                         /* horizontal swipe = gesture; vertical = scroll */
+}
+/* Prev/Next edge arrows — centred on the left/right border line (half outside the panel). */
+.ff-nav {
+	position: absolute; top: 50%; transform: translateY(-50%);
+	z-index: 2;
+	width: 40px; height: 40px;
+	display: inline-flex; align-items: center; justify-content: center;
+	color: var(--ft-color-nodeText, #222);
+	background: var(--ft-color-nodeBg, #fff);
+	border: 1px solid var(--ft-color-border, #e5e7eb);
+	border-radius: 50%;
+	cursor: pointer;
+	box-shadow: var(--ft-tw-shadowMd, 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1));
+	opacity: 0.9;
+}
+.ff-nav:hover { opacity: 1; color: var(--ft-color-key, #d4a017); border-color: var(--ft-color-key, #d4a017); }
+.ff-nav-prev { left: -20px; }
+.ff-nav-next { right: -20px; }
+.ff-nav-prev .ft-nav-swipe { transform: scaleX(-1); }   /* mirror so prev/next point opposite ways */
+/* Inset header/body so the half-overhang arrows never overlap content. */
+.ff-openpanel .ff-sechead,
+.ff-openpanel .ff-secbody { padding-left: 40px; padding-right: 40px; }
+.ff-openpanel .ff-sechead { border-radius: var(--ft-tw-radMd, 8px) var(--ft-tw-radLg, 8px) 0 0; }
+.ff-openpanel .ff-secbody { border-radius: 0 0 var(--ft-tw-radLg, 8px) var(--ft-tw-radLg, 8px); }
+.ff-sechead { display: flex; align-items: center; gap: 11px; padding: 13px 15px; }
+.ff-sechead.ff-sec-member   { background: var(--ft-color-key, #d4a017); }
+.ff-sechead.ff-sec-father   { background: #3b82f6; }
+.ff-sechead.ff-sec-mother   { background: #ec4899; }
+.ff-sechead.ff-sec-spouse   { background: #0ea371; }
+.ff-sechead.ff-sec-children { background: #8b5cf6; }
+.ff-sechead .ff-sectitle { color: #fff; }
+.ff-sectitle {
+	flex: 1 1 auto; font-size: 16px; font-weight: 700; letter-spacing: 0.01em;
+	color: var(--ft-color-ancText, #222);
+	font-family: 'Comfortaa', Georgia, 'Times New Roman', serif;
+	text-transform: uppercase;
+}
+.ff-secrm {
+	flex: 0 0 auto;
+	display: inline-flex; align-items: center; justify-content: center;
+	width: 30px; height: 30px; margin-right: 2px;
+	color: #fff;
+	background: rgba(255, 255, 255, 0.18);
+	border: 1px solid rgba(255, 255, 255, 0.4);
+	border-radius: 7px; cursor: pointer;
+}
+.ff-secrm:hover { background: rgba(255, 255, 255, 0.32); }
+.ff-secbody { padding: 15px; border-top: 1px solid color-mix(in srgb, var(--ft-color-border, #e5e7eb) 55%, transparent); }
+
+/* Field layout: Full Name 100% (own line), then Gender 50% · Birth Date 50%.
+   Same on desktop and mobile. ff-nogender (father/mother/spouse) drops Gender → Birth Date 100%. */
+.ff-fields { display: flex; flex-direction: column; gap: 12px; }
+.ff-row { display: grid; gap: 12px 14px; align-items: end; }
+.ff-row-1 { grid-template-columns: 1fr 1fr; }
+.ff-row-1 > .ff-field:first-child { grid-column: 1 / -1; }          /* Full Name 100% */
+.ff-row-1.ff-nogender > .ff-field:last-child { grid-column: 1 / -1; }   /* lone Birth Date 100% */
+.ff-field { gap: 5px; }   /* inherits .ip-field flex-column */
+.ff-gender { cursor: pointer; }
+.ff-locked { opacity: 0.7; cursor: not-allowed; }
+
+/* Birth Date: text input + calendar button summoning the off-screen native date picker. */
+.ff-date-wrap { position: relative; display: flex; align-items: stretch; }
+.ff-date-text { flex: 1 1 auto; padding-right: 40px; }
+.ff-date-cal {
+	position: absolute; top: 0; right: 0; bottom: 0;
+	width: 38px;
+	display: inline-flex; align-items: center; justify-content: center;
+	color: var(--ft-color-subtitle, #777);
+	background: none; border: none; cursor: pointer;
+	border-left: 1px solid color-mix(in srgb, var(--ft-color-border, #e5e7eb) 50%, transparent);
+}
+.ff-date-cal:hover { color: var(--ft-color-key, #d4a017); }
+.ff-date-native {
+	position: absolute; right: 0; bottom: 0;
+	width: 38px; height: 1px;
+	opacity: 0; pointer-events: none;
+	border: 0; padding: 0; margin: 0;
+}
+.ff-date-field { display: flex; flex-direction: column; gap: 5px; }
+.ff-date-text.ff-invalid {
+	border-color: color-mix(in srgb, #c0392b 60%, var(--ft-color-border, #e5e7eb));
+	box-shadow: 0 0 0 3px color-mix(in srgb, #c0392b 18%, transparent);
+}
+.ff-date-err { font-size: 12px; line-height: 1.35; color: color-mix(in srgb, #c0392b 85%, var(--ft-color-nodeText, #222)); }
+
+/* "+ Add X" reveal — pale gold. */
+.ff-addbtn {
+	margin-top: 14px;
+	display: inline-flex; align-items: center; gap: 3px;
+	padding: 9px 15px;
+	font-size: 14px; font-weight: 700;
+	color: var(--ft-color-keyText, #8b6914);
+	background: color-mix(in srgb, var(--ft-color-key, #d4a017) 10%, transparent);
+	border: 1px solid color-mix(in srgb, var(--ft-color-key, #d4a017) 32%, transparent);
+	border-radius: var(--ft-tw-radLg, 8px); cursor: pointer;
+}
+.ff-addbtn:hover { background: color-mix(in srgb, var(--ft-color-key, #d4a017) 18%, transparent); }
+.ff-addplus { font-size: 16px; }
+
+/* Children: child cards. */
+.ff-childcard {
+	padding: 13px; margin-bottom: 11px;
+	background: color-mix(in srgb, var(--ft-color-bodyBg, #C2D9D9) 55%, var(--ft-color-nodeBg, #fff));
+	border: 1px solid color-mix(in srgb, var(--ft-color-border, #e5e7eb) 55%, transparent);
+	border-radius: var(--ft-tw-radLg, 8px);
+}
+.ff-childrm {
+	display: inline-flex; align-items: center; gap: 4px;
+	margin-top: 10px; padding: 5px 10px;
+	font-size: 13px; font-weight: 600;
+	color: color-mix(in srgb, #c0392b 80%, var(--ft-color-nodeText, #222));
+	background: color-mix(in srgb, #c0392b 8%, transparent);
+	border: 1px solid color-mix(in srgb, #c0392b 28%, transparent);
+	border-radius: 7px; cursor: pointer;
+}
+.ff-childrm:hover { background: color-mix(in srgb, #c0392b 16%, transparent); }
+.ff-addchild {
+	display: inline-flex; align-items: center; gap: 4px;
+	padding: 2px 0; font-size: 14px; font-weight: 700;
+	color: var(--ft-color-keyText, #8b6914);
+	background: none; border: none; cursor: pointer;
+}
+.ff-addchild-ico { color: var(--ft-color-key, #d4a017); font-size: 16px; }
+
+/* Summary: per-person rows + role badges. */
+.ff-summary {
+	display: flex; flex-direction: column; gap: 8px;
+	padding: 16px 18px;
+	background: var(--ft-color-nodeBg, #fff);
+	border: 1px solid color-mix(in srgb, var(--ft-color-key, #d4a017) 26%, transparent);
+	border-radius: var(--ft-tw-radMd, 5px);
+}
+.ff-sum-head {
+	display: flex; align-items: center; gap: 8px;
+	font-size: 13px; font-weight: 700; letter-spacing: 0.04em;
+	color: var(--ft-color-ancText, #222);
+}
+.ff-sum-ico { color: var(--ft-color-key, #d4a017); }
+.ff-sum-sub { margin: 0 0 6px; font-size: 12.5px; line-height: 1.45; color: var(--ft-color-subtitle, #777); font-style: italic; }
+.ff-sum-empty { margin: 6px 0 0; font-size: 13.5px; color: var(--ft-color-subtitle, #888); font-style: italic; }
+.ff-sum-row {
+	display: flex; align-items: center; justify-content: space-between; gap: 12px;
+	border-bottom: 1px solid color-mix(in srgb, var(--ft-color-border, #e5e7eb) 30%, transparent);
+	padding: 5px 0;
+}
+.ff-sum-row:last-child { border-bottom: none; }
+.ff-sum-left { display: flex; align-items: center; gap: 10px; flex: 1 1 auto; min-width: 0; }
+.ff-sum-text { font-size: 14px; color: var(--ft-color-ancText, #222); }
+.ff-sum-nick { color: var(--ft-color-subtitle, #999); }
+.ff-sum-meta { color: var(--ft-color-subtitle, #777); }
+.ff-badge {
+	flex: 0 0 auto;
+	padding: 3px 9px; font-size: 11px; font-weight: 700;
+	border-radius: var(--ft-tw-radMd, 5px);
+	color: var(--ft-color-keyText, #8b6914);
+	background: color-mix(in srgb, var(--ft-color-key, #d4a017) 16%, transparent);
+}
+
+/* All-correct gate + warning + deceased prompt. */
+.ff-allrow {
+	display: flex; align-items: center; gap: 9px;
+	padding-top: 10px;
+	border-top: 1px solid color-mix(in srgb, var(--ft-color-key, #d4a017) 20%, transparent);
+	font-size: 14px; color: var(--ft-color-ancText, #222); cursor: pointer;
+}
+.ff-allchk, .ff-decchk, .ff-decradio { width: 17px; height: 17px; accent-color: var(--ft-color-key, #d4a017); cursor: pointer; }
+.ff-warn {
+	display: flex; align-items: flex-start; gap: 6px;
+	padding: 9px 13px; font-size: 13px;
+	color: var(--ft-color-keyText, #8b6914);
+	background: color-mix(in srgb, var(--ft-color-key, #d4a017) 12%, transparent);
+	border: 1px solid color-mix(in srgb, var(--ft-color-key, #d4a017) 32%, transparent);
+	border-radius: var(--ft-tw-radLg, 8px);
+}
+.ff-warn-required {
+	color: #a11; margin-bottom: 8px;
+	background: color-mix(in srgb, #c0392b 10%, transparent);
+	border-color: color-mix(in srgb, #c0392b 34%, transparent);
+}
+.ff-decprompt {
+	padding: 14px 16px;
+	background: color-mix(in srgb, var(--ft-color-key, #d4a017) 10%, transparent);
+	border: 1px solid color-mix(in srgb, var(--ft-color-key, #d4a017) 34%, transparent);
+	border-radius: var(--ft-tw-radLg, 8px);
+}
+.ff-decq { display: block; font-size: 14px; font-weight: 700; color: var(--ft-color-keyText, #8b6914); margin-bottom: 9px; }
+.ff-decopts { display: flex; gap: 22px; }
+.ff-decopt { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; color: var(--ft-color-ancText, #222); cursor: pointer; }
+.ff-dec { display: inline-flex; align-items: center; gap: 7px; flex: 0 0 auto; font-size: 13px; color: var(--ft-color-nodeText, #222); cursor: pointer; }
+
+/* Footer: Cancel (ghost) + Save (= .ip-explore). */
+.ff-footer { display: flex; justify-content: flex-end; gap: 11px; margin-top: 2px; }
+.ff-save { margin-top: 0; }
+.ff-cancel {
+	padding: 12px 20px; font-size: 15px; font-weight: 700;
+	color: var(--ft-color-nodeText, #222);
+	background: var(--ft-color-nodeBg, #fff);
+	border: 1px solid var(--ft-color-border, #e5e7eb);
+	border-radius: var(--ft-tw-radLg, 8px); cursor: pointer;
+}
+.ff-cancel:hover { border-color: var(--ft-color-key, #d4a017); }
+
+/* Narrow screens: field layout is identical to desktop (Full Name 100%, Gender/Birth Date 50/50);
+   only the summary + footer stack. */
+@media (max-width: 560px) {
+	.ff-sum-row { flex-direction: column; align-items: flex-start; }
+	.ff-footer { flex-direction: column-reverse; }
+	.ff-cancel, .ff-save { width: 100%; text-align: center; }
+}
