@@ -36,13 +36,16 @@ self.addEventListener('fetch', (e) => {
 		);
 		return;
 	}
-	// SHELL ASSETS (same-origin non-navigation: app.js/style.css/icons, each ?v=-stamped so new HTML
-	// requests a new url) — cache-first for instant offline load; network fallback fills the cache.
+	// SHELL ASSETS (same-origin non-navigation: app.js/style.css/icons). The HTML references them with
+	// a ?v=<stamp> cache-buster (app.js?v=…), but the precache stored them under BARE names (./app.js).
+	// So match with ignoreSearch:true — otherwise offline the ?v= request MISSES the cache, app.js fails
+	// to load, and the page is blank (header only). This was the Android-blank root cause. Cache-first;
+	// network fallback fills the cache (stored WITHOUT the query so the next ?v= still matches).
 	e.respondWith(
-		caches.match(req).then((hit) => hit || fetch(req).then((res) => {
+		caches.match(req, { ignoreSearch: true }).then((hit) => hit || fetch(req).then((res) => {
 			if (res && res.ok && res.type === 'basic') {
 				const copy = res.clone();
-				caches.open(CACHE).then((c) => c.put(req, copy));
+				caches.open(CACHE).then((c) => c.put(new Request(url.origin + url.pathname), copy));
 			}
 			return res;
 		}).catch(() => undefined))
