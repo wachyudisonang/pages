@@ -36,18 +36,20 @@ self.addEventListener('fetch', (e) => {
 		);
 		return;
 	}
-	// SHELL ASSETS (same-origin non-navigation: app.js/style.css/icons). The HTML references them with
-	// a ?v=<stamp> cache-buster (app.js?v=…), but the precache stored them under BARE names (./app.js).
-	// So match with ignoreSearch:true — otherwise offline the ?v= request MISSES the cache, app.js fails
-	// to load, and the page is blank (header only). This was the Android-blank root cause. Cache-first;
-	// network fallback fills the cache (stored WITHOUT the query so the next ?v= still matches).
+	// SHELL ASSETS (same-origin non-navigation: app.js/style.css/icons, each referenced with a ?v=<stamp>
+	// cache-buster). NETWORK-FIRST: a new deploy changes ?v=, and we MUST fetch the new bytes when
+	// online — a cache-first (or ignoreSearch) match would serve the FIRST-cached app.js forever and
+	// freeze the app at the old version even as the HTML updates (the "stale app.js, new HTML" bug).
+	// So: try network first (refresh the cache under the BARE path so offline has the latest), and only
+	// fall back to the cached copy when the network fails (offline). Offline match uses ignoreSearch so
+	// the ?v= request still resolves to the bare-cached asset.
 	e.respondWith(
-		caches.match(req, { ignoreSearch: true }).then((hit) => hit || fetch(req).then((res) => {
+		fetch(req).then((res) => {
 			if (res && res.ok && res.type === 'basic') {
 				const copy = res.clone();
 				caches.open(CACHE).then((c) => c.put(new Request(url.origin + url.pathname), copy));
 			}
 			return res;
-		}).catch(() => undefined))
+		}).catch(() => caches.match(req, { ignoreSearch: true }))
 	);
 });
