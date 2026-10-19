@@ -22,17 +22,29 @@ self.addEventListener('fetch', (e) => {
 	if (url.hostname.endsWith('firebasedatabase.app') || url.hostname === 'www.gstatic.com' || url.hostname.endsWith('googleapis.com')) {
 		return;                                               // let the network handle it (default)
 	}
-	// SHELL (same-origin GET) — cache-first so the app opens offline. A navigation that misses falls
-	// back to the cached index.html (SPA shell), so a deep link opens offline too.
-	if (url.origin === self.location.origin) {
+	if (url.origin !== self.location.origin) return;
+	// NAVIGATION (the HTML) — NETWORK-FIRST. The HTML points at the ?v=-stamped assets, so if it were
+	// cache-first a new deploy could NEVER reach the device: it would keep serving the old index.html
+	// (→ old app.js) and never fetch the new bundle (the Android "stuck on stale shell → blank" bug).
+	// Network-first = always the latest HTML when online; cached index.html only when offline.
+	if (req.mode === 'navigate') {
 		e.respondWith(
-			caches.match(req).then((hit) => hit || fetch(req).then((res) => {
-				if (res && res.ok && res.type === 'basic') {
-					const copy = res.clone();
-					caches.open(CACHE).then((c) => c.put(req, copy));
-				}
+			fetch(req).then((res) => {
+				if (res && res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put('./index.html', copy)); }
 				return res;
-			}).catch(() => (req.mode === 'navigate' ? caches.match('./index.html') : undefined)))
+			}).catch(() => caches.match('./index.html').then((h) => h || caches.match('./')))
 		);
+		return;
 	}
+	// SHELL ASSETS (same-origin non-navigation: app.js/style.css/icons, each ?v=-stamped so new HTML
+	// requests a new url) — cache-first for instant offline load; network fallback fills the cache.
+	e.respondWith(
+		caches.match(req).then((hit) => hit || fetch(req).then((res) => {
+			if (res && res.ok && res.type === 'basic') {
+				const copy = res.clone();
+				caches.open(CACHE).then((c) => c.put(req, copy));
+			}
+			return res;
+		}).catch(() => undefined))
+	);
 });
