@@ -26,17 +26,30 @@ self.addEventListener('fetch', (e) => {
 	if (url.hostname.endsWith('firebasedatabase.app') || url.hostname === 'www.gstatic.com' || url.hostname.endsWith('googleapis.com')) {
 		return;
 	}
-	// SHELL (same-origin GET) — cache-first so the app opens offline; a missed navigation falls back
-	// to the cached index.html.
-	if (url.origin === self.location.origin) {
+	if (url.origin !== self.location.origin) return;
+	// NAVIGATION (the HTML) — NETWORK-FIRST so a new deploy always reaches the device (the HTML points
+	// at the ?v=-stamped assets; cache-first HTML would pin the device on the old shell forever —
+	// the Android "stuck on stale shell" bug). Cached index.html only when offline.
+	if (req.mode === 'navigate') {
 		e.respondWith(
-			caches.match(req).then((hit) => hit || fetch(req).then((res) => {
-				if (res && res.ok && res.type === 'basic') {
-					const copy = res.clone();
-					caches.open(CACHE).then((c) => c.put(req, copy));
-				}
+			fetch(req).then((res) => {
+				if (res && res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put('./index.html', copy)); }
 				return res;
-			}).catch(() => (req.mode === 'navigate' ? caches.match('./index.html') : undefined)))
+			}).catch(() => caches.match('./index.html').then((h) => h || caches.match('./')))
 		);
+		return;
 	}
+	// SHELL ASSETS (same-origin non-navigation, each ?v=<stamp>-stamped). NETWORK-FIRST: a new deploy
+	// changes ?v= and we must fetch the new bytes online — cache-first/ignoreSearch would serve the
+	// FIRST-cached asset forever and freeze the app at the old version. Refresh the cache under the bare
+	// path; fall back to the cached copy (ignoreSearch) only when offline.
+	e.respondWith(
+		fetch(req).then((res) => {
+			if (res && res.ok && res.type === 'basic') {
+				const copy = res.clone();
+				caches.open(CACHE).then((c) => c.put(new Request(url.origin + url.pathname), copy));
+			}
+			return res;
+		}).catch(() => caches.match(req, { ignoreSearch: true }))
+	);
 });

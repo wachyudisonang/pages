@@ -8,18 +8,18 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Belanja">
-<link rel="icon" type="image/png" href="icon.png?v=202610190827">
-<link rel="apple-touch-icon" href="icon.png?v=202610190827">
+<link rel="icon" type="image/png" href="icon.png?v=202610191150">
+<link rel="apple-touch-icon" href="icon.png?v=202610191150">
 <link rel="manifest" href="manifest.json">
 <title>Daftar Belanja</title>
-<meta name="app-version" content="202610190827" />
+<meta name="app-version" content="202610191150" />
 <script>
   /* Apply saved theme BEFORE first paint to avoid a light/dark flash.
      Values: 'light' | 'dark' | 'system' (default). 'system' leaves no
      data-theme attribute so the prefers-color-scheme @media rule governs. */
   (function(){ try{ var t=localStorage.getItem('grocery_theme'); if(t==='light'||t==='dark'){ document.documentElement.setAttribute('data-theme',t); } }catch(e){} })();
 </script>
-<link rel="stylesheet" href="style.css?v=202610190827">
+<link rel="stylesheet" href="style.css?v=202610191150">
 </head>
 <body>
 <div class="app">
@@ -57,6 +57,10 @@
 
     <!-- ===== SETTINGS ===== -->
     <section id="tab-more">
+      <div class="card">
+        <h2>Status</h2>
+        <div class="cursect" id="offlineLine">🟢 Daring — tersambung ke internet.</div>
+      </div>
       <div class="card">
         <h2>Riwayat bersama (cloud)</h2>
         <div class="cursect" id="syncStat">Belum pernah disinkronkan</div>
@@ -142,7 +146,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=202610190827"></script>
+<script src="app.js?v=202610191150"></script>
 <!-- Service worker (webapp-pwa-standards §12): registers ONLY in a secure context (HTTPS hub). The
      app-version meta is 'unset' in the source (grocery is build-free; there is no real version until
      deploy) — pages/deploy.sh stamps the ONE real version onto the hub copy. We DO NOT register the

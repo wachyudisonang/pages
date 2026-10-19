@@ -31,6 +31,70 @@ function normName(s){ return (s||'').trim().toLowerCase().replace(/\s+/g,' '); }
 function groupDigits(s){ var d=(s+'').replace(/\D/g,''); if(!d) return ''; d=d.replace(/^0+(?=\d)/,''); return d.replace(/\B(?=(\d{3})+(?!\d))/g,'.'); } // Indonesian thousand grouping (534534 -> 534.534)
 function digitsToNum(s){ var d=(s+'').replace(/\D/g,''); return d?parseInt(d,10):NaN; }
 function toast(m){ var t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(function(){ t.classList.remove('show'); },1600); }
+
+// showOfflineNotice(detail) — the §12.7 fallback: never leave a blank/terse body when the app cannot
+// render. grocery is data-first (IndexedDB primary), so this fires only if even the local read fails
+// (the init() catch). Themed via CSS vars (webapp-pwa-standards §4 — never a fixed palette), Bahasa
+// copy (§10 — Bahasa UI), with a Reload button. Rendered into <main>.
+function showOfflineNotice(detail){
+  var main=document.querySelector('main'); if(!main) return;
+  main.innerHTML='';
+  var box=document.createElement('div');
+  box.setAttribute('role','status');
+  box.style.cssText=[
+    'max-width:min(90vw,420px)','margin:16vh auto 0','padding:20px 22px',
+    'border:1px solid var(--border,#d7dde3)','border-radius:14px',
+    'background:var(--card,#fff)','color:var(--text,#1a1a1a)',
+    'font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif','text-align:center',
+    'box-shadow:0 4px 16px rgba(0,0,0,.08)'
+  ].join(';');
+  var h=document.createElement('div'); h.textContent='⚠ Tidak bisa memuat data';
+  h.style.cssText='font-weight:700;font-size:17px;margin-bottom:8px;';
+  var p=document.createElement('p');
+  p.textContent='Penyimpanan di perangkat ini tidak bisa dibuka'+(detail?(' ('+detail+')'):'')+'. Coba muat ulang halaman.';
+  p.style.cssText='margin:0 0 14px;';
+  var btn=document.createElement('button'); btn.type='button'; btn.textContent='Muat ulang';
+  btn.style.cssText=[
+    'cursor:pointer','border:1px solid var(--accent,#397fda)','background:var(--accent,#397fda)',
+    'color:#fff','font-weight:600','font-size:14px','padding:9px 18px','border-radius:8px'
+  ].join(';');
+  btn.addEventListener('click',function(){ window.location.reload(); });
+  box.appendChild(h); box.appendChild(p); box.appendChild(btn);
+  main.appendChild(box);
+}
+
+// mountOfflineBadge() — the shared §12.9 offline badge: a header chip shown only when offline, plus a
+// live state other UI can read (the Lainnya status line). grocery is data-first with NO cloud
+// dependency, so navigator.onLine + the window online/offline events are sufficient here (a false
+// "online" is harmless — the app works offline regardless). Themed via CSS vars. Bahasa label.
+var OFFLINE_NOW=false;
+function isOfflineState(){ return (typeof navigator!=='undefined' && navigator.onLine===false); }
+function mountOfflineBadge(){
+  var host=document.querySelector('header.top'); if(!host) return;
+  var chip=document.createElement('span');
+  chip.id='offlineChip'; chip.setAttribute('role','status');
+  chip.setAttribute('aria-label','Luring'); chip.title='Luring'; chip.hidden=true;
+  chip.textContent='📴';                            // ICON ONLY — no word
+  chip.style.cssText=[
+    'display:inline-flex','align-items:center','vertical-align:middle','margin-left:8px',
+    'font-size:16px','line-height:1','cursor:default'
+  ].join(';');
+  var h1=host.querySelector('h1'); if(h1) h1.appendChild(chip); else host.appendChild(chip);
+  function apply(off){ OFFLINE_NOW=off; chip.hidden=!off; chip.style.display=off?'inline-flex':'none'; try{ updateOfflineLine(); }catch(_){} }
+  if(typeof window!=='undefined'){
+    window.addEventListener('offline',function(){ apply(true); });
+    window.addEventListener('online',function(){ apply(false); });
+  }
+  apply(isOfflineState());
+}
+// updateOfflineLine() — reflect the live state into the Lainnya status line (if present).
+function updateOfflineLine(){
+  var el=document.getElementById('offlineLine'); if(!el) return;
+  el.textContent = OFFLINE_NOW
+    ? '📴 Luring — menampilkan data tersimpan di perangkat. Sinkron cloud nonaktif sampai tersambung lagi.'
+    : '🟢 Daring — tersambung ke internet.';
+  el.style.color = OFFLINE_NOW ? 'var(--danger,#b42318)' : 'var(--muted,#6b7280)';
+}
 function todayStart(){ var d=new Date(); d.setHours(0,0,0,0); return d.getTime(); }
 function monthKey(ts){ var d=new Date(ts); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
 var MONTHS=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; // Indonesian labels shown in UI
@@ -937,14 +1001,42 @@ function bind(){
   });
 }
 
+/* ================= debug tracer (webapp-pwa-standards §12.12) =================
+   Shared PWA pattern: an on-screen boot/flow tracer, OFF by default. trace() is a no-op (zero DOM
+   cost) unless enabled via ?trace in the URL or localStorage 'gc.debug.trace'=1. A fixed top bar
+   logs each milestone + any thrown error, so an offline/mobile failure can be read WITHOUT DevTools
+   (this is the tool that isolated the familytree offline-blank). Flat-app inline twin of
+   familytree's source/core/debug-trace.js — keep the two in sync. */
+var _traceOn=null;
+function traceEnabled(){
+  if(_traceOn!==null) return _traceOn; _traceOn=false;
+  try{
+    var q=new URLSearchParams(window.location.search);
+    if(q.has('trace')) _traceOn=true;
+    else if(localStorage.getItem('gc.debug.trace')==='1') _traceOn=true;
+  }catch(_e){ _traceOn=false; }
+  return _traceOn;
+}
+function trace(msg){
+  if(!traceEnabled()||typeof document==='undefined') return;
+  try{
+    var t=document.getElementById('gc-boottrace');
+    if(!t){ t=document.createElement('pre'); t.id='gc-boottrace';
+      t.style.cssText='position:fixed;left:0;right:0;top:0;z-index:2147483647;margin:0;padding:6px 10px;background:#003;color:#6cf;font:11px/1.35 monospace;white-space:pre-wrap;max-height:55vh;overflow:auto;';
+      (document.body||document.documentElement).appendChild(t); }
+    t.textContent += String(msg)+'\n';
+  }catch(_e){}
+}
+
 /* ================= init ================= */
 (function init(){
+  trace('1 init start onLine=' + (typeof navigator!=='undefined'?navigator.onLine:'?'));
   openDB()
     .then(reload)
     .then(purgeOld)
     .then(reload)
     .then(syncHistoryNames)
     .then(reload)
-    .then(function(){ applyTheme(getTheme()); bind(); applyTab(); renderWish(); renderBasket(); renderHistory(); updateStat(); updateSyncStat(); })
-    .catch(function(err){ document.querySelector('main').innerHTML='<div class="empty">Gagal membuka penyimpanan.<br>'+esc(err&&err.message||err)+'</div>'; });
+    .then(function(){ trace('2 db+sync done; rendering'); applyTheme(getTheme()); bind(); applyTab(); renderWish(); renderBasket(); renderHistory(); updateStat(); updateSyncStat(); mountOfflineBadge(); updateOfflineLine(); trace('Z render done'); })
+    .catch(function(err){ trace('X INIT THREW ' + (err&&(err.message||err.name)||err)); showOfflineNotice(err&&err.message||err); });
 })();
