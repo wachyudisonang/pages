@@ -8,18 +8,18 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Belanja">
-<link rel="icon" type="image/png" href="icon.png?v=202610121308">
-<link rel="apple-touch-icon" href="icon.png?v=202610121308">
+<link rel="icon" type="image/png" href="icon.png?v=202610190827">
+<link rel="apple-touch-icon" href="icon.png?v=202610190827">
 <link rel="manifest" href="manifest.json">
 <title>Daftar Belanja</title>
-<meta name="app-version" content="202610121308" />
+<meta name="app-version" content="202610190827" />
 <script>
   /* Apply saved theme BEFORE first paint to avoid a light/dark flash.
      Values: 'light' | 'dark' | 'system' (default). 'system' leaves no
      data-theme attribute so the prefers-color-scheme @media rule governs. */
   (function(){ try{ var t=localStorage.getItem('grocery_theme'); if(t==='light'||t==='dark'){ document.documentElement.setAttribute('data-theme',t); } }catch(e){} })();
 </script>
-<link rel="stylesheet" href="style.css?v=202610121308">
+<link rel="stylesheet" href="style.css?v=202610190827">
 </head>
 <body>
 <div class="app">
@@ -142,6 +142,22 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=202610121308"></script>
+<script src="app.js?v=202610190827"></script>
+<!-- Service worker (webapp-pwa-standards §12): registers ONLY in a secure context (HTTPS hub). The
+     app-version meta is 'unset' in the source (grocery is build-free; there is no real version until
+     deploy) — pages/deploy.sh stamps the ONE real version onto the hub copy. We DO NOT register the
+     SW while the version is 'unset'/absent, so an un-deployed source (opened on localhost) never
+     installs a version-less shell cache that can't be busted — dev stays plain network + hard-reload.
+     Shell-only on the hub — Firebase/RTDB never cached. -->
+<script>
+(function () {
+	if (!('serviceWorker' in navigator) || !window.isSecureContext) return;
+	var v = (document.querySelector('meta[name="app-version"]') || {}).content || '';
+	if (!v || v === 'unset') return;                 // un-deployed source — no version, no SW caching
+	window.addEventListener('load', function () {
+		navigator.serviceWorker.register('sw.js?v=' + encodeURIComponent(v)).catch(function () {});
+	});
+})();
+</script>
 </body>
 </html>

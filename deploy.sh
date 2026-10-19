@@ -145,9 +145,9 @@ deploy_familytree() {
   fi
   echo "==> familytree  (building dist/ from source/ via esbuild)"
   run bash -c "cd '$ftsrc' && node tools/build.js && node tools/make-icons.js"
-  # Publish ONLY the self-contained bundle output (same file set as grocery).
+  # Publish ONLY the self-contained bundle output (same file set as grocery) + the shell service worker.
   rsync_project familytree "$ftsrc/dist" \
-    index.html style.css app.js manifest.json icon.png icon-512.png
+    index.html style.css app.js manifest.json icon.png icon-512.png sw.js
   # Cache-bust: meta + hub link, then version every LOCAL asset ref so a stale app.js/style.css/icon
   # can't be served from the browser cache. (The gstatic Firebase SDK URL inside app.js is external
   # and never stamped — stamp_asset only touches quoted/paren'd local refs, never http(s):// URLs.)
@@ -157,7 +157,7 @@ deploy_familytree() {
     stamp_asset "$d/index.html" style.css "$DEPLOY_STAMP"
     stamp_asset "$d/index.html" app.js    "$DEPLOY_STAMP"
     stamp_asset "$d/index.html" icon.png  "$DEPLOY_STAMP"
-    echo "   assets versioned: style.css, app.js, icon.png"
+    echo "   assets versioned: style.css, app.js, icon.png (sw.js cache keyed off the app-version meta)"
   fi
 }
 
@@ -181,7 +181,7 @@ deploy_grocery() {
   # grocery serves from repo root; multi-file app (index.html + style.css + app.js +
   # manifest.json + icon.png 192 + icon-512.png 512). NOT README.md / .gitignore / .kiro.
   rsync_project grocery "$BIG_OWN/grocery" \
-    index.html style.css app.js manifest.json icon.png icon-512.png
+    index.html style.css app.js manifest.json icon.png icon-512.png sw.js
   # Cache-bust: meta + hub link, then version every LOCAL asset ref so a stale
   # style.css/app.js/icon.png can't be served from the browser cache.
   stamp_version grocery "$DEPLOY_STAMP"

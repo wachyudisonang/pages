@@ -7,12 +7,12 @@
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-title" content="Family Tree">
-	<link rel="icon" type="image/png" href="icon.png?v=202610190348">
-	<link rel="apple-touch-icon" href="icon.png?v=202610190348">
+	<link rel="icon" type="image/png" href="icon.png?v=202610190827">
+	<link rel="apple-touch-icon" href="icon.png?v=202610190827">
 	<link rel="manifest" href="manifest.json">
 	<title>Family Tree</title>
-<meta name="app-version" content="202610190348" />
-	<link rel="stylesheet" href="style.css?v=202610190348">
+	<meta name="app-version" content="202610190827" />
+	<link rel="stylesheet" href="style.css?v=202610190827">
 </head>
 <body>
 	<div id="ft-controls"></div>
@@ -43,6 +43,20 @@
 	     on first load; emptied again when the visitor presses "Explore Your Family Tree". -->
 	<div id="ft-modal"></div>
 
-	<script type="module" src="app.js?v=202610190348"></script>
+	<script type="module" src="app.js?v=202610190827"></script>
+	<!-- Service worker (webapp-pwa-standards §12): registers ONLY in a secure context (HTTPS hub), so
+	     it no-ops on the plain-HTTP dev vhost. The cache is versioned by the app-version meta (stamped
+	     by pages/deploy.sh), passed to sw.js via ?v= so a new deploy busts the shell cache AND the
+	     byte-changed sw.js re-installs. Shell-only: Firebase/RTDB are never cached (IndexedDB owns data). -->
+	<script>
+	(function () {
+		if (!('serviceWorker' in navigator) || !window.isSecureContext) return;
+		var v = (document.querySelector('meta[name="app-version"]') || {}).content || '';
+		if (!v || v === 'unset') return;                 // no real version (shouldn't happen — build stamps one) → no SW caching
+		window.addEventListener('load', function () {
+			navigator.serviceWorker.register('sw.js?v=' + encodeURIComponent(v)).catch(function () {});
+		});
+	})();
+	</script>
 </body>
 </html>
