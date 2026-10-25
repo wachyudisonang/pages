@@ -1,62 +1,142 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-	<meta name="theme-color" content="#2f6dc0">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+	<meta name="theme-color" content="#397fda">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="default">
 	<meta name="apple-mobile-web-app-title" content="Family Tree">
-	<link rel="icon" type="image/png" href="icon.png?v=202610191150">
-	<link rel="apple-touch-icon" href="icon.png?v=202610191150">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@1..144,100..900&family=Parisienne&display=swap" rel="stylesheet">
+	<link rel="icon" type="image/png" href="icon.png?v=202610260340">
+	<link rel="apple-touch-icon" href="icon.png?v=202610260340">
 	<link rel="manifest" href="manifest.json">
 	<title>Family Tree</title>
-	<meta name="app-version" content="202610191150" />
-	<link rel="stylesheet" href="style.css?v=202610191150">
-</head>
-<body>
-	<div id="ft-controls"></div>
-	<header id="ft-header">
-		<a id="ft-home" href="./" aria-label="Family Tree home">
-			<svg id="ft-logo" aria-hidden="true" viewBox="0 0 48 48" fill="none">
-				<path d="M24 42V22M24 31 12 20M24 28l12-12M24 20 18 12"></path>
-				<circle cx="12" cy="15" r="7"></circle>
-				<circle cx="21" cy="9" r="6"></circle>
-				<circle cx="37" cy="11" r="8"></circle>
-				<circle cx="10" cy="25" r="6"></circle>
-				<circle cx="36" cy="24" r="7"></circle>
-			</svg>
-			<span id="ft-brandtext">
-				<span id="ft-title">Family Tree</span>
-				<span id="ft-subtitle"></span>
-			</span>
-		</a>
-		<button id="ft-menu" type="button" aria-label="Menu">
-			<svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
-				<path d="M4 7h16M4 12h16M4 17h16"></path>
-			</svg>
-		</button>
-	</header>
-	<div id="ft-stage"></div>
-
-	<!-- Initial-popup overlay layer (visitor onboarding). Empty until main.js mounts the modal
-	     on first load; emptied again when the visitor presses "Explore Your Family Tree". -->
-	<div id="ft-modal"></div>
-
-	<script type="module" src="app.js?v=202610191150"></script>
-	<!-- Service worker (webapp-pwa-standards §12): registers ONLY in a secure context (HTTPS hub), so
-	     it no-ops on the plain-HTTP dev vhost. The cache is versioned by the app-version meta (stamped
-	     by pages/deploy.sh), passed to sw.js via ?v= so a new deploy busts the shell cache AND the
-	     byte-changed sw.js re-installs. Shell-only: Firebase/RTDB are never cached (IndexedDB owns data). -->
+	<meta name="app-version" content="202610260340" />
+	<link rel="stylesheet" href="style.css?v=202610260340">
+	<!-- Pre-paint: apply saved theme + language and raise the welcome gate before first paint (no
+	     light->dark flash, no late popup pop-in). Mirrors the dev index.html inline script. -->
 	<script>
-	(function () {
-		if (!('serviceWorker' in navigator) || !window.isSecureContext) return;
-		var v = (document.querySelector('meta[name="app-version"]') || {}).content || '';
-		if (!v || v === 'unset') return;                 // no real version (shouldn't happen — build stamps one) → no SW caching
-		window.addEventListener('load', function () {
-			navigator.serviceWorker.register('sw.js?v=' + encodeURIComponent(v)).catch(function () {});
-		});
+	(function(){
+		try{
+			var t=localStorage.getItem('APP_theme'); if(t==='light'||t==='dark'){ document.documentElement.setAttribute('data-theme',t); }
+			var l=localStorage.getItem('APP_lang'); document.documentElement.setAttribute('lang', (l==='en'||l==='id')?l:'id');
+			var id=null; try{ id=JSON.parse(localStorage.getItem('ft.identity.v1')||'null'); }catch(_){}
+			var deepLink=/[?&](intro|me|focus)=/.test(location.search);
+			if(!(id&&id.personId)&&!deepLink){ document.documentElement.classList.add('ft-gating'); }
+		}catch(e){}
 	})();
 	</script>
+</head>
+<body>
+<div class="app">
+	<header class="top">
+		<h1>
+			<a class="brand" href="/" aria-label="Family Tree home">
+				<span class="logo" aria-hidden="true">
+					<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+				</span>
+				<span id="topTitle">Family Tree</span>
+			</a>
+		</h1>
+		<button class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="tabs">
+			<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+		</button>
+	</header>
+
+	<main>
+		<div id="desktop-view" class="hidden md:block">
+			<div id="ft-stage-wrap" class="full-bleed py-6">
+				<div class="container-wide">
+					<div id="ft-controls" class="card-row"></div>
+					<div class="ft-stage"></div>
+				</div>
+			</div>
+			<div id="ft-block-info" class="full-bleed py-6">
+				<div class="container-wide">
+					<p>This is a dummy paragraph placed after the stage wrap.</p>
+					<button type="button" id="ft-edit-family-v2">Edit Family</button>
+				</div>
+			</div>
+		</div>
+		<div id="mobile-view" class="md:hidden">
+			<div id="mobile-stage-wrap" class="full-bleed py-6">
+				<div class="container-wide">
+					<div class="ft-stage"></div>
+				</div>
+			</div>
+		</div>
+		<div id="ft-viewer"></div>
+	</main>
+
+	<nav class="tabs" id="tabs">
+		<button class="nav on" data-tab="home">
+			<span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+			<span class="lbl2" data-i18n="nav.home">Who you Are</span>
+		</button>
+		<button class="nav" data-tab="list">
+			<span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span>
+			<span class="lbl2" data-i18n="nav.list">Config / Data</span>
+		</button>
+		<div class="nav-dd" id="ftAdminDd" hidden>
+			<button class="nav nav-dd-toggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="ftAdminDdMenu">
+				<span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+				<span class="lbl2" data-i18n="nav.more">Admin</span>
+				<span class="nav-dd-caret" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+			</button>
+			<div class="nav-dd-menu" id="ftAdminDdMenu" role="menu">
+				<a href="?switchFamily" role="menuitem" data-ft-admin="switchFamily">Switch Family</a>
+				<a href="?pending" role="menuitem" data-ft-admin="pending">Pending review</a>
+				<a href="?possibleMe" role="menuitem" data-ft-admin="possibleMe">possibleMe</a>
+				<a href="?visitors" role="menuitem" data-ft-admin="visitors">Visitors log</a>
+			</div>
+		</div>
+	</nav>
+	<div class="nav-scrim" id="navScrim" hidden></div>
+
+	<nav class="botbar" aria-label="Quick navigation">
+		<button class="botbar-btn" data-tab="home">
+			<span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+			<span class="lbl2" data-i18n="nav.home">Home</span>
+		</button>
+		<button class="botbar-btn" data-tab="more">
+			<span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+			<span class="lbl2" data-i18n="nav.more">More</span>
+		</button>
+	</nav>
+</div>
+
+<div class="modal-bg" id="modalBg" aria-hidden="true">
+	<div class="modal" role="dialog" aria-modal="true">
+		<button class="x" id="modalX" data-i18n-aria="modal.close" aria-label="Close">✕</button>
+		<div class="modal-body"></div>
+	</div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- Familytree renderer's own overlay layer (visitor onboarding / forms). -->
+<div id="ft-modal"></div>
+
+<!-- Bundled renderer + PWA shell chrome (dev loads source/main.js + source/core/shell.js). -->
+<script type="module" src="app.js?v=202610260340"></script>
+<script type="module" src="shell.js?v=202610260340"></script>
+<!-- Service worker (webapp-pwa-standards §12): registers ONLY in a secure context (HTTPS hub), so
+     it no-ops on the plain-HTTP dev vhost. The cache is versioned by the app-version meta (stamped
+     by pages/deploy.sh), passed to sw.js via ?v= so a new deploy busts the shell cache AND the
+     byte-changed sw.js re-installs. Shell-only: Firebase/RTDB are never cached (IndexedDB owns data). -->
+<script>
+(function () {
+	if (!('serviceWorker' in navigator) || !window.isSecureContext) return;
+	var v = (document.querySelector('meta[name="app-version"]') || {}).content || '';
+	if (!v || v === 'unset') return;                 // no real version (shouldn't happen — build stamps one) → no SW caching
+	window.addEventListener('load', function () {
+		navigator.serviceWorker.register('sw.js?v=' + encodeURIComponent(v)).catch(function () {});
+	});
+})();
+</script>
 </body>
 </html>
