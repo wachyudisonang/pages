@@ -11,12 +11,12 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@1..144,100..900&family=Parisienne&display=swap" rel="stylesheet">
-	<link rel="icon" type="image/png" href="icon.png?v=202610260340">
-	<link rel="apple-touch-icon" href="icon.png?v=202610260340">
+	<link rel="icon" type="image/png" href="icon.png?v=202610261404">
+	<link rel="apple-touch-icon" href="icon.png?v=202610261404">
 	<link rel="manifest" href="manifest.json">
 	<title>Family Tree</title>
-	<meta name="app-version" content="202610260340" />
-	<link rel="stylesheet" href="style.css?v=202610260340">
+	<meta name="app-version" content="202610261404" />
+	<link rel="stylesheet" href="style.css?v=202610261404">
 	<!-- Pre-paint: apply saved theme + language and raise the welcome gate before first paint (no
 	     light->dark flash, no late popup pop-in). Mirrors the dev index.html inline script. -->
 	<script>
@@ -122,8 +122,8 @@
 <div id="ft-modal"></div>
 
 <!-- Bundled renderer + PWA shell chrome (dev loads source/main.js + source/core/shell.js). -->
-<script type="module" src="app.js?v=202610260340"></script>
-<script type="module" src="shell.js?v=202610260340"></script>
+<script type="module" src="app.js?v=202610261404"></script>
+<script type="module" src="shell.js?v=202610261404"></script>
 <!-- Service worker (webapp-pwa-standards §12): registers ONLY in a secure context (HTTPS hub), so
      it no-ops on the plain-HTTP dev vhost. The cache is versioned by the app-version meta (stamped
      by pages/deploy.sh), passed to sw.js via ?v= so a new deploy busts the shell cache AND the

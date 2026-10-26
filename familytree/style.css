@@ -2244,6 +2244,7 @@ header.top {
 } /* anchors the full-width nav overlay */
 .ft-m-section2 {
   position: relative;
+  margin-top: 12px; /* key box → section2 boundary = 12px existing + 12px = 24px, matching the inter-generation gap */
   margin-bottom: 0;
   background: color-mix(in srgb, var(--ft-color-key, #d4a017) 10%, #fff);
   padding-top: 16px;
@@ -2264,16 +2265,29 @@ header.top {
   margin-bottom: 0; /* clear the fixed bottom action bar */
   text-align: center;
 }
+header.top .logo {
+  border: none;
+  box-shadow: none;
+  background: none;
+  width: 45px;
+  height: 45px;
+}
+header.top .logo svg {
+  width: 90%;
+  height: 90%;
+}
 .ft-m-tagline-logo {
   display: block;
-  width: 28px;
-  height: 28px;
-  margin: 0 auto 4px;
   stroke: var(--ft-color-key, #d4a017);
   stroke-width: 2.2;
   stroke-linecap: round;
   stroke-linejoin: round;
   fill: none;
+}
+.ft-stage .ft-m-tagline-logo {
+  width: 28px;
+  height: 28px;
+  margin: 0 auto 4px;
 }
 .ft-m-tagline-logo circle {
   fill: color-mix(in srgb, var(--ft-color-key, #d4a017) 16%, transparent);
@@ -2330,7 +2344,10 @@ header.top {
 .ft-m-boxstage .ft-node--key {
   border: 1px solid var(--ft-color-border, #e5e7eb);
   border-radius: var(--ft-tw-radLg, 8px);
-  padding: var(--ft-box-padY) var(--ft-box-padX);
+  /* Minimum top/bottom breathing room: the global --ft-box-padY (4px) is too tight for a name that
+     wraps to 3 lines (it sat flush against the border). The spine box height grows to match via the
+     engine's padY override (outline-mobile.js S1_BOX.padY), so short names keep their floor height. */
+  padding: 12px var(--ft-box-padX);
 }
 .ft-m-boxstage .ft-node--ancestor {
   background: var(--ft-color-keyBg);
@@ -2346,6 +2363,19 @@ header.top {
   position: absolute;
   z-index: 1;
 }
+/* Bloodline-path spouse sub-line under a spine parent's name (e.g. "⚭ Moeshari" — the mother of
+   the next person down). Reuses the design tokens we already have: the familytree subtitle colour
+   (same muted ink as hints/subtitles) and the PWA template's --text-sm size + --sp-1 spacing. */
+.ft-m-boxstage .ft-nm-spouse {
+  margin-top: var(--sp-4, 4px);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 400;
+  line-height: 1.15;
+  text-align: center;
+  text-transform: capitalize;
+  word-break: break-word;
+  color: var(--ft-color-subtitle, var(--muted, #6b7a90));
+}
 .ft-m-boxstage .ft-connector {
   stroke: #c9c9c9;
   stroke-width: 1;
@@ -2355,7 +2385,7 @@ header.top {
 .ft-m-spinebridge {
   position: absolute;
   width: 1px;
-  height: 46px;
+  height: 24px; /* fallback — JS measures and overrides to end exactly at the section-2 dot */
   transform: translateX(-50%);
   pointer-events: none;
   z-index: 1;
@@ -2364,8 +2394,8 @@ header.top {
 /* Gold connector dot on a box's top edge (placed inline by JS). */
 .ft-m-topdot {
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--ft-color-key, #d4a017);
   transform: translate(-50%, -50%);
@@ -2377,8 +2407,8 @@ header.top {
   position: absolute;
   top: 0;
   left: 50%;
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--ft-color-key, #d4a017);
   transform: translate(-50%, -50%);
@@ -2439,6 +2469,46 @@ header.top {
 }
 .ft-node.ft-m-static {
   cursor: default;
+}
+/* Sibling-navigation PILL (replaces the finger arrow): "‹ N older" on the left, "N younger ›" on
+   the right of a spine row. Rounded capsule, soft tint; reuses PWA-template tokens for size +
+   spacing and the familytree key colour for the accent. */
+.ft-m-sibpill {
+  position: absolute;
+  transform: translateY(-50%);     /* top set inline from the target box's row */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-4, 4px);
+  pointer-events: auto;
+  touch-action: pan-y;             /* let a horizontal drag become a spine swipe, keep vertical scroll */
+  appearance: none;
+  cursor: pointer;
+  z-index: 22;
+  padding: var(--sp-4, 4px) var(--sp-8, 8px);
+  border-radius: 999px;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 500;
+  line-height: 1.1;
+  white-space: nowrap;
+  color: var(--ft-color-key, #c99a1e);
+  border: 1px solid color-mix(in srgb, var(--ft-color-key, #c99a1e) 30%, transparent);
+}
+.ft-m-sibpill--older {
+  left: 0;
+}
+.ft-m-sibpill--younger {
+  right: 0;
+}
+.ft-m-sibpill-caret {
+  font-size: 1.1em;
+  line-height: 1;
+  opacity: 0.85;
+}
+.ft-m-sibpill:active {
+  transform: translateY(-50%) scale(0.92);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ft-m-sibpill { transition: background 0.15s ease, transform 0.1s ease; }
 }
 .ft-m-sibarrow {
   position: absolute;
