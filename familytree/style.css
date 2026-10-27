@@ -1891,11 +1891,14 @@ header.top {
 #ft-viewer {
   background: #fff;
 }
-/* Mobile: no wrapper margin, so a section background can bleed to the screen edge. */
-.ft-surface-mobile #ft-stage-wrap {
-  margin: 0;
+/* DESKTOP template only: the measured box tree has a fixed pixel width (e.g. 1224px for a sibling
+   row). Below that width it used to overflow the PAGE (sideways page scroll from 768px up to
+   ~1250px). Give the tree its own horizontal scroller instead. #ft-controls is positioned against
+   #ft-stage-wrap (outside this scroller), so the cards stay pinned top-right while the tree scrolls.
+   Scoped to #desktop-view: the mobile outline (#mobile-view) is a different, flowing template. */
+#desktop-view #ft-stage-wrap .container-wide {
+  overflow-x: auto;
 }
-
 /* ============================================================ CONTROL CARDS
    card-controls + card-debug + card-print. Float top-right, no flow space. */
 #ft-controls {
@@ -2190,6 +2193,11 @@ header.top {
   #ft-stage {
     position: relative;
   }
+  /* The on-screen horizontal scroller (see "DESKTOP template only" above) must not clip the tree on
+     paper: an overflow:auto box does not grow to fit its content when printed. */
+  #desktop-view #ft-stage-wrap .container-wide {
+    overflow: visible;
+  }
 }
 
 /* ============================================================ MOBILE OUTLINE
@@ -2211,9 +2219,6 @@ header.top {
 .ft-m-section2 .ft-m-section-title {
   text-align: center;
   margin-bottom: 20px;
-}
-.ft-surface-mobile #ft-controls {
-  display: none !important;
 }
 .ft-m-section-hint {
   display: flex;
@@ -3455,4 +3460,16 @@ html.ft-gating .app {
     width: 100%;
     text-align: center;
   }
+}
+
+/* Render error boundary (main.js drawMount): shown in ONE mount when its template throws. Design-system
+   tokens only (bigown.css). Keyboard focus on tree nodes / outline rows uses bigown.css's global
+   :focus-visible ring, so there is deliberately no per-element focus style here. */
+.ft-render-error {
+  padding: var(--sp-16);
+  text-align: center;
+  color: var(--text);
+}
+.ft-render-error button {
+  margin-top: var(--sp-8);
 }

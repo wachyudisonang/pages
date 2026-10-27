@@ -146,19 +146,28 @@ deploy_familytree() {
   echo "==> familytree  (building dist/ from source/ via esbuild)"
   run bash -c "cd '$ftsrc' && node tools/build.js && node tools/make-icons.js"
   # Publish ONLY the self-contained bundle output (same file set as grocery) + the shell service worker.
-  rsync_project familytree "$ftsrc/dist" \
-    index.html style.css app.js shell.js manifest.json icon.png icon-512.png sw.js
+  # The file lists come from the familytree repo itself (tools/publish-files.js — ONE definition shared
+  # with the service-worker precache and the dist verifier, and gate-checked against the built
+  # index.html), so adding a file or an icon there never needs a second edit in this repo.
+  local pubfiles stampfiles
+  pubfiles="$(node "$ftsrc/tools/publish-files.js" files)"
+  stampfiles="$(node "$ftsrc/tools/publish-files.js" stamp)"
+  if [[ -z "$pubfiles" || -z "$stampfiles" ]]; then
+    echo "!! familytree publish list is empty (tools/publish-files.js) — refusing to deploy"
+    return 1
+  fi
+  rsync_project familytree "$ftsrc/dist" $pubfiles
   # Cache-bust: meta + hub link, then version every LOCAL asset ref so a stale app.js/style.css/icon
   # can't be served from the browser cache. (The gstatic Firebase SDK URL inside app.js is external
   # and never stamped — stamp_asset only touches quoted/paren'd local refs, never http(s):// URLs.)
   if [[ -f "$HERE/familytree/index.html" ]]; then
     stamp_version familytree "$DEPLOY_STAMP"
     local d="$HERE/familytree"
-    stamp_asset "$d/index.html" style.css "$DEPLOY_STAMP"
-    stamp_asset "$d/index.html" app.js    "$DEPLOY_STAMP"
-    stamp_asset "$d/index.html" shell.js  "$DEPLOY_STAMP"
-    stamp_asset "$d/index.html" icon.png  "$DEPLOY_STAMP"
-    echo "   assets versioned: style.css, app.js, shell.js, icon.png (sw.js cache keyed off the app-version meta)"
+    local asset
+    for asset in $stampfiles; do
+      stamp_asset "$d/index.html" "$asset" "$DEPLOY_STAMP"
+    done
+    echo "   assets versioned: ${stampfiles// /, } (sw.js cache keyed off the app-version meta)"
   fi
 }
 
