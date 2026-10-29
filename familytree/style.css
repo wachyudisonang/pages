@@ -11,6 +11,7 @@
    class-name grammar (mt-3, py-6, px-5, order-1, flex, gap-2, ...).
    ============================================================ */
 
+/* @kit:tokens */
 /* ============================================================
    1. THEME VARIABLES
    Every surface MUST use these vars — never a fixed hex / bg-white.
@@ -121,6 +122,7 @@
   --shadow-overlay-up: 0 -8px 30px -6px rgba(0, 0, 0, .45);
 }
 
+/* @kit:reset */
 /* ============================================================
    2. RESET — adapted from Tailwind Preflight
    (box-sizing, margin zero-out, media defaults, form inheritance).
@@ -254,6 +256,7 @@ code {
   outline: 2px solid var(--accent);
 }
 
+/* @kit:layout */
 /* ============================================================
    3. LAYOUT — RESPONSIVE, single codebase (no separate desktop/mobile
       renders). Mobile-first: header on top with a HAMBURGER button; the nav
@@ -494,6 +497,7 @@ main > * > .full-bleed:first-child {
   }
 }
 
+/* @kit:edge */
 /* ============================================================
    4. EDGE-TO-EDGE / RESPONSIVE CONTAINER SYSTEM
       (the Bootstrap .container idea, hand-rolled — no Bootstrap CSS)
@@ -573,6 +577,7 @@ main {
   }
 }
 
+/* @kit:components */
 /* ============================================================
    5. COMPONENTS
    ============================================================ */
@@ -864,10 +869,9 @@ nav.tabs .nav.on .lbl2 {
   flex-direction: column;
 }
 /* Honor the HTML `hidden` attribute: `.nav-dd { display:flex }` above would otherwise override
-   hidden's default display:none, leaving a hidden dropdown visible. Class+attribute specificity
-   (0,2,0) beats the bare class (0,1,0) so no !important needed. familytree gates #ftAdminDd this way
-   (hidden for non-admins). NOTE: this rule must also live in the pwa-template style.css source — a
-   re-sync of bigown.css from the template will WIPE it otherwise (it has already done so once). */
+   hidden's default display:none, leaving a hidden dropdown visible. Any app that gates a .nav-dd by
+   toggling `hidden` (e.g. an admin-only dropdown) relies on this. !important because the desktop
+   `.app:not(.with-rail) .nav-dd*` rules below are higher specificity. */
 .nav-dd[hidden] {
   display: none !important;
 }
@@ -1432,6 +1436,7 @@ nav.tabs .nav.on .lbl2 {
   color: var(--muted-2);
 }
 
+/* @kit:utilities */
 /* ============================================================
    6. UTILITY CLASSES — Tailwind naming (subset we actually use)
    Spacing scale: 1=4px 2=8px 3=12px 4=16px 5=20px 6=24px 8=32px
@@ -2338,6 +2343,129 @@ header.top .logo svg {
 .ft-m-action:active {
   transform: scale(0.98);
 }
+/* ============================================================ TREE VIEW ON A NARROW SCREEN
+   There is ONE tree render. main.js puts `ft-tree-view` on <html> only while the screen is narrow AND
+   state.showTree is on; then #desktop-view is shown in place of #mobile-view and render/zoom-frame.js
+   fits it to the screen. Outside that class the wrappers have no box and the zoom bar is hidden, so the
+   wide layout is exactly what it always was.
+   In the tree view the page is exactly one screen tall and does not scroll: .app is 100dvh, and a flex
+   column runs down from it (main > #desktop-view > #ft-stage-wrap > .container-wide) so the zoom
+   viewport takes ALL the height between the header and the fixed action bar, with the zoom bar as a
+   plain row under it. The bar therefore stays at the bottom whatever the zoom level; only the viewport
+   scrolls. --ft-actionbar-h (set from the fixed action bar's real height) is the space main leaves for it.
+   The stage is drawn at actual size and scaled with a transform AFTER it is measured; the sizer holds the
+   scaled size, and its auto margins centre it in the viewport on both axes while it is smaller than the
+   viewport (a bigger one starts at the top-left and scrolls). */
+.ft-zoom-viewport,
+.ft-zoom-sizer {
+  display: contents;
+}
+.ft-zoom-nav {
+  display: none;
+}
+html.ft-tree-view #mobile-view {
+  display: none;
+}
+html.ft-tree-view .app {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+}
+html.ft-tree-view main {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding-bottom: var(--ft-actionbar-h, 0px);
+}
+html.ft-tree-view main > #desktop-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  padding-top: 0;
+}
+/* the desktop view's floating cards and its Edit Family block do not fit a phone (the bottom bar has Edit Family) */
+html.ft-tree-view #desktop-view #ft-controls,
+html.ft-tree-view #desktop-view #ft-block-info {
+  display: none;
+}
+html.ft-tree-view #desktop-view #ft-stage-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  margin-top: 0;
+  padding: 0;
+}
+html.ft-tree-view #desktop-view #ft-stage-wrap .container-wide {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  max-width: none;
+  padding-inline: 0;
+  overflow: visible;
+}
+html.ft-tree-view .ft-zoom-viewport {
+  display: flex;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: auto;
+  /* pan with a finger, but leave the two-finger pinch to the frame (it zooms the tree, not the page) */
+  touch-action: pan-x pan-y;
+}
+html.ft-tree-view .ft-zoom-sizer {
+  display: block;
+  position: relative;
+  flex: none;
+  margin: auto;   /* centre on both axes while smaller than the viewport; a bigger one scrolls from the top-left */
+}
+html.ft-tree-view .ft-zoom-sizer > .ft-stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+}
+html.ft-tree-view .ft-zoom-nav {
+  display: flex;
+  flex: none;
+  justify-content: center;
+  gap: var(--ft-zoom-gap);
+  padding: var(--ft-zoom-gap);
+}
+.ft-zoom-btn {
+  appearance: none;
+  min-width: var(--ft-zoom-tap);
+  min-height: var(--ft-zoom-tap);
+  padding: 0 var(--ft-zoom-gap);
+  border: 1px solid var(--ft-color-border);
+  border-radius: var(--ft-tw-radLg);
+  box-shadow: var(--ft-tw-shadowMd);
+  background: var(--ft-color-nodeBg);
+  color: var(--ft-color-nodeText);
+  font-weight: 600;
+  cursor: pointer;
+}
+.ft-zoom-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+/* the zoom in / zoom out magnifier: drawn in the button's own text colour, so disabled and hover follow it */
+.ft-zoom-icon {
+  display: block;
+  width: var(--ft-zoom-icon);
+  height: var(--ft-zoom-icon);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ft-zoom-fit.ft-zoom-on {
+  background: var(--ft-color-key);
+  border-color: var(--ft-color-key);
+  color: #fff;
+}
 /* Box stage: hosts absolute node boxes + the sibling-nav overlay; overflow visible for edge arrows. */
 .ft-m-boxstage {
   position: relative;
@@ -2351,7 +2479,7 @@ header.top .logo svg {
   border-radius: var(--ft-tw-radLg, 8px);
   /* Minimum top/bottom breathing room: the global --ft-box-padY (4px) is too tight for a name that
      wraps to 3 lines (it sat flush against the border). The spine box height grows to match via the
-     engine's padY override (outline-mobile.js S1_BOX.padY), so short names keep their floor height. */
+     engine's padY override (tokens.spine.boxPadY, templates/spine-outline.js), so short names keep their floor height. */
   padding: 12px var(--ft-box-padX);
 }
 .ft-m-boxstage .ft-node--ancestor {
