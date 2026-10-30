@@ -1884,6 +1884,7 @@ header.top {
 /* ============================================================ PAGE WRAPPERS
    The stage wrapper carries the light bodyBg card; the mobile wrapper is white. */
 #ft-stage-wrap {
+  --ft-controls-inset: 12px;   /* the control cards' distance from the top-right corner (CONTROL CARDS) */
   position: relative;
   background: var(--ft-color-bodyBg);
   box-shadow: var(
@@ -1896,6 +1897,30 @@ header.top {
 #ft-viewer {
   background: #fff;
 }
+/* An empty viewer mount (every page but ?config / ?pending / ...) takes no room: it would otherwise show
+   as a white strip (main > * top padding) under the tree. */
+#ft-viewer:empty {
+  display: none;
+}
+/* WIDE SCREEN: the page is at least one screen tall, the light stage card grows to fill what the tree
+   leaves, and main ends above the fixed bottom action bar (--ft-actionbar-h, set by render/action-bar.js),
+   so no dark band shows under a short tree and the bar never covers the Edit Family block under a tall one.
+   (The narrow tree view, html.ft-tree-view, has its own one-screen layout below.) */
+@media (min-width: 768px) {
+  html:not(.ft-tree-view) main {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: var(--ft-actionbar-h, 0px);
+  }
+  html:not(.ft-tree-view) main > #desktop-view {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 auto;
+  }
+  html:not(.ft-tree-view) #desktop-view > #ft-stage-wrap {
+    flex: 1 0 auto;
+  }
+}
 /* DESKTOP template only: the measured box tree has a fixed pixel width (e.g. 1224px for a sibling
    row). Below that width it used to overflow the PAGE (sideways page scroll from 768px up to
    ~1250px). Give the tree its own horizontal scroller instead. #ft-controls is positioned against
@@ -1905,11 +1930,17 @@ header.top {
   overflow-x: auto;
 }
 /* ============================================================ CONTROL CARDS
-   card-controls + card-debug + card-print. Float top-right, no flow space. */
+   card-controls + card-debug + card-print. Float top-right, no flow space: an expanded card floats over
+   the tree. The stage itself starts below the row of COLLAPSED cards (--ft-controls-h, measured by
+   render/card-shell.js watchControlsHeight), so on a screen too narrow for cards and tree side by side
+   the cards never sit on the tree's first row; the stage's own top padding is the gap between them. */
+html:not(.ft-tree-view) #desktop-view #ft-stage-wrap {
+  padding-top: max(calc(var(--spacing) * 6), calc(var(--ft-controls-inset) + var(--ft-controls-h, 0px)));
+}
 #ft-controls {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: var(--ft-controls-inset);
+  right: var(--ft-controls-inset);
   display: flex;
   flex-direction: row;
   align-items: flex-start;
@@ -2286,21 +2317,15 @@ header.top .logo svg {
   width: 90%;
   height: 90%;
 }
+/* The tree mark (render/tree-logo.js): a gold-gradient silhouette painted through an SVG mask, so it
+   takes no stroke/fill from CSS (a CSS fill on its circles would break the mask). */
 .ft-m-tagline-logo {
   display: block;
-  stroke: var(--ft-color-key, #d4a017);
-  stroke-width: 2.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  fill: none;
 }
 .ft-stage .ft-m-tagline-logo {
   width: 28px;
   height: 28px;
   margin: 0 auto 4px;
-}
-.ft-m-tagline-logo circle {
-  fill: color-mix(in srgb, var(--ft-color-key, #d4a017) 16%, transparent);
 }
 .ft-m-tagline {
   margin: 0;
@@ -2384,7 +2409,7 @@ html.ft-tree-view main > #desktop-view {
   min-height: 0;
   padding-top: 0;
 }
-/* the desktop view's floating cards and its Edit Family block do not fit a phone (the bottom bar has Edit Family) */
+/* the desktop view's floating cards and its Edit Family block do not fit a phone (the bottom bar has the Edit button) */
 html.ft-tree-view #desktop-view #ft-controls,
 html.ft-tree-view #desktop-view #ft-block-info {
   display: none;
@@ -2717,7 +2742,7 @@ html.ft-tree-view .ft-zoom-nav {
   display: none;
 }
 /* Counterpart: once a family IS defined, the "Who you Are" nav reopens the SAME popup
-   WITHOUT `welcome` (it carries `dismissable` instead — set in initial-popup.js). It then
+   WITHOUT `welcome` (it carries `dismissable` instead — set by render/shell-modal.js). It then
    needs no special rule here — it inherits the DEFAULT .modal-bg (translucent scrim +
    blur) and the default-visible X — and shell.js closeModal lets X / backdrop / Escape
    dismiss it, because the close lock keys off `welcome`, not `dismissable`. */
@@ -2725,18 +2750,130 @@ html.ft-tree-view .ft-zoom-nav {
    saved identity). Boot is async — the reachability probe + directory lookup take
    time — so without this the empty tree body would paint first and the welcome
    popup would pop in seconds later. While gating: hide the app body and cover the
-   viewport with a solid page background, so the visitor sees a clean solid page
+   viewport with the splash (#ft-splash, below), so the visitor sees a clean page
    from the first frame until the popup is ready. main.js removes `ft-gating`
    the moment a family is actually loaded/rendered. */
-html.ft-gating body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 900;
-  background: var(--ft-color-pageBg, #1e5068);
+html.ft-gating #ft-splash {
+  opacity: 1;
+  visibility: visible;
+  transition: none;
 }
 html.ft-gating .app {
   visibility: hidden;
+}
+/* BOOT COVER: the same cover for every visitor who is NOT shown the name gate (index.html's head script adds
+   `ft-booting`). The tree is built by modules that arrive after the first paint, so without it the page paints
+   half-built (unstyled header, the Edit Family band right under an empty tree) and then jumps. main.js drops it
+   once the first tree / viewer page is drawn and the fonts are in. If JS never gets that far (a module fails
+   to load) the animations below give the cover up after --ft-boot-giveup, so the page is never left blank. */
+html.ft-booting #ft-splash {
+  opacity: 1;
+  visibility: visible;
+  transition: none;
+  animation: ft-boot-giveup 0s linear var(--ft-boot-giveup, 6s) forwards;
+}
+html.ft-booting .app {
+  visibility: hidden;
+  animation: ft-boot-show 0s linear var(--ft-boot-giveup, 6s) forwards;
+}
+@keyframes ft-boot-giveup {
+  to {
+    visibility: hidden;
+  }
+}
+@keyframes ft-boot-show {
+  to {
+    visibility: visible;
+  }
+}
+/* SPLASH: the cover itself (#ft-splash, first child of <body>). Hidden by default; the two html classes above
+   show it with no transition, and removing the class fades it out. The tree logo grows once (trunk, crown
+   circles, veins draw, node dots pop), then breathes while a gold arc spins around it. Transforms use
+   fill-box so each shape scales about its own centre (the trunk about its foot). */
+#ft-splash {
+  --ft-sp-fade: 0.35s;      /* cover fade-out */
+  --ft-sp-grow: 1.25s;      /* the logo is fully grown by then: core/splash.js SPLASH_MIN_MS (gate boot-cover-sync) */
+  --ft-sp-ring-a: 0.55;     /* opacity of the spinning arc */
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: grid;
+  place-items: center;
+  background: var(--ft-color-pageBg, #1e5068);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity var(--ft-sp-fade) ease, visibility 0s linear var(--ft-sp-fade);
+}
+html.ft-gating #ft-splash,
+html.ft-booting #ft-splash {
+  pointer-events: auto;
+}
+/* Behind the cover the page is still in its pre-JS layout (.app is not yet pinned to one screen by
+   `ft-tree-view`, so it is taller than the viewport). Without this the root scrollbar shows beside the
+   splash and its width shifts the layout when the cover lifts. */
+html.ft-gating,
+html.ft-booting {
+  overflow: hidden;
+}
+.ft-sp {
+  width: clamp(96px, 26vmin, 160px);
+  height: auto;
+  overflow: visible;
+}
+.ft-sp * {
+  transform-box: fill-box;
+}
+.ft-sp-pop {
+  transform-origin: center;
+  animation: ft-sp-pop 0.35s cubic-bezier(0.33, 1, 0.68, 1) var(--d, 0s) both;
+}
+.ft-sp-trunk {
+  transform-origin: 50% 100%;
+  animation: ft-sp-trunk 0.4s cubic-bezier(0.33, 1, 0.68, 1) both;
+}
+.ft-sp-vein {
+  stroke-dasharray: 1 2;
+  animation: ft-sp-vein 0.35s cubic-bezier(0.65, 0, 0.35, 1) var(--d, 0s) both;
+}
+.ft-sp-tree {
+  transform-origin: 50% 100%;
+  animation: ft-sp-breathe 3s ease-in-out var(--ft-sp-grow) infinite;
+}
+.ft-sp-ring {
+  transform-origin: center;
+  opacity: 0;
+  animation: ft-sp-ring-in 0.5s ease 0.3s forwards, ft-sp-spin 2.6s linear infinite;
+}
+@keyframes ft-sp-pop {
+  from { transform: scale(0); }
+  60% { transform: scale(1.14); }
+  to { transform: scale(1); }
+}
+@keyframes ft-sp-trunk {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+@keyframes ft-sp-vein {
+  from { stroke-dashoffset: 1; opacity: 0; }
+  10% { opacity: 1; }
+  to { stroke-dashoffset: 0; opacity: 1; }
+}
+@keyframes ft-sp-breathe {
+  50% { transform: scale(1.035); }
+}
+@keyframes ft-sp-ring-in {
+  to { opacity: var(--ft-sp-ring-a); }
+}
+@keyframes ft-sp-spin {
+  to { transform: rotate(1turn); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ft-sp-pop, .ft-sp-trunk, .ft-sp-vein, .ft-sp-tree, .ft-sp-ring {
+    animation: none;
+  }
+  .ft-sp-vein { stroke-dasharray: none; }
+  .ft-sp-ring { opacity: var(--ft-sp-ring-a); }
 }
 .modal {
   --modal-pad: calc(var(--spacing) * 8);
@@ -2751,6 +2888,22 @@ html.ft-gating .app {
   color: var(--ft-color-nodeText, #222);
   border: 1px solid var(--ft-color-border, #e5e7eb);
   border-radius: var(--ft-tw-radXl, 12px);
+}
+/* Family form (render/family-form.js) in the SAME card as the welcome popup (440px, same radius, same
+   centring). Its content is far taller than the viewport, so the card takes the welcome popup's height
+   and the BODY scrolls inside it: the card itself clips to its rounded corners, and the scrollbar no
+   longer sits on the card's edge (which squared the corner and narrowed the card). Keyed on the modal
+   kind render/shell-modal.js sets (data-modal-kind), which is cleared on close, so it drops away when
+   another modal opens. The viewport caps above (max-height) still win on a short screen. */
+#modalBg[data-modal-kind="family-form"] .modal {
+  height: var(--ft-modal-formH);
+  overflow: hidden;
+}
+#modalBg[data-modal-kind="family-form"] .modal > .modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 .modal h2.ip-title {
   margin: calc(var(--spacing) * 6) 0 calc(var(--spacing) * 8);
@@ -2844,10 +2997,7 @@ html.ft-gating .app {
   cursor: not-allowed;
 }
 
-/* Admin family switcher (reuses .ip-panel/.ip-select/.ip-explore). */
-.af-panel {
-  gap: 16px;
-}
+/* Admin family switcher (render/admin-families.js, in the shell modal; reuses .ip-select/.ip-explore). */
 .af-select {
   margin-top: 2px;
 }
@@ -3063,16 +3213,9 @@ html.ft-gating .app {
 }
 
 /* ============================================================ ADD/EDIT FAMILY FORM
-   render/family-form.js — reuses the welcome-popup chrome (.ip-overlay/.ip-panel/.ip-select/
-   .ip-explore). Rules below add the form-only pieces: tab strip, open panel, field grid,
-   summary, deceased controls. */
-.ff-overlay {
-  align-items: flex-start;
-  overflow-y: auto;
-} /* long form scrolls from the top */
-.ff-panel {
-  margin: auto;
-} /* same dimensions as .ip-panel (440px, gap 14px) */
+   render/family-form.js — opens in the shell modal (#modalBg, sized above) and reuses the welcome-popup
+   controls (.ip-select/.ip-explore). Rules below add the form-only pieces: tab strip, open panel, field
+   grid, summary, deceased controls. */
 
 /* Compact tab strip: one pill per section; clicking flips the single open panel below. */
 .ff-tabs {
