@@ -3124,8 +3124,14 @@ html.ft-booting {
   font-weight: 600;
   color: #fff;
   background: #25d366;
+  border: 0;
   border-radius: 7px;
   text-decoration: none;
+  cursor: pointer;
+}
+.ip-wa-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
 }
 .ip-wa-btn svg {
   display: block;
@@ -3133,6 +3139,24 @@ html.ft-booting {
 }
 .ip-wa-btn:hover {
   filter: brightness(1.06);
+}
+.ip-claim-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--ft-color-key, #d4a017) 35%, transparent);
+  border-radius: var(--ft-tw-radMd, 7px);
+  background: color-mix(in srgb, var(--ft-color-key, #d4a017) 8%, var(--ft-color-nodeBg, #fff));
+  color: var(--ft-color-nodeText, #222);
+}
+.ip-claim-block[hidden] {
+  display: none;
+}
+.ip-claim:disabled {
+  opacity: 0.65;
+  cursor: wait;
 }
 /* Identified-but-empty: shown when a confirmed visitor has no family records yet. */
 .ip-empty {
@@ -3692,7 +3716,23 @@ html.ft-booting {
   cursor: pointer;
 }
 
-/* Footer: Cancel (ghost) + Save (= .ip-explore). */
+/* Footer: persistence result + Cancel (ghost) + Save (= .ip-explore). */
+.ff-save-status {
+  min-height: 20px;
+  margin-top: 8px;
+  text-align: right;
+}
+.ff-save-ok {
+  color: var(--ft-color-success, #1f7a34);
+}
+.ff-save-error {
+  color: var(--ft-color-danger, #c0392b);
+}
+.ff-contributor-action {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: calc(var(--spacing) * 2);
+}
 .ff-footer {
   display: flex;
   justify-content: flex-end;
@@ -3727,7 +3767,8 @@ html.ft-booting {
     flex-direction: column-reverse;
   }
   .ff-cancel,
-  .ff-save {
+  .ff-save,
+  .ff-contributor-request {
     width: 100%;
     text-align: center;
   }
