@@ -5,7 +5,7 @@
 // browser re-installs. Shell-only: Firebase/RTDB are NEVER cached (local storage/IndexedDB owns data).
 const VERSION = new URL(self.location.href).searchParams.get('v') || 'dev';
 const CACHE = 'grocery-shell-v' + VERSION;
-const SHELL = ['./', './index.html', './app.js', './style.css', './manifest.json', './icon.png', './icon-512.png'];
+const SHELL = ['./', './index.html', './app.js', './i18n.js', './style.css', './manifest.json', './icon.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
 	e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));

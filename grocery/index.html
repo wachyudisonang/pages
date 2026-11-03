@@ -8,21 +8,22 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Belanja">
-<link rel="icon" type="image/png" href="icon.png?v=202610191150">
-<link rel="apple-touch-icon" href="icon.png?v=202610191150">
+<link rel="icon" type="image/png" href="icon.png?v=202611031529">
+<link rel="apple-touch-icon" href="icon.png?v=202611031529">
 <link rel="manifest" href="manifest.json">
 <title>Daftar Belanja</title>
-<meta name="app-version" content="202610191150" />
+<meta name="app-version" content="202611031529" />
 <script>
-  /* Apply saved theme BEFORE first paint to avoid a light/dark flash.
-     Values: 'light' | 'dark' | 'system' (default). 'system' leaves no
-     data-theme attribute so the prefers-color-scheme @media rule governs. */
-  (function(){ try{ var t=localStorage.getItem('grocery_theme'); if(t==='light'||t==='dark'){ document.documentElement.setAttribute('data-theme',t); } }catch(e){} })();
+  /* Apply saved theme + language BEFORE first paint. */
+  (function(){ try{
+    var t=localStorage.getItem('grocery_theme'); if(t==='light'||t==='dark'){ document.documentElement.setAttribute('data-theme',t); }
+    var l=localStorage.getItem('grocery_lang'); document.documentElement.setAttribute('lang',(l==='en'||l==='id')?l:'id');
+  }catch(e){} })();
 </script>
-<link rel="stylesheet" href="style.css?v=202610191150">
+<link rel="stylesheet" href="style.css?v=202611031529">
 </head>
 <body>
-<div class="app">
+<div class="app with-rail">
   <header class="top">
     <h1><span class="logo"><svg viewBox="0 0 576 512" width="18" height="18" fill="currentColor"><path d="M0 24C0 10.7 10.7 0 24 0L69.5 0c22 0 41.5 12.8 50.6 32l411 0c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3l-288.5 0 5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5L488 336c13.3 0 24 10.7 24 24s-10.7 24-24 24l-288.3 0c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5L24 48C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z"/></svg></span> <span id="topTitle">Daftar Belanja</span></h1>
     <div class="sub" id="topSub">Catat dulu, belanja lebih hemat</div>
@@ -30,123 +31,135 @@
 
   <main>
     <!-- ===== WISHLIST (home) ===== -->
-    <section id="tab-wish" class="on">
-      <div class="sectitle">Yang perlu dibeli</div>
+    <section id="tab-wish" class="tab container on">
+      <div class="sectitle" data-i18n="wish.section">Yang perlu dibeli</div>
       <div id="wishBox"></div>
     </section>
 
     <!-- ===== BASKET ===== -->
-    <section id="tab-basket">
-      <div class="sectitle">Sudah diambil — siap bayar</div>
+    <section id="tab-basket" class="tab container">
+      <div class="sectitle" data-i18n="basket.section">Sudah diambil — siap bayar</div>
       <div id="basketBox"></div>
-      <div class="total-bar"><span class="lbl">Perkiraan total</span><span class="amt" id="basketTotal">—</span></div>
-      <button class="btn pay" id="payBtn" disabled>✓ Tandai sudah dibayar</button>
+      <div class="total-bar"><span class="lbl" data-i18n="basket.totalLabel">Perkiraan total</span><span class="amt" id="basketTotal">—</span></div>
+      <button class="btn pay" id="payBtn" disabled data-i18n="basket.pay">✓ Tandai sudah dibayar</button>
     </section>
 
     <!-- ===== HISTORY ===== -->
-    <section id="tab-history">
+    <section id="tab-history" class="tab container">
       <div class="searchbox">
-        <input id="hsearch" placeholder="Cari item untuk lihat riwayat harga…" autocomplete="off">
+        <input id="hsearch" placeholder="Cari item untuk lihat riwayat harga…" data-i18n-ph="history.search.ph" aria-label="Cari item untuk lihat riwayat harga" data-i18n-aria="history.search.ph" autocomplete="off">
         <div class="drop" id="hdrop"></div>
       </div>
       <div class="dropmask" id="hdropMask"></div>
       <div id="lookResult"></div>
-      <div class="sectitle" style="margin-top:14px">Riwayat belanja</div>
+      <div class="sectitle" style="margin-top:14px" data-i18n="history.section">Riwayat belanja</div>
       <div id="histBox"></div>
     </section>
 
     <!-- ===== SETTINGS ===== -->
-    <section id="tab-more">
+    <section id="tab-more" class="tab container">
       <div class="card">
-        <h2>Status</h2>
-        <div class="cursect" id="offlineLine">🟢 Daring — tersambung ke internet.</div>
+        <h2 data-i18n="settings.status">Status</h2>
+        <div class="cursect" id="offlineLine" data-i18n="settings.online">🟢 Daring — tersambung ke internet.</div>
       </div>
       <div class="card">
-        <h2>Riwayat bersama (cloud)</h2>
-        <div class="cursect" id="syncStat">Belum pernah disinkronkan</div>
-        <button class="btn primary sm" id="syncBtn" style="margin-top:4px">☁ Sinkron ke cloud</button>
-        <button class="btn ghost sm" id="catalogBtn" style="margin-top:8px;width:100%">⬇ Ambil riwayat dari cloud</button>
-        <div class="hint">Mengirim riwayat belanja perangkat ini ke penyimpanan bersama, sehingga seluruh riwayat rumah tangga terkumpul di satu tempat (tanpa duplikat). Wishlist &amp; keranjang tetap di perangkat ini saja. Jalankan sesekali — misalnya tiap akhir bulan. Butuh internet hanya saat tombol ini ditekan.<br><br><b>Ambil riwayat</b>: menarik riwayat belanja bersama dari cloud ke perangkat ini — mengisi tab Riwayat, perbandingan harga, dan nama barang (jadi tidak perlu ketik ulang). Hanya mengambil <b>3/6 bulan terakhir</b> (sesuai setelan penyimpanan di bawah), tanpa duplikat. Berguna di perangkat baru atau untuk memulihkan setelah "Hapus semua data".</div>
+        <h2 data-i18n="settings.cloud.title">Riwayat bersama (cloud)</h2>
+        <div class="cursect" id="syncStat" data-i18n="sync.never">Belum pernah disinkronkan</div>
+        <button class="btn primary sm" id="syncBtn" style="margin-top:4px" data-i18n="sync.btn">☁ Sinkron ke cloud</button>
+        <button class="btn ghost sm" id="catalogBtn" style="margin-top:8px;width:100%" data-i18n="pull.btn">⬇ Ambil riwayat dari cloud</button>
+        <div class="hint" data-i18n="settings.cloud.pushHint">Mengirim riwayat belanja perangkat ini ke penyimpanan bersama, sehingga seluruh riwayat rumah tangga terkumpul di satu tempat tanpa duplikat. Wishlist dan keranjang tetap di perangkat ini. Jalankan sesekali, misalnya tiap akhir bulan. Butuh internet hanya saat tombol ini ditekan.</div>
+        <div class="hint"><b data-i18n="settings.cloud.pullLead">Ambil riwayat:</b> <span data-i18n="settings.cloud.pullHint">menarik riwayat belanja bersama dari cloud ke perangkat ini. Riwayat, perbandingan harga, dan nama barang akan terisi tanpa perlu mengetik ulang. Hanya 3 atau 6 bulan terakhir yang diambil, sesuai setelan penyimpanan, tanpa duplikat. Berguna di perangkat baru atau setelah menghapus data lokal.</span></div>
       </div>
       <div class="card">
-        <h2>Data</h2>
+        <h2 data-i18n="settings.data">Data</h2>
         <div class="cursect" id="dataStat"></div>
         <div style="display:flex;gap:8px">
-          <button class="btn ghost sm" id="exportBtn" style="flex:1">⬇ Cadangkan</button>
-          <button class="btn ghost sm" id="importBtn" style="flex:1">⬆ Pulihkan</button>
+          <button class="btn ghost sm" id="exportBtn" style="flex:1" data-i18n="data.backup">⬇ Cadangkan</button>
+          <button class="btn ghost sm" id="importBtn" style="flex:1" data-i18n="data.restore">⬆ Pulihkan</button>
         </div>
         <input type="file" id="importFile" accept="application/json,.json" style="display:none">
-        <button class="btn danger sm" id="clearBtn" style="margin-top:8px">🗑 Hapus semua data</button>
+        <button class="btn danger sm" id="clearBtn" style="margin-top:8px" data-i18n="data.clear">🗑 Hapus semua data</button>
         <div class="retain">
-          <div class="retain-lbl">Simpan riwayat selama</div>
+          <div class="retain-lbl" data-i18n="retain.label">Simpan riwayat selama</div>
           <div class="seg" id="retainSeg">
-            <button data-m="3">3 bulan</button>
-            <button data-m="6">6 bulan</button>
+            <button data-m="3" data-i18n="retain.3">3 bulan</button>
+            <button data-m="6" data-i18n="retain.6">6 bulan</button>
           </div>
         </div>
-        <div class="hint">Pembelian lebih lama dari periode di atas dihapus otomatis saat aplikasi dibuka. Daftar item &amp; harga terakhir tetap tersimpan. Semua data hanya di perangkat ini (offline).</div>
+        <div class="hint" data-i18n="retain.hint">Pembelian lebih lama dari periode di atas dihapus otomatis saat aplikasi dibuka. Daftar item dan harga terakhir tetap tersimpan. Semua data hanya di perangkat ini.</div>
       </div>
       <div class="card">
-        <h2>Tampilan</h2>
+        <h2 data-i18n="settings.appearance">Tampilan</h2>
         <div class="retain">
-          <div class="retain-lbl">Tema</div>
+          <div class="retain-lbl" data-i18n="settings.theme">Tema</div>
           <div class="seg" id="themeSeg">
-            <button data-theme="light">Terang</button>
-            <button data-theme="dark">Gelap</button>
-            <button data-theme="system">Sistem</button>
+            <button data-theme="light" data-i18n="settings.theme.light">Terang</button>
+            <button data-theme="dark" data-i18n="settings.theme.dark">Gelap</button>
+            <button data-theme="system" data-i18n="settings.theme.system">Sistem</button>
           </div>
         </div>
-        <div class="hint">“Sistem” mengikuti pengaturan terang/gelap perangkatmu.</div>
+        <div class="hint" data-i18n="settings.theme.hint">“Sistem” mengikuti pengaturan terang/gelap perangkatmu.</div>
       </div>
       <div class="card">
-        <h2>Tentang</h2>
-        <div class="hint">Harga dalam Rupiah (Rp). Data disimpan lokal di browser (IndexedDB) — cepat &amp; tanpa internet.</div>
+        <h2 data-i18n="settings.language">Bahasa</h2>
+        <div class="retain">
+          <div class="seg" id="langSeg">
+            <button data-lang="id">Indonesia</button>
+            <button data-lang="en">English</button>
+          </div>
+        </div>
+        <div class="hint" data-i18n="settings.lang.hint">Mengubah semua teks di aplikasi. Disimpan di perangkat ini.</div>
+      </div>
+      <div class="card">
+        <h2 data-i18n="settings.about">Tentang</h2>
+        <div class="hint" data-i18n="settings.about.hint">Harga dalam Rupiah (Rp). Data disimpan lokal di browser (IndexedDB), sehingga cepat dan dapat digunakan tanpa internet.</div>
       </div>
     </section>
   </main>
 
-  <button class="fab" id="fab" aria-label="Tambah item"><svg viewBox="0 0 448 512" width="26" height="26" fill="#fff"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg></button>
+  <button class="fab" id="fab" aria-label="Tambah item" data-i18n-aria="fab.add"><svg viewBox="0 0 448 512" width="26" height="26" fill="#fff"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg></button>
 
-  <nav class="tabs">
+  <nav class="tabs" id="tabs" aria-label="Navigasi utama" data-i18n-aria="nav.main">
     <svg class="navbg" viewBox="0 0 400 68" preserveAspectRatio="none" aria-hidden="true"><path d="M0 12 C0 5 5 0 12 0 L150 0 C160 0 165 6 168 12 C172 22 182 30 200 30 C218 30 228 22 232 12 C235 6 240 0 250 0 L388 0 C395 0 400 5 400 12 L400 68 L0 68 Z"/></svg>
     <div class="navrow">
-      <button class="nav on" data-tab="wish"><span class="ic"><svg viewBox="0 0 384 512"><path d="M192 0c-41.8 0-77.4 26.7-90.5 64L64 64C28.7 64 0 92.7 0 128L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64l-37.5 0C269.4 26.7 233.8 0 192 0zm0 64a32 32 0 1 1 0 64 32 32 0 1 1 0-64zM72 272a24 24 0 1 1 48 0 24 24 0 1 1 -48 0zm104-16l128 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-128 0c-8.8 0-16-7.2-16-16s7.2-16 16-16zM72 368a24 24 0 1 1 48 0 24 24 0 1 1 -48 0zm88 0c0-8.8 7.2-16 16-16l128 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-128 0c-8.8 0-16-7.2-16-16z"/></svg></span><span class="lbl2">Wishlist</span></button>
-      <button class="nav" data-tab="basket"><span class="ic"><svg viewBox="0 0 576 512"><path d="M253.3 35.1c6.1-11.8 1.5-26.3-10.2-32.4s-26.3-1.5-32.4 10.2L117.6 192 32 192c-17.7 0-32 14.3-32 32s14.3 32 32 32L83.9 463.5C91 492 116.6 512 146 512L430 512c29.4 0 55-20 62.1-48.5L544 256c17.7 0 32-14.3 32-32s-14.3-32-32-32l-85.6 0L365.3 12.9C359.2 1.2 344.7-3.4 332.9 2.7s-16.3 20.6-10.2 32.4L404.3 192l-232.6 0L253.3 35.1zM192 304l0 96c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-96c0-8.8 7.2-16 16-16s16 7.2 16 16zm96-16c8.8 0 16 7.2 16 16l0 96c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-96c0-8.8 7.2-16 16-16zm128 16l0 96c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-96c0-8.8 7.2-16 16-16s16 7.2 16 16z"/></svg></span><span class="badge" id="basketBadge">0</span><span class="lbl2">Keranjang</span></button>
+      <button class="nav on" id="nav-wish" type="button" aria-controls="tab-wish" aria-current="page" data-tab="wish"><span class="ic"><svg viewBox="0 0 384 512"><path d="M192 0c-41.8 0-77.4 26.7-90.5 64L64 64C28.7 64 0 92.7 0 128L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64l-37.5 0C269.4 26.7 233.8 0 192 0zm0 64a32 32 0 1 1 0 64 32 32 0 1 1 0-64zM72 272a24 24 0 1 1 48 0 24 24 0 1 1 -48 0zm104-16l128 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-128 0c-8.8 0-16-7.2-16-16s7.2-16 16-16zM72 368a24 24 0 1 1 48 0 24 24 0 1 1 -48 0zm88 0c0-8.8 7.2-16 16-16l128 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-128 0c-8.8 0-16-7.2-16-16z"/></svg></span><span class="lbl2" data-i18n="nav.wish">Wishlist</span></button>
+      <button class="nav" id="nav-basket" type="button" aria-controls="tab-basket" data-tab="basket"><span class="ic"><svg viewBox="0 0 576 512"><path d="M253.3 35.1c6.1-11.8 1.5-26.3-10.2-32.4s-26.3-1.5-32.4 10.2L117.6 192 32 192c-17.7 0-32 14.3-32 32s14.3 32 32 32L83.9 463.5C91 492 116.6 512 146 512L430 512c29.4 0 55-20 62.1-48.5L544 256c17.7 0 32-14.3 32-32s-14.3-32-32-32l-85.6 0L365.3 12.9C359.2 1.2 344.7-3.4 332.9 2.7s-16.3 20.6-10.2 32.4L404.3 192l-232.6 0L253.3 35.1zM192 304l0 96c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-96c0-8.8 7.2-16 16-16s16 7.2 16 16zm96-16c8.8 0 16 7.2 16 16l0 96c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-96c0-8.8 7.2-16 16-16zm128 16l0 96c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-96c0-8.8 7.2-16 16-16s16 7.2 16 16z"/></svg></span><span class="badge" id="basketBadge">0</span><span class="lbl2" data-i18n="nav.basket">Keranjang</span></button>
       <div class="navgap"></div>
-      <button class="nav" data-tab="history"><span class="ic"><svg viewBox="0 0 512 512"><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9L0 168c0 13.3 10.7 24 24 24l110.1 0c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24l0 104c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65 0-94.1c0-13.3-10.7-24-24-24z"/></svg></span><span class="lbl2">Riwayat</span></button>
-      <button class="nav" data-tab="more"><span class="ic"><svg viewBox="0 0 512 512"><path d="M0 416c0 17.7 14.3 32 32 32l54.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48L480 448c17.7 0 32-14.3 32-32s-14.3-32-32-32l-246.7 0c-12.3-28.3-40.5-48-73.3-48s-61 19.7-73.3 48L32 384c-17.7 0-32 14.3-32 32zm128 0a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zM320 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm32-80c-32.8 0-61 19.7-73.3 48L32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l246.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48l54.7 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-54.7 0c-12.3-28.3-40.5-48-73.3-48zM192 128a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm73.3-64C253 35.7 224.8 16 192 16s-61 19.7-73.3 48L32 64C14.3 64 0 78.3 0 96s14.3 32 32 32l86.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48L480 128c17.7 0 32-14.3 32-32s-14.3-32-32-32L265.3 64z"/></svg></span><span class="lbl2">Lainnya</span></button>
+      <button class="nav" id="nav-history" type="button" aria-controls="tab-history" data-tab="history"><span class="ic"><svg viewBox="0 0 512 512"><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9L0 168c0 13.3 10.7 24 24 24l110.1 0c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24l0 104c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65 0-94.1c0-13.3-10.7-24-24-24z"/></svg></span><span class="lbl2" data-i18n="nav.history">Riwayat</span></button>
+      <button class="nav" id="nav-more" type="button" aria-controls="tab-more" data-tab="more"><span class="ic"><svg viewBox="0 0 512 512"><path d="M0 416c0 17.7 14.3 32 32 32l54.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48L480 448c17.7 0 32-14.3 32-32s-14.3-32-32-32l-246.7 0c-12.3-28.3-40.5-48-73.3-48s-61 19.7-73.3 48L32 384c-17.7 0-32 14.3-32 32zm128 0a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zM320 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm32-80c-32.8 0-61 19.7-73.3 48L32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l246.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48l54.7 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-54.7 0c-12.3-28.3-40.5-48-73.3-48zM192 128a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm73.3-64C253 35.7 224.8 16 192 16s-61 19.7-73.3 48L32 64C14.3 64 0 78.3 0 96s14.3 32 32 32l86.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48L480 128c17.7 0 32-14.3 32-32s-14.3-32-32-32L265.3 64z"/></svg></span><span class="lbl2" data-i18n="nav.more">Lainnya</span></button>
     </div>
   </nav>
 </div>
 
 <!-- add-wish modal -->
-<div class="modal-bg" id="modalBg">
-  <div class="modal">
-    <button class="x" id="modalX">✕</button>
-    <h2>Tambah ke wishlist</h2>
+<div class="modal-bg" id="modalBg" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="addModalTitle">
+    <button class="x" id="modalX" aria-label="Tutup" data-i18n-aria="common.close">✕</button>
+    <h2 id="addModalTitle" data-i18n="modal.add.title">Tambah ke wishlist</h2>
     <div class="searchbox">
-      <input id="wsearch" type="search" placeholder="Ketik nama barang…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text" enterkeyhint="done" name="item-name" data-lpignore="true" data-1p-ignore data-form-type="other" results="0">
+      <input id="wsearch" type="search" placeholder="Ketik nama barang…" data-i18n-ph="modal.add.ph" aria-label="Ketik nama barang" data-i18n-aria="modal.add.ph" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text" enterkeyhint="done" name="item-name" data-lpignore="true" data-1p-ignore data-form-type="other" results="0">
     </div>
     <div class="drop static on" id="wdrop"></div>
   </div>
 </div>
 
 <!-- confirm sheet (replaces native confirm which can be blocked in webviews) -->
-<div class="modal-bg" id="confirmBg">
-  <div class="modal">
-    <h2 id="confirmTitle">Konfirmasi</h2>
+<div class="modal-bg" id="confirmBg" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <h2 id="confirmTitle" data-i18n="confirm.title">Konfirmasi</h2>
     <div id="confirmMsg" style="font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:16px"></div>
-    <input id="confirmInput" type="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text" enterkeyhint="done" name="rename-item" data-lpignore="true" data-1p-ignore data-form-type="other" results="0" style="display:none;width:100%;box-sizing:border-box;padding:11px 13px;font-size:15px;border:1px solid var(--border-2);border-radius:10px;background:var(--card);color:var(--text);margin-bottom:16px">
+    <input id="confirmInput" type="search" aria-label="Ubah nama barang" data-i18n-aria="prompt.rename.title" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text" enterkeyhint="done" name="rename-item" data-lpignore="true" data-1p-ignore data-form-type="other" results="0" style="display:none;width:100%;box-sizing:border-box;padding:11px 13px;font-size:15px;border:1px solid var(--border-2);border-radius:10px;background:var(--card);color:var(--text);margin-bottom:16px">
     <div style="display:flex;gap:10px">
-      <button class="btn ghost" id="confirmNo" style="flex:1">Batal</button>
-      <button class="btn danger" id="confirmYes" style="flex:1">Hapus</button>
+      <button class="btn ghost" id="confirmNo" style="flex:1" data-i18n="common.cancel">Batal</button>
+      <button class="btn danger" id="confirmYes" style="flex:1" data-i18n="common.delete">Hapus</button>
     </div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="app.js?v=202610191150"></script>
+<script src="i18n.js"></script>
+<script src="app.js?v=202611031529"></script>
 <!-- Service worker (webapp-pwa-standards §12): registers ONLY in a secure context (HTTPS hub). The
      app-version meta is 'unset' in the source (grocery is build-free; there is no real version until
      deploy) — pages/deploy.sh stamps the ONE real version onto the hub copy. We DO NOT register the
