@@ -18,6 +18,8 @@
 #   BIG_OWN/masak-apa/
 #   BIG_OWN/familytree/
 #   BIG_OWN/sentralingua-v2/
+#   BIG_OWN/grocery/
+#   BIG_OWN/begood/
 #
 set -euo pipefail
 
@@ -188,18 +190,53 @@ deploy_sentralingua_v2() {
 }
 
 deploy_grocery() {
-  # grocery serves from repo root; multi-file app (index.html + style.css + app.js +
+  # grocery serves from repo root; multi-file app (index.html + style.css + i18n.js + app.js +
   # manifest.json + icon.png 192 + icon-512.png 512). NOT README.md / .gitignore / .kiro.
   rsync_project grocery "$BIG_OWN/grocery" \
-    index.html style.css app.js manifest.json icon.png icon-512.png sw.js
+    index.html style.css i18n.js app.js manifest.json icon.png icon-512.png sw.js
   # Cache-bust: meta + hub link, then version every LOCAL asset ref so a stale
-  # style.css/app.js/icon.png can't be served from the browser cache.
+  # style.css/i18n.js/app.js/icon.png can't be served from the browser cache.
   stamp_version grocery "$DEPLOY_STAMP"
   local d="$HERE/grocery"
   stamp_asset "$d/index.html" style.css "$DEPLOY_STAMP"
+  stamp_asset "$d/index.html" i18n.js   "$DEPLOY_STAMP"
   stamp_asset "$d/index.html" app.js    "$DEPLOY_STAMP"
   stamp_asset "$d/index.html" icon.png  "$DEPLOY_STAMP"
-  echo "   assets versioned: style.css, app.js, icon.png"
+  echo "   assets versioned: style.css, i18n.js, app.js, icon.png"
+}
+
+deploy_begood() {
+  # begood is a MODULAR ES-module app (source/). The hub is public and served with a 10 minute max-age,
+  # and unbundled modules would let a device mix cached old modules with new ones after a deploy, so we
+  # ship ONE esbuild bundle: tools/build.js (gate first, then bundle + dist check) writes dist/. The
+  # file lists come from the begood repo itself (tools/publish-files.js: ONE definition shared with the
+  # service-worker precache and the dist verifier), so adding a file there never needs an edit here.
+  local bgsrc="$BIG_OWN/begood"
+  if [[ ! -d "$bgsrc/source" ]]; then
+    echo "!! skip begood — source not found: $bgsrc/source"
+    return 0
+  fi
+  echo "==> begood  (building dist/ from source/ via esbuild)"
+  run bash -c "cd '$bgsrc' && node tools/build.js"
+  local pubfiles stampfiles
+  pubfiles="$(node "$bgsrc/tools/publish-files.js" files)"
+  stampfiles="$(node "$bgsrc/tools/publish-files.js" stamp)"
+  if [[ -z "$pubfiles" || -z "$stampfiles" ]]; then
+    echo "!! begood publish list is empty (tools/publish-files.js) — refusing to deploy"
+    return 1
+  fi
+  rsync_project begood "$bgsrc/dist" $pubfiles
+  # Cache-bust: meta + hub link, then version every LOCAL asset ref. The service worker's cache is
+  # keyed off the app-version meta. The gstatic Firebase SDK URL is external and never stamped.
+  if [[ -f "$HERE/begood/index.html" ]]; then
+    stamp_version begood "$DEPLOY_STAMP"
+    local d="$HERE/begood"
+    local asset
+    for asset in $stampfiles; do
+      stamp_asset "$d/index.html" "$asset" "$DEPLOY_STAMP"
+    done
+    echo "   assets versioned: ${stampfiles// /, } (sw.js cache keyed off the app-version meta)"
+  fi
 }
 
 TARGET="${1:-all}"
@@ -208,13 +245,15 @@ case "$TARGET" in
   familytree)       deploy_familytree ;;
   sentralingua-v2)  deploy_sentralingua_v2 ;;
   grocery)          deploy_grocery ;;
+  begood)           deploy_begood ;;
   all)
     deploy_masak_apa
     deploy_familytree
     deploy_sentralingua_v2
     deploy_grocery
+    deploy_begood
     ;;
-  *) echo "unknown project: $TARGET (use: masak-apa | familytree | sentralingua-v2 | grocery | all)"; exit 1 ;;
+  *) echo "unknown project: $TARGET (use: masak-apa | familytree | sentralingua-v2 | grocery | begood | all)"; exit 1 ;;
 esac
 
 echo

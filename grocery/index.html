@@ -8,11 +8,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Belanja">
-<link rel="icon" type="image/png" href="icon.png?v=202611031529">
-<link rel="apple-touch-icon" href="icon.png?v=202611031529">
+<link rel="icon" type="image/png" href="icon.png?v=202611031537">
+<link rel="apple-touch-icon" href="icon.png?v=202611031537">
 <link rel="manifest" href="manifest.json">
 <title>Daftar Belanja</title>
-<meta name="app-version" content="202611031529" />
+<meta name="app-version" content="202611031537" />
 <script>
   /* Apply saved theme + language BEFORE first paint. */
   (function(){ try{
@@ -20,7 +20,7 @@
     var l=localStorage.getItem('grocery_lang'); document.documentElement.setAttribute('lang',(l==='en'||l==='id')?l:'id');
   }catch(e){} })();
 </script>
-<link rel="stylesheet" href="style.css?v=202611031529">
+<link rel="stylesheet" href="style.css?v=202611031537">
 </head>
 <body>
 <div class="app with-rail">
@@ -158,8 +158,8 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="i18n.js"></script>
-<script src="app.js?v=202611031529"></script>
+<script src="i18n.js?v=202611031537"></script>
+<script src="app.js?v=202611031537"></script>
 <!-- Service worker (webapp-pwa-standards §12): registers ONLY in a secure context (HTTPS hub). The
      app-version meta is 'unset' in the source (grocery is build-free; there is no real version until
      deploy) — pages/deploy.sh stamps the ONE real version onto the hub copy. We DO NOT register the
