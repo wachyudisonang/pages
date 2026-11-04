@@ -1,0 +1,288 @@
+[hidden] {
+  display: none !important;
+}
+
+body {
+  min-width: 0;
+}
+
+.vault-gate {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--sp-20) var(--gutter);
+}
+
+.vault-card {
+  width: min(100%, var(--modal-max));
+  padding: var(--sp-24);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--card);
+  box-shadow: var(--shadow-lg);
+}
+
+.vault-card h1 {
+  margin-top: var(--sp-12);
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  text-align: center;
+}
+
+.vault-card h2 {
+  margin-top: var(--sp-20);
+  font-size: var(--text-lg);
+  font-weight: 800;
+}
+
+.vault-mark {
+  display: grid;
+  place-items: center;
+  width: var(--sp-44);
+  height: var(--sp-44);
+  margin-inline: auto;
+  border-radius: var(--r-sm);
+  color: var(--on-accent);
+  background: var(--grad);
+  box-shadow: var(--shadow-accent);
+  font-weight: 900;
+}
+
+.app-subtitle {
+  display: none;
+  margin-left: auto;
+  color: var(--on-accent);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-12);
+  margin-bottom: var(--sp-14);
+}
+
+.page-heading h2,
+.page-title {
+  font-size: var(--text-2xl);
+  font-weight: 800;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: var(--sp-12);
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+.metric span {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 700;
+}
+
+.metric strong {
+  font-size: var(--text-xl);
+  font-variant-numeric: tabular-nums;
+}
+
+.metric.income strong {
+  color: var(--ok);
+}
+
+.metric.expense strong {
+  color: var(--danger);
+}
+
+.metric.accent {
+  color: var(--on-accent);
+  background: var(--grad);
+  border-color: transparent;
+}
+
+.metric.accent span,
+.metric.accent strong {
+  color: var(--on-accent);
+}
+
+label.field {
+  display: block;
+}
+
+.pw-field {
+  position: relative;
+  display: block;
+}
+
+.pw-field input {
+  padding-inline-end: var(--sp-44);
+}
+
+.pw-toggle {
+  position: absolute;
+  inset-block: var(--sp-4);
+  inset-inline-end: var(--sp-4);
+  display: grid;
+  place-items: center;
+  width: var(--sp-40);
+  padding: 0;
+  border: 0;
+  border-radius: var(--sp-8);
+  color: var(--muted);
+}
+
+.pw-toggle:hover {
+  color: var(--text);
+}
+
+.pw-toggle .pw-eye-off,
+.pw-toggle[aria-pressed='true'] .pw-eye {
+  display: none;
+}
+
+.pw-toggle[aria-pressed='true'] .pw-eye-off {
+  display: block;
+}
+
+select,
+textarea {
+  width: 100%;
+  padding: var(--sp-12) var(--sp-13);
+  border: 1.5px solid var(--border-2);
+  border-radius: var(--sp-12);
+  color: var(--text);
+  background: var(--card);
+}
+
+textarea {
+  min-height: var(--sp-84);
+  resize: vertical;
+}
+
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.transaction-list {
+  display: grid;
+  gap: var(--sp-10);
+}
+
+.transaction-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--sp-8) var(--sp-12);
+  align-items: center;
+}
+
+.transaction-title {
+  font-weight: 800;
+}
+
+.transaction-meta {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+.transaction-amount {
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.transaction-amount.income {
+  color: var(--ok);
+}
+
+.transaction-amount.expense {
+  color: var(--danger);
+}
+
+.transaction-delete {
+  grid-column: 1 / -1;
+  justify-self: end;
+  width: auto;
+  padding: var(--sp-6) var(--sp-10);
+  color: var(--danger);
+  font-size: var(--text-xs);
+}
+
+.form-error {
+  min-height: var(--sp-24);
+  margin-top: var(--sp-8);
+  color: var(--danger);
+  font-size: var(--text-sm);
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-8);
+}
+
+.file-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.file-button input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+}
+
+.zakat-result {
+  margin-top: var(--sp-12);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+
+.zakat-result strong {
+  font-size: var(--text-2xl);
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.assessment-card {
+  display: grid;
+  gap: var(--sp-5);
+}
+
+.assessment-card strong {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.cursect[data-online='false'] {
+  color: var(--danger);
+}
+
+.botbar .add-action {
+  color: var(--on-accent);
+  background: var(--grad);
+  box-shadow: var(--shadow-accent-sm);
+}
+
+@media (min-width: 1024px) {
+  .app-subtitle {
+    display: inline;
+  }
+}
+
+@media (min-width: 768px) {
+  .vault-card {
+    padding: var(--sp-28);
+  }
+}

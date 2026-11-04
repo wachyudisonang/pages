@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com https://apis.google.com https://*.firebasedatabase.app; style-src 'self'; img-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebaseio.com wss://*.firebasedatabase.app; frame-src https://accounts.google.com https://*.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'; worker-src 'self'">
+<meta name="theme-color" content="#397fda">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="BeGood">
+<meta name="app-version" content="202611041125" />
+<link rel="icon" type="image/png" href="icon.png?v=202611041125">
+<link rel="apple-touch-icon" href="icon.png?v=202611041125">
+<link rel="manifest" href="manifest.json">
+<title>BeGood — Keuangan &amp; Zakat</title>
+<script src="prepaint.js?v=202611041125"></script>
+<link rel="stylesheet" href="bigown.css?v=202611041125">
+<link rel="stylesheet" href="style.css?v=202611041125">
+</head>
+<body>
+<section class="vault-gate" id="vaultGate" aria-labelledby="vaultTitle">
+  <div class="vault-card">
+    <div class="vault-mark" aria-hidden="true">BG</div>
+    <h1 id="vaultTitle" data-i18n="vault.title"></h1>
+    <div id="vaultSetup" hidden>
+      <h2 data-i18n="vault.setup"></h2>
+      <p class="hint" data-i18n="vault.setupHint"></p>
+      <form id="vaultSetupForm">
+        <label class="field">
+          <span class="field-lbl" data-i18n="vault.passphrase"></span>
+          <span class="pw-field"><input id="vaultSetupPassphrase" type="password" minlength="12" autocomplete="new-password" required><button class="pw-toggle" type="button" aria-pressed="false" data-toggle-password data-i18n-aria="vault.togglePassphrase"><svg class="pw-eye" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"></path><circle cx="12" cy="12" r="3"></circle></svg><svg class="pw-eye-off" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 19c-6.4 0-10-7-10-7a18 18 0 0 1 4.1-5.2M9.9 5.2A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a18 18 0 0 1-2.2 3.2M1 1l22 22"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg></button></span>
+        </label>
+        <label class="field">
+          <span class="field-lbl" data-i18n="vault.confirm"></span>
+          <span class="pw-field"><input id="vaultSetupConfirm" type="password" minlength="12" autocomplete="new-password" required><button class="pw-toggle" type="button" aria-pressed="false" data-toggle-password data-i18n-aria="vault.togglePassphrase"><svg class="pw-eye" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"></path><circle cx="12" cy="12" r="3"></circle></svg><svg class="pw-eye-off" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 19c-6.4 0-10-7-10-7a18 18 0 0 1 4.1-5.2M9.9 5.2A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a18 18 0 0 1-2.2 3.2M1 1l22 22"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg></button></span>
+        </label>
+        <button class="btn mt-4" type="submit" data-i18n="vault.create"></button>
+      </form>
+    </div>
+    <div id="vaultUnlock" hidden>
+      <h2 data-i18n="vault.unlock"></h2>
+      <p class="hint" data-i18n="vault.unlockHint"></p>
+      <form id="vaultUnlockForm">
+        <label class="field">
+          <span class="field-lbl" data-i18n="vault.passphrase"></span>
+          <span class="pw-field"><input id="vaultUnlockPassphrase" type="password" minlength="12" autocomplete="current-password" required><button class="pw-toggle" type="button" aria-pressed="false" data-toggle-password data-i18n-aria="vault.togglePassphrase"><svg class="pw-eye" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"></path><circle cx="12" cy="12" r="3"></circle></svg><svg class="pw-eye-off" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 19c-6.4 0-10-7-10-7a18 18 0 0 1 4.1-5.2M9.9 5.2A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a18 18 0 0 1-2.2 3.2M1 1l22 22"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg></button></span>
+        </label>
+        <button class="btn mt-4" type="submit" data-i18n="vault.open"></button>
+      </form>
+    </div>
+    <button class="btn ghost mt-3" id="restoreCloudButton" type="button" data-i18n="vault.restoreCloud"></button>
+    <p class="form-error" id="vaultError" role="alert"></p>
+  </div>
+</section>
+
+<div class="app with-botbar" id="appRoot" hidden>
+  <header class="top">
+    <h1>
+      <a class="brand" href="./" data-i18n-aria="a11y.home">
+        <span class="logo" aria-hidden="true">BG</span>
+        <span data-i18n="app.name"></span>
+      </a>
+    </h1>
+    <span class="app-subtitle" data-i18n="app.subtitle"></span>
+    <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="tabs" data-i18n-aria="a11y.menu">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+  </header>
+
+  <main>
+    <section class="tab on" data-view="summary">
+      <div class="container-wide">
+        <div class="page-heading">
+          <div>
+            <div class="sectitle" data-i18n="summary.title"></div>
+            <h2 id="summaryYear"></h2>
+          </div>
+          <button class="btn sm" type="button" data-open-transaction data-i18n="transactions.add"></button>
+        </div>
+        <div class="metric-grid">
+          <article class="card metric income"><span data-i18n="summary.income"></span><strong id="summaryIncome"></strong></article>
+          <article class="card metric expense"><span data-i18n="summary.expense"></span><strong id="summaryExpense"></strong></article>
+          <article class="card metric"><span data-i18n="summary.cashflow"></span><strong id="summaryCashflow"></strong></article>
+          <article class="card metric"><span data-i18n="summary.eligible"></span><strong id="summaryEligible"></strong></article>
+          <article class="card metric accent"><span data-i18n="summary.estimate"></span><strong id="summaryEstimate"></strong></article>
+          <article class="card metric"><span data-i18n="summary.paid"></span><strong id="summaryPaid"></strong></article>
+          <article class="card metric"><span data-i18n="summary.remaining"></span><strong id="summaryRemaining"></strong></article>
+        </div>
+        <div class="empty mt-4" id="summaryEmpty" hidden data-i18n="summary.empty"></div>
+      </div>
+    </section>
+
+    <section class="tab" data-view="transactions">
+      <div class="container">
+        <div class="page-heading">
+          <h2 data-i18n="transactions.title"></h2>
+          <button class="btn sm" type="button" data-open-transaction data-i18n="transactions.add"></button>
+        </div>
+        <div class="transaction-list" id="transactionList"></div>
+        <div class="empty" id="transactionEmpty" data-i18n="transactions.empty"></div>
+      </div>
+    </section>
+
+    <section class="tab" data-view="zakat">
+      <div class="container">
+        <h2 class="page-title" data-i18n="zakat.title"></h2>
+        <form class="card" id="zakatSettingsForm">
+          <label class="field">
+            <span class="field-lbl" data-i18n="zakat.method"></span>
+            <select id="zakatMethod">
+              <option value="grossIncome" data-i18n="zakat.methodGross"></option>
+              <option value="netIncome" data-i18n="zakat.methodNet"></option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="field-lbl" data-i18n="zakat.nisab"></span>
+            <input id="zakatNisab" inputmode="numeric" autocomplete="off" required>
+          </label>
+          <label class="field">
+            <span class="field-lbl" data-i18n="zakat.rate"></span>
+            <input id="zakatRate" type="number" min="0.01" max="100" step="0.01" required>
+          </label>
+          <button class="btn mt-4" type="submit" data-i18n="zakat.saveSettings"></button>
+        </form>
+        <article class="card zakat-result">
+          <span id="zakatThreshold"></span>
+          <strong id="zakatDue"></strong>
+          <button class="btn mt-4" id="finalizeAssessment" type="button" data-i18n="zakat.finalize"></button>
+        </article>
+        <div class="sectitle" data-i18n="zakat.assessments"></div>
+        <div id="assessmentList"></div>
+        <div class="empty" id="assessmentEmpty" data-i18n="zakat.noAssessments"></div>
+      </div>
+    </section>
+
+    <section class="tab" data-view="settings">
+      <div class="container">
+        <article class="card">
+          <h2 data-i18n="settings.status"></h2>
+          <p class="cursect" id="onlineStatus"></p>
+        </article>
+        <article class="card">
+          <h2 data-i18n="settings.cloud"></h2>
+          <p class="hint" data-i18n="settings.cloudHint"></p>
+          <p class="cursect mt-3" id="cloudStatus" data-i18n="settings.cloudNever"></p>
+          <div class="button-row mt-3">
+            <button class="btn sm" id="syncCloudButton" type="button" data-i18n="settings.sync"></button>
+            <button class="btn ghost sm" id="signOutCloudButton" type="button" data-i18n="settings.signOut"></button>
+          </div>
+        </article>
+        <article class="card">
+          <h2 data-i18n="settings.backup"></h2>
+          <p class="hint" data-i18n="settings.backupHint"></p>
+          <div class="button-row mt-3">
+            <button class="btn sm" id="exportBackupButton" type="button" data-i18n="settings.export"></button>
+            <label class="btn ghost sm file-button">
+              <span data-i18n="settings.import"></span>
+              <input id="importBackupInput" type="file" accept="application/json,.json">
+            </label>
+          </div>
+          <button class="btn danger sm mt-3" id="applyImportButton" type="button" hidden data-i18n="settings.importApply"></button>
+        </article>
+        <article class="card">
+          <h2 data-i18n="settings.autoLock"></h2>
+          <p class="hint" data-i18n="settings.autoLockHint"></p>
+          <form id="autoLockForm">
+            <label class="field">
+              <span class="field-lbl" data-i18n="settings.autoLockMinutes"></span>
+              <input id="autoLockMinutes" type="number" min="1" max="1440" step="1" inputmode="numeric" required>
+            </label>
+            <button class="btn sm mt-3" type="submit" data-i18n="settings.autoLockSave"></button>
+          </form>
+        </article>
+        <article class="card">
+          <h2 data-i18n="settings.language"></h2>
+          <div class="seg" id="langSeg">
+            <button type="button" data-lang="id">Indonesia</button>
+            <button type="button" data-lang="en">English</button>
+          </div>
+        </article>
+        <article class="card">
+          <h2 data-i18n="settings.appearance"></h2>
+          <div class="field-lbl" data-i18n="settings.theme"></div>
+          <div class="seg" id="themeSeg">
+            <button type="button" data-theme="light" data-i18n="settings.themeLight"></button>
+            <button type="button" data-theme="dark" data-i18n="settings.themeDark"></button>
+            <button type="button" data-theme="system" data-i18n="settings.themeSystem"></button>
+          </div>
+        </article>
+        <article class="card">
+          <h2 data-i18n="settings.about"></h2>
+          <p class="hint" data-i18n="settings.aboutHint"></p>
+          <button class="btn ghost sm mt-3" id="lockVaultButton" type="button" data-i18n="settings.lock"></button>
+        </article>
+      </div>
+    </section>
+
+    <footer class="site-foot">
+      <p class="site-foot-copy" data-i18n="footer.copy"></p>
+      <p class="site-foot-meta" data-i18n="footer.meta"></p>
+    </footer>
+  </main>
+
+  <nav class="tabs" id="tabs">
+    <button class="nav on" type="button" data-tab="summary"><span class="ic" aria-hidden="true">⌂</span><span class="lbl2" data-i18n="nav.summary"></span></button>
+    <button class="nav" type="button" data-tab="transactions"><span class="ic" aria-hidden="true">↕</span><span class="lbl2" data-i18n="nav.transactions"></span></button>
+    <button class="nav" type="button" data-tab="zakat"><span class="ic" aria-hidden="true">◇</span><span class="lbl2" data-i18n="nav.zakat"></span></button>
+    <button class="nav" type="button" data-tab="settings"><span class="ic" aria-hidden="true">⚙</span><span class="lbl2" data-i18n="nav.settings"></span></button>
+  </nav>
+  <div class="nav-scrim" id="navScrim" hidden></div>
+
+  <nav class="botbar" aria-label="Quick navigation">
+    <button class="botbar-btn" type="button" data-tab="summary"><span class="ic" aria-hidden="true">⌂</span><span class="lbl2" data-i18n="nav.summary"></span></button>
+    <button class="botbar-btn add-action" type="button" data-open-transaction><span class="ic" aria-hidden="true">＋</span><span class="lbl2" data-i18n="transactions.add"></span></button>
+    <button class="botbar-btn" type="button" data-tab="zakat"><span class="ic" aria-hidden="true">◇</span><span class="lbl2" data-i18n="nav.zakat"></span></button>
+  </nav>
+
+  <button type="button" id="toTop" class="to-top" data-i18n-aria="a11y.toTop">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+</div>
+
+<div class="modal-bg" id="transactionModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="transactionModalTitle">
+    <button class="x" id="transactionModalClose" type="button" data-i18n-aria="common.close">✕</button>
+    <div class="modal-bleed bleed-top bg-accent py-5 px-5">
+      <h2 class="on-accent" id="transactionModalTitle" data-i18n="transaction.modalTitle"></h2>
+      <p class="hint on-accent" data-i18n="transaction.modalHint"></p>
+    </div>
+    <form class="modal-body" id="transactionForm">
+      <label class="field"><span class="field-lbl" data-i18n="transaction.type"></span><select id="transactionType"><option value="income" data-i18n="transactions.income"></option><option value="expense" data-i18n="transactions.expense"></option></select></label>
+      <label class="field"><span class="field-lbl" data-i18n="transaction.date"></span><input id="transactionDate" type="date" required></label>
+      <label class="field"><span class="field-lbl" data-i18n="transaction.amount"></span><input id="transactionAmount" inputmode="numeric" autocomplete="off" required></label>
+      <label class="field"><span class="field-lbl" data-i18n="transaction.account"></span><input id="transactionAccount" autocomplete="off" maxlength="80" required></label>
+      <label class="field"><span class="field-lbl" data-i18n="transaction.category"></span><input id="transactionCategory" autocomplete="off" maxlength="80" required></label>
+      <label class="field"><span class="field-lbl" data-i18n="transaction.treatment"></span><select id="transactionTreatment"></select></label>
+      <label class="field" id="assessmentField" hidden><span class="field-lbl" data-i18n="zakat.assessments"></span><select id="transactionAssessment"></select></label>
+      <label class="field"><span class="field-lbl" data-i18n="transaction.description"></span><textarea id="transactionDescription" maxlength="500"></textarea></label>
+      <p class="form-error" id="transactionError" role="alert"></p>
+      <div class="button-row mt-4"><button class="btn" type="submit" data-i18n="transaction.save"></button><button class="btn ghost" id="transactionCancel" type="button" data-i18n="transaction.cancel"></button></div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="i18n.js?v=202611041125"></script>
+<script src="app.js?v=202611041125"></script>
+<script type="module" src="main.js?v=202611041125"></script>
+</body>
+</html>
