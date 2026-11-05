@@ -818,6 +818,9 @@ nav.tabs {
 nav.tabs.open {
   display: flex;
 }
+nav.tabs .nav[hidden] {
+  display: none !important;
+}
 nav.tabs .nav {
   display: flex;
   flex-direction: row;
