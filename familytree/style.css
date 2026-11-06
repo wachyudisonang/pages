@@ -1905,9 +1905,13 @@ header.top {
     0 4px 6px -4px rgba(0, 0, 0, 0.1)
   );
 }
+/* These white surfaces keep light native controls and dark text when the system is in dark mode.
+   bigown.css's dark palette would otherwise set near-white text and dark checkboxes on the white panel. */
 #mobile-stage-wrap,
 #ft-viewer {
   background: #fff;
+  color-scheme: light;
+  color: var(--ft-color-ancText, #222);
 }
 /* An empty viewer mount (every page but ?config / ?pending / ...) takes no room: it would otherwise show
    as a white strip (main > * top padding) under the tree. */
@@ -3455,7 +3459,7 @@ html.ft-booting {
 .ff-row {
   display: grid;
   gap: 12px 14px;
-  align-items: end;
+  align-items: start;
 }
 .ff-row-1 {
   grid-template-columns: 1fr 1fr;
@@ -3494,6 +3498,7 @@ html.ft-booting {
   right: 0;
   bottom: 0;
   width: 38px;
+  padding: 0;   /* bigown.css gives every button 12px 24px padding, which squeezes the 18px icon to 0 px */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3801,10 +3806,6 @@ html.ft-booting {
 /* Narrow screens: field layout is identical to desktop (Full Name 100%, Gender/Birth Date 50/50);
    only the summary + footer stack. */
 @media (max-width: 560px) {
-  .ff-sum-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
   .ff-footer {
     flex-direction: column-reverse;
   }
@@ -3813,9 +3814,6 @@ html.ft-booting {
   .ff-contributor-request {
     width: 100%;
     text-align: center;
-  }
-  .ff-date-text::placeholder {
-    font-size: var(--text-xs, 0.75rem);
   }
 }
 
@@ -3850,5 +3848,30 @@ html.ft-booting {
   border-top: 0;
   border-radius: 0 0 7px 7px;
   box-shadow: none;
+}
+
+/* The Death Date field in the summary row, beside the Deceased checkbox. */
+.ff-sum-row-stack {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+.ff-sum-dec-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.ff-sum-death {
+  flex: 0 1 260px;
+  min-width: 0;
+  max-width: 60%;
+  margin-left: auto;
+}
+.ff-sum-death .ff-date-field,
+.ff-sum-death .ff-date-wrap,
+.ff-sum-death .ff-date-text {
+  width: 100%;
+  min-width: 0;
 }
 
