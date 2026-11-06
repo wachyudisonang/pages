@@ -3827,3 +3827,9 @@ html.ft-booting {
 .ft-render-error button {
   margin-top: var(--sp-8);
 }
+
+/* My Pending (?my-pending): one bordered block per stored edit. */
+.mp-list { list-style: none; padding: 0; margin: 12px 0; }
+.mp-item { display: flex; flex-direction: column; gap: 6px; border: 1px solid var(--ft-color-border, #e5e7eb); border-radius: 10px; padding: 12px 14px; margin: 0 0 10px; }
+.mp-meta { font-size: 14px; opacity: 0.75; }
+.mp-actions { display: flex; flex-wrap: wrap; gap: 8px; }
