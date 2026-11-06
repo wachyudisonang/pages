@@ -1711,6 +1711,10 @@ html[data-theme='dark'] {
   }
 }
 
+html:has(#modalBg.on[data-modal-kind="welcome-popup"], #modalBg.on[data-modal-kind="family-not-found"]) :is(nav.tabs, nav.botbar, #ftAdminDd, #navScrim) {
+  display: none !important;
+}
+
 body,
 .app::before,
 header.top {
