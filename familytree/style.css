@@ -1715,6 +1715,11 @@ html:has(#modalBg.on[data-modal-kind="welcome-popup"], #modalBg.on[data-modal-ki
   display: none !important;
 }
 
+/* Secondary display font. The vendored bigown.css sets --font-type-2 to Google Sans Flex; this app overrides it here. */
+:root {
+  --font-type-2: 'Parisienne';
+}
+
 body,
 .app::before,
 header.top {
@@ -1909,15 +1914,13 @@ header.top {
 #ft-viewer:empty {
   display: none;
 }
-/* WIDE SCREEN: the page is at least one screen tall, the light stage card grows to fill what the tree
-   leaves, and main ends above the fixed bottom action bar (--ft-actionbar-h, set by render/action-bar.js),
-   so no dark band shows under a short tree and the bar never covers the Edit Family block under a tall one.
-   (The narrow tree view, html.ft-tree-view, has its own one-screen layout below.) */
+/* WIDE SCREEN: the page is at least one screen tall and the light stage card grows to fill what the tree
+   leaves, so no dark band shows under a short tree. (The narrow tree view, html.ft-tree-view, has its own
+   one-screen layout below.) */
 @media (min-width: 768px) {
   html:not(.ft-tree-view) main {
     display: flex;
     flex-direction: column;
-    padding-bottom: var(--ft-actionbar-h, 0px);
   }
   html:not(.ft-tree-view) main > #desktop-view {
     display: flex;
@@ -2252,7 +2255,7 @@ html:not(.ft-tree-view) #desktop-view #ft-stage-wrap {
   box-sizing: border-box;
 }
 .ft-m-section-title {
-  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  font-family: var(--font-type), var(--font-fallback);
   font-weight: 600;
   font-size: 17px;
   letter-spacing: 0.01em;
@@ -2334,10 +2337,14 @@ header.top .logo svg {
   height: 28px;
   margin: 0 auto 4px;
 }
+#ft-tagline-wide .ft-m-tagline-logo {
+  width: 36px;
+  height: 36px;
+  margin: 0 auto 6px;
+}
 .ft-m-tagline {
   margin: 0;
-  font-family: "Libre Caslon Display", "Playfair Display", Georgia,
-    "Times New Roman", serif;
+  font-family: var(--font-type), var(--font-fallback);
   font-size: 20px;
   font-weight: 500;
   color: #f3efe4;
@@ -2371,6 +2378,14 @@ header.top .logo svg {
   background: var(--ft-color-key, #d4a017);
   border-color: var(--ft-color-key, #d4a017);
   color: #fff;
+}
+/* "Show List" / "Lihat List" (the tree view is on): a different colour from "Show Tree". */
+.ft-m-action--list {
+  --ft-color-list: #2a6f97;
+  --ft-color-list-ink: #fff;
+  background: var(--ft-color-list);
+  border-color: var(--ft-color-list);
+  color: var(--ft-color-list-ink);
 }
 .ft-m-action:active {
   transform: scale(0.98);
@@ -2624,6 +2639,20 @@ html.ft-tree-view .ft-zoom-nav {
 }
 .ft-m-label.ft-m-static {
   cursor: default;
+}
+/* The partner name in a section-2 couple row ("Husband ⚭ Wife"): tappable to refocus on her. Only the
+   parent-level partner (the focused person's own spouse, depth 0) is underlined; descendants' partners are not. */
+.ft-m-partner {
+  cursor: pointer;
+}
+.ft-m-partner--parent {
+  text-decoration: underline;
+  text-decoration-color: rgba(107, 107, 123, 0.4);
+  text-underline-offset: 3px;
+}
+.ft-m-partner.ft-m-static {
+  cursor: default;
+  text-decoration: none;
 }
 
 /* Section-1 sibling navigation: prev/next button pinned to the section's screen edge + box swipe. */
@@ -2914,7 +2943,7 @@ html.ft-booting {
 }
 .modal h2.ip-title {
   margin: calc(var(--spacing) * 6) 0 calc(var(--spacing) * 8);
-  font-family: "Parisienne", cursive;
+  font-family: var(--font-type-2), cursive;
   font-size: 2rem;
   font-weight: 800;
   color: var(--ft-color-ancText, #222);
@@ -2936,6 +2965,9 @@ html.ft-booting {
   width: 100%;
   color: var(--ft-color-nodeText, #222);
   background: var(--ft-color-nodeBg, #fff);
+  border: 1px solid var(--ft-color-border, #e5e7eb);
+  border-radius: 7px;
+  padding: var(--sp-6) var(--sp-12);
 }
 .ip-select:focus {
   outline: none;
@@ -3315,6 +3347,7 @@ html.ft-booting {
   z-index: 2;
   width: 40px;
   height: 40px;
+  padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3386,7 +3419,7 @@ html.ft-booting {
   font-weight: 600;
   letter-spacing: 0.01em;
   color: var(--ft-color-ancText, #222);
-  font-family: "Comfortaa", Georgia, "Times New Roman", serif;
+  font-family: var(--font-type), var(--font-fallback);
   text-transform: uppercase;
 }
 .ff-secrm {
@@ -3443,6 +3476,7 @@ html.ft-booting {
   opacity: 0.7;
   cursor: not-allowed;
 }
+
 
 /* Birth Date: text input + calendar button summoning the off-screen native date picker. */
 .ff-date-wrap {
@@ -3624,8 +3658,9 @@ html.ft-booting {
 }
 .ff-sum-left {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
   flex: 1 1 auto;
   min-width: 0;
 }

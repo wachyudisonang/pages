@@ -11,11 +11,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@1..144,100..900&family=Parisienne&display=swap" rel="stylesheet">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=202611061406">
-<link rel="apple-touch-icon" href="icon.png?v=202611061406">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=202611062141">
+<link rel="apple-touch-icon" href="icon.png?v=202611062141">
 <link rel="manifest" href="manifest.json">
 <title>Family Tree</title>
-<meta name="app-version" content="202611061406" />
+<meta name="app-version" content="202611062141" />
 
   <script>
   (function(){
@@ -28,7 +28,7 @@
     }catch(e){}
   })();
 </script>
-<link rel="stylesheet" href="style.css?v=202611061406">
+<link rel="stylesheet" href="style.css?v=202611062141">
 </head>
 <body>
 
@@ -100,9 +100,13 @@
       </div>
       <div id="ft-block-info" class="full-bleed py-6">
         <div class="container-wide">
-          <button type="button" id="ft-edit-family-v2" class="ft-m-action" data-i18n="admin.editFamily">Edit Family</button>
+          <button type="button" id="ft-edit-family-v2" class="ft-m-action">Edit Family</button>
         </div>
       </div>
+      
+      <section id="ft-tagline-wide" class="full-bleed ft-m-section3">
+        <div class="container-wide"></div>
+      </section>
     </div>
 
     <div id="mobile-view" class="md:hidden">
@@ -113,7 +117,7 @@
       </div>
     </div>
 
-    <div id="ft-viewer"></div>
+    <div id="ft-viewer" class="full-bleed py-6"></div>
 
   </main>
 
@@ -121,6 +125,10 @@
     <button class="nav on" data-tab="home">
       <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
       <span class="lbl2" data-i18n="nav.home">Who you Are</span>
+    </button>
+    <button class="nav" id="ftMyPending" type="button" hidden>
+      <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+      <span class="lbl2" data-i18n="nav.myPending">My Pending</span>
     </button>
     <button class="nav" data-tab="list">
       <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span>
@@ -139,7 +147,7 @@
       </button>
       <div class="nav-dd-menu" id="ftAdminDdMenu" role="menu">
         <a href="?switchFamily" role="menuitem" data-ft-admin="switchFamily" data-i18n="admin.switchFamily">Switch Family</a>
-        <a href="?edit" role="menuitem" data-ft-admin="editFamily" data-i18n="admin.editFamily">Edit Family</a>
+        <a href="?admin-edit" role="menuitem" data-ft-admin="editFamily" data-i18n="admin.editFamily">Edit Family</a>
         <a href="?pending" role="menuitem" data-ft-admin="pending" data-i18n="admin.pending">Pending review</a>
         <a href="?possibleMe" role="menuitem" data-ft-admin="possibleMe" data-i18n="admin.possibleMe">PossibleMe</a>
         <a href="?visitors" role="menuitem" data-ft-admin="visitors" data-i18n="admin.visitors">Visitors log</a>
@@ -170,10 +178,10 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="i18n.js?v=202611061406"></script>
-<script type="module" src="app.js?v=202611061406"></script>
+<script src="i18n.js?v=202611062141"></script>
+<script type="module" src="app.js?v=202611062141"></script>
 
-<script type="module" src="shell.js?v=202611061406"></script>
+<script type="module" src="shell.js?v=202611062141"></script>
 <script>
 (function () {
 	if (!('serviceWorker' in navigator) || !window.isSecureContext) return;
