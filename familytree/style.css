@@ -3099,7 +3099,7 @@ html.ft-booting {
 .ip-name-row {
   display: flex;
   gap: 8px;
-  align-items: stretch;
+  align-items: flex-start;
 }
 .ip-name-input {
   flex: 1 1 auto;
@@ -3814,6 +3814,9 @@ html.ft-booting {
     width: 100%;
     text-align: center;
   }
+  .ff-date-text::placeholder {
+    font-size: var(--text-xs, 0.75rem);
+  }
 }
 
 /* Render error boundary (main.js drawMount): shown in ONE mount when its template throws. Design-system
@@ -3833,3 +3836,19 @@ html.ft-booting {
 .mp-item { display: flex; flex-direction: column; gap: 6px; border: 1px solid var(--ft-color-border, #e5e7eb); border-radius: 10px; padding: 12px 14px; margin: 0 0 10px; }
 .mp-meta { font-size: 14px; opacity: 0.75; }
 .mp-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* The welcome popup's name box wraps its input in the combo, so the combo takes the input's share of the row. */
+.ip-name-row > .ip-combo {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* The name box's list sits 4px under its input and flows in the popup, so the popup never clips it. */
+.ip-name-row .ip-combo-list {
+  position: static;
+  margin-top: 4px;
+  border-top: 0;
+  border-radius: 0 0 7px 7px;
+  box-shadow: none;
+}
+
