@@ -1718,6 +1718,8 @@ html:has(#modalBg.on[data-modal-kind="welcome-popup"], #modalBg.on[data-modal-ki
 /* Secondary display font. The vendored bigown.css sets --font-type-2 to Google Sans Flex; this app overrides it here. */
 :root {
   --font-type-2: 'Parisienne';
+  /* Siblings panel colour: its pill and its section header. */
+  --ft-color-sibling: #f59e0b;
 }
 
 body,
@@ -3324,6 +3326,10 @@ html.ft-booting {
 .ff-tab-children {
   background: #8b5cf6;
 }
+.ff-tab-sibling {
+  background: var(--ft-color-sibling);
+}
+
 
 .ff-title {
   margin: 0 0 4px;
@@ -3342,6 +3348,9 @@ html.ft-booting {
     0 2px 4px -2px rgba(0, 0, 0, 0.1)
   );
   touch-action: pan-y; /* horizontal swipe = gesture; vertical = scroll */
+}
+.ff-openpanel .form-label {
+  margin: 0;
 }
 /* Prev/Next edge arrows — centred on the left/right border line (half outside the panel). */
 .ff-nav {
@@ -3414,10 +3423,23 @@ html.ft-booting {
 .ff-sechead.ff-sec-children {
   background: #8b5cf6;
 }
+.ff-sechead.ff-sec-sibling {
+  background: var(--ft-color-sibling);
+}
 .ff-sechead .ff-sectitle {
   color: #fff;
 }
+.ff-sectitle-sub {
+  font-size: var(--text-xs);
+  text-transform: none;
+  font-weight: 400;
+  letter-spacing: normal;
+}
 .ff-sectitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 6px;
   flex: 1 1 auto;
   font-size: 16px;
   font-weight: 600;
@@ -3433,6 +3455,7 @@ html.ft-booting {
   justify-content: center;
   width: 30px;
   height: 30px;
+  padding: 0;
   margin-right: 2px;
   color: #fff;
   background: rgba(255, 255, 255, 0.18);
@@ -3473,6 +3496,37 @@ html.ft-booting {
 .ff-field {
   gap: 5px;
 } /* inherits .ip-field flex-column */
+/* The children block under a spouse's divider starts 12px below it, matching the gap above the divider. */
+.ff-spouse-kids {
+  margin-top: 12px;
+}
+.ff-spouse-kids:empty {
+  display: none;
+}
+.ff-divider {
+  position: relative;
+  height: 0;
+  margin: 12px 0;
+}
+.ff-divider::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  border-top: 1px solid currentColor;
+  opacity: 0.25;
+}
+.ff-divider > span {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -50%);
+  padding: 0 10px;
+  background: var(--ft-color-nodeBg);
+  font-size: 0.85em;
+  opacity: 0.75;
+}
 .ff-gender {
   cursor: pointer;
 }
@@ -3545,7 +3599,7 @@ html.ft-booting {
 
 /* "+ Add X" reveal — pale gold. */
 .ff-addbtn {
-  margin-top: 14px;
+  margin-top: 20px;
   display: inline-flex;
   align-items: center;
   gap: 3px;
@@ -3596,21 +3650,15 @@ html.ft-booting {
 .ff-childrm:hover {
   background: color-mix(in srgb, #c0392b 16%, transparent);
 }
-.ff-addchild {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ft-color-keyText, #8b6914);
-  background: none;
-  border: none;
-  cursor: pointer;
+/* Add Child / Add Sibling sit at the right, in the same pale button as Add Spouse. */
+.ff-addrow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
 }
-.ff-addchild-ico {
-  color: var(--ft-color-key, #d4a017);
-  font-size: 16px;
+/* The author display rule above would override the hidden attribute, so hidden rows are removed explicitly. */
+.ff-addrow[hidden] {
+  display: none;
 }
 
 /* Summary: per-person rows + role badges. */
@@ -3834,6 +3882,12 @@ html.ft-booting {
 .mp-item { display: flex; flex-direction: column; gap: 6px; border: 1px solid var(--ft-color-border, #e5e7eb); border-radius: 10px; padding: 12px 14px; margin: 0 0 10px; }
 .mp-meta { font-size: 14px; opacity: 0.75; }
 .mp-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Device notes: one small card per decided visitor edit, stacked at the bottom of the screen. */
+.device-notes { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 1000; display: flex; flex-direction: column; gap: 8px; width: min(92vw, 420px); pointer-events: none; }
+.device-note { pointer-events: auto; display: flex; align-items: flex-start; gap: 10px; background: var(--ft-color-nodeBg); color: var(--ft-color-nodeText); border: 1px solid var(--ft-color-border); border-radius: 10px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18); padding: 10px 12px; font-size: 15px; }
+.device-note > span { flex: 1 1 auto; }
+.device-note-close { background: none; border: 0; font-size: 20px; line-height: 1; cursor: pointer; color: inherit; padding: 0 2px; }
 
 /* The welcome popup's name box wraps its input in the combo, so the combo takes the input's share of the row. */
 .ip-name-row > .ip-combo {
