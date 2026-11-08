@@ -2355,6 +2355,23 @@ header.top .logo svg {
   font-weight: 500;
   color: #f3efe4;
 }
+/* The WhatsApp share link under the tagline (render/tagline.js). Label and icon are one link. */
+.ft-m-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-family: var(--font-type), var(--font-fallback);
+  font-size: 15px;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+.ft-m-share svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
 .ft-m-actionbar {
   position: fixed;
   left: 0;
