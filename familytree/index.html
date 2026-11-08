@@ -11,11 +11,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@1..144,100..900&family=Parisienne&display=swap" rel="stylesheet">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=202611081216">
-<link rel="apple-touch-icon" href="icon.png?v=202611081216">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=202611081504">
+<link rel="apple-touch-icon" href="icon.png?v=202611081504">
 <link rel="manifest" href="manifest.json">
 <title>Family Tree</title>
-<meta name="app-version" content="202611081216" />
+<meta name="app-version" content="202611081504" />
 
   <script>
   (function(){
@@ -28,7 +28,7 @@
     }catch(e){}
   })();
 </script>
-<link rel="stylesheet" href="style.css?v=202611081216">
+<link rel="stylesheet" href="style.css?v=202611081504">
 </head>
 <body>
 
@@ -100,7 +100,7 @@
       </div>
       <div id="ft-block-info" class="full-bleed py-6">
         <div class="container-wide">
-          <button type="button" id="ft-edit-family-v2" class="ft-m-action">Edit Family</button>
+          <button type="button" id="ft-edit-family" class="ft-m-action">Edit Family</button>
         </div>
       </div>
       
@@ -149,6 +149,7 @@
         <a href="?switchFamily" role="menuitem" data-ft-admin="switchFamily" data-i18n="admin.switchFamily">Switch Family</a>
         <a href="?admin-edit" role="menuitem" data-ft-admin="editFamily" data-i18n="admin.editFamily">Edit Family</a>
         <a href="?pending" role="menuitem" data-ft-admin="pending" data-i18n="admin.pending">Pending review</a>
+        <a href="?users" role="menuitem" data-ft-admin="users" data-i18n="admin.users">Users</a>
         <a href="?possibleMe" role="menuitem" data-ft-admin="possibleMe" data-i18n="admin.possibleMe">PossibleMe</a>
         <a href="?visitors" role="menuitem" data-ft-admin="visitors" data-i18n="admin.visitors">Visitors log</a>
         <a href="?signOut" role="menuitem" data-ft-admin="signOut" data-i18n="admin.signOut">Sign out</a>
@@ -179,10 +180,10 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="i18n.js?v=202611081216"></script>
-<script type="module" src="app.js?v=202611081216"></script>
+<script src="i18n.js?v=202611081504"></script>
+<script type="module" src="app.js?v=202611081504"></script>
 
-<script type="module" src="shell.js?v=202611081216"></script>
+<script type="module" src="shell.js?v=202611081504"></script>
 <script>
 (function () {
 	if (!('serviceWorker' in navigator) || !window.isSecureContext) return;
