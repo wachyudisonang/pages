@@ -1910,7 +1910,8 @@ header.top {
 /* These white surfaces keep light native controls and dark text when the system is in dark mode.
    bigown.css's dark palette would otherwise set near-white text and dark checkboxes on the white panel. */
 #mobile-stage-wrap,
-#ft-viewer {
+#ft-viewer,
+#pm-membership-host {
   background: #fff;
   color-scheme: light;
   color: var(--ft-color-ancText, #222);
