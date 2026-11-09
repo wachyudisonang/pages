@@ -2363,7 +2363,7 @@ header.top .logo svg {
   gap: 6px;
   margin-top: 10px;
   font-family: var(--font-type), var(--font-fallback);
-  font-size: 15px;
+  font-size: var(--text-sm);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 4px;
