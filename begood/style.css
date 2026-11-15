@@ -26,11 +26,20 @@
   --accent: #089163;
   --accent-d: #047857;
   --accent-t: #dcf5ea;
-  --grad: linear-gradient(45deg, #067a53, #0bb07a);
+  --grad: linear-gradient(45deg, #089163, #0bb07a 50%, #089163);
+  --grad-x: linear-gradient(90deg, #089163, #0bb07a 50%, #089163);
+  --base-line: #e48442;
   --shadow-accent: 0 8px 18px -8px rgba(8, 145, 99, .55);
   --shadow-accent-sm: 0 4px 12px -5px rgba(8, 145, 99, .55);
   --shadow-accent-lg: 0 8px 24px -12px rgba(8, 145, 99, .6);
   --rail-bg: #101c18;
+}
+
+@supports (background: linear-gradient(45deg in oklab, red, blue)) {
+  :root {
+    --grad: linear-gradient(45deg in oklab, #089163, #0bb07a 50%, #089163);
+    --grad-x: linear-gradient(90deg in oklab, #089163, #0bb07a 50%, #089163);
+  }
 }
 
 html[data-theme='dark'] {
@@ -115,8 +124,8 @@ body {
 
 /* The header shows the mark straight on the header gradient, without bigown.css's translucent box. */
 header.top .logo {
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
   background: none;
   box-shadow: none;
 }
@@ -581,6 +590,28 @@ select {
   color: var(--on-accent);
   background: var(--grad);
   box-shadow: var(--shadow-accent-sm);
+  border-bottom: 3px solid var(--base-line);
+}
+
+.botbar-btn {
+  background: var(--grad-x);
+  border-bottom: 3px solid var(--base-line);
+}
+
+/* The code is shown once for the user to copy or write down, so one tap selects all of it. */
+.recovery-code {
+  margin-top: var(--sp-12);
+  padding: var(--sp-12);
+  border-radius: var(--sp-12);
+  background: var(--accent-t);
+  color: var(--accent-d);
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: var(--text-lg);
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-align: center;
+  word-break: break-all;
+  user-select: all;
 }
 
 @media (min-width: 1024px) {
@@ -836,6 +867,7 @@ html.bg-booting {
 .bg-sp-pop,
 .bg-sp-star {
   transform-box: fill-box;
+  transform-origin: center;
 }
 
 .bg-sp-rise {
@@ -844,12 +876,7 @@ html.bg-booting {
 }
 
 .bg-sp-pop {
-  transform-origin: center;
   animation: bg-sp-pop 0.2s var(--bg-sp-ease) both;
-}
-
-.bg-sp-star {
-  transform-origin: center;
 }
 
 .bg-sp-b1 { animation-delay: 0s; }

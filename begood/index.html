@@ -9,15 +9,15 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="BeGood">
-<meta name="app-version" content="202611160215" />
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=202611160215">
-<link rel="icon" type="image/png" href="icon.png?v=202611160215">
-<link rel="apple-touch-icon" href="icon.png?v=202611160215">
+<meta name="app-version" content="202611160440" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=202611160440">
+<link rel="icon" type="image/png" href="icon.png?v=202611160440">
+<link rel="apple-touch-icon" href="icon.png?v=202611160440">
 <link rel="manifest" href="manifest.json">
 <title>BeGood — Keuangan &amp; Zakat</title>
-<script src="prepaint.js?v=202611160215"></script>
-<link rel="stylesheet" href="bigown.css?v=202611160215">
-<link rel="stylesheet" href="style.css?v=202611160215">
+<script src="prepaint.js?v=202611160440"></script>
+<link rel="stylesheet" href="bigown.css?v=202611160440">
+<link rel="stylesheet" href="style.css?v=202611160440">
 </head>
 <body>
 <!-- SPLASH: the boot cover (see style.css "SPLASH"). prepaint.js raises html.bg-booting before the first paint and
@@ -30,6 +30,7 @@
   <div class="vault-card">
     <div class="vault-mark" aria-hidden="true"><!-- logo:use:start --><svg viewBox="62 66 237.49 277.57" aria-hidden="true"><use href="#bgLogoMark"/></svg><!-- logo:use:end --></div>
     <h1 id="vaultTitle" data-i18n="vault.title"></h1>
+    <p class="cursect" id="gateAccount" hidden></p>
     <div id="vaultSetup" hidden>
       <h2 data-i18n="vault.setup"></h2>
       <p class="hint" data-i18n="vault.setupHint"></p>
@@ -60,6 +61,27 @@
         </label>
         <button class="btn mt-4" type="submit" data-i18n="vault.open"></button>
       </form>
+      <button class="btn ghost mt-3" id="forgotPassphraseButton" type="button" data-i18n="vault.forgot"></button>
+    </div>
+    <div id="vaultRecover" hidden>
+      <h2 data-i18n="vault.recoverTitle"></h2>
+      <p class="hint" data-i18n="vault.recoverHint"></p>
+      <form id="vaultRecoverForm">
+        <label class="field">
+          <span class="field-lbl" data-i18n="vault.recoverCode"></span>
+          <input id="recoverCode" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" required>
+        </label>
+        <label class="field">
+          <span class="field-lbl" data-i18n="settings.passphraseNew"></span>
+          <span class="pw-field"><input id="recoverNew" type="password" minlength="12" autocomplete="new-password" required><button class="pw-toggle" type="button" aria-pressed="false" data-toggle-password data-i18n-aria="vault.togglePassphrase"><svg class="pw-eye" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"></path><circle cx="12" cy="12" r="3"></circle></svg><svg class="pw-eye-off" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 19c-6.4 0-10-7-10-7a18 18 0 0 1 4.1-5.2M9.9 5.2A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a18 18 0 0 1-2.2 3.2M1 1l22 22"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg></button></span>
+        </label>
+        <label class="field">
+          <span class="field-lbl" data-i18n="vault.confirm"></span>
+          <span class="pw-field"><input id="recoverConfirm" type="password" minlength="12" autocomplete="new-password" required><button class="pw-toggle" type="button" aria-pressed="false" data-toggle-password data-i18n-aria="vault.togglePassphrase"><svg class="pw-eye" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"></path><circle cx="12" cy="12" r="3"></circle></svg><svg class="pw-eye-off" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 19c-6.4 0-10-7-10-7a18 18 0 0 1 4.1-5.2M9.9 5.2A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a18 18 0 0 1-2.2 3.2M1 1l22 22"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg></button></span>
+        </label>
+        <button class="btn mt-4" id="recoverButton" type="submit" data-i18n="vault.recoverSave"></button>
+      </form>
+      <button class="btn ghost mt-3" id="recoverBackButton" type="button" data-i18n="vault.recoverBack"></button>
     </div>
     <button class="btn ghost mt-3" id="restoreCloudButton" type="button" data-i18n="vault.restoreCloud"></button>
     <p class="form-error" id="vaultError" role="alert"></p>
@@ -259,6 +281,7 @@
           <div class="button-row mt-3">
             <button class="btn sm" id="syncCloudButton" type="button" data-i18n="settings.syncNow"></button>
             <button class="btn ghost sm" id="signOutCloudButton" type="button" data-i18n="settings.signOut"></button>
+            <button class="btn danger sm" id="replaceLocalButton" type="button" hidden data-i18n="settings.replaceLocal"></button>
           </div>
         </article>
         <article class="card">
@@ -272,6 +295,52 @@
             </label>
           </div>
           <button class="btn danger sm mt-3" id="applyImportButton" type="button" hidden data-i18n="settings.importApply"></button>
+        </article>
+        <article class="card">
+          <h2 data-i18n="settings.merge"></h2>
+          <p class="hint" data-i18n="settings.mergeHint"></p>
+          <form id="mergeBackupForm">
+            <label class="field">
+              <span class="field-lbl" data-i18n="settings.mergeFile"></span>
+              <input id="mergeBackupFile" type="file" accept="application/json,.json" required>
+            </label>
+            <label class="field">
+              <span class="field-lbl" data-i18n="settings.mergePassphrase"></span>
+              <span class="pw-field"><input id="mergeBackupPassphrase" type="password" autocomplete="off" required><button class="pw-toggle" type="button" aria-pressed="false" data-toggle-password data-i18n-aria="vault.togglePassphrase"><svg class="pw-eye" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"></path><circle cx="12" cy="12" r="3"></circle></svg><svg class="pw-eye-off" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 19c-6.4 0-10-7-10-7a18 18 0 0 1 4.1-5.2M9.9 5.2A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a18 18 0 0 1-2.2 3.2M1 1l22 22"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg></button></span>
+            </label>
+            <button class="btn sm mt-3" id="mergeBackupButton" type="submit" data-i18n="settings.mergeSave"></button>
+          </form>
+        </article>
+        <article class="card">
+          <h2 data-i18n="settings.recovery"></h2>
+          <p class="hint" data-i18n="settings.recoveryHint"></p>
+          <p class="cursect mt-3" id="recoveryStatus"></p>
+          <form id="recoveryForm">
+            <label class="field">
+              <span class="field-lbl" data-i18n="settings.passphraseCurrent"></span>
+              <span class="pw-field"><input id="recoveryPassphrase" type="password" autocomplete="current-password" required><button class="pw-toggle" type="button" aria-pressed="false" data-toggle-password data-i18n-aria="vault.togglePassphrase"><svg class="pw-eye" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"></path><circle cx="12" cy="12" r="3"></circle></svg><svg class="pw-eye-off" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 19c-6.4 0-10-7-10-7a18 18 0 0 1 4.1-5.2M9.9 5.2A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a18 18 0 0 1-2.2 3.2M1 1l22 22"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg></button></span>
+            </label>
+            <button class="btn sm mt-3" id="recoveryButton" type="submit" data-i18n="settings.recoverySave"></button>
+          </form>
+        </article>
+        <article class="card">
+          <h2 data-i18n="settings.passphrase"></h2>
+          <p class="hint" data-i18n="settings.passphraseHint"></p>
+          <form id="changePassphraseForm">
+            <label class="field">
+              <span class="field-lbl" data-i18n="settings.passphraseCurrent"></span>
+              <span class="pw-field"><input id="currentPassphrase" type="password" autocomplete="current-password" required><button class="pw-toggle" type="button" aria-pressed="false" data-toggle-password data-i18n-aria="vault.togglePassphrase"><svg class="pw-eye" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"></path><circle cx="12" cy="12" r="3"></circle></svg><svg class="pw-eye-off" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 19c-6.4 0-10-7-10-7a18 18 0 0 1 4.1-5.2M9.9 5.2A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a18 18 0 0 1-2.2 3.2M1 1l22 22"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg></button></span>
+            </label>
+            <label class="field">
+              <span class="field-lbl" data-i18n="settings.passphraseNew"></span>
+              <span class="pw-field"><input id="newPassphrase" type="password" minlength="12" autocomplete="new-password" required><button class="pw-toggle" type="button" aria-pressed="false" data-toggle-password data-i18n-aria="vault.togglePassphrase"><svg class="pw-eye" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"></path><circle cx="12" cy="12" r="3"></circle></svg><svg class="pw-eye-off" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 19c-6.4 0-10-7-10-7a18 18 0 0 1 4.1-5.2M9.9 5.2A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a18 18 0 0 1-2.2 3.2M1 1l22 22"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg></button></span>
+            </label>
+            <label class="field">
+              <span class="field-lbl" data-i18n="vault.confirm"></span>
+              <span class="pw-field"><input id="newPassphraseConfirm" type="password" minlength="12" autocomplete="new-password" required><button class="pw-toggle" type="button" aria-pressed="false" data-toggle-password data-i18n-aria="vault.togglePassphrase"><svg class="pw-eye" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"></path><circle cx="12" cy="12" r="3"></circle></svg><svg class="pw-eye-off" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 19c-6.4 0-10-7-10-7a18 18 0 0 1 4.1-5.2M9.9 5.2A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a18 18 0 0 1-2.2 3.2M1 1l22 22"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg></button></span>
+            </label>
+            <button class="btn sm mt-3" id="changePassphraseButton" type="submit" data-i18n="settings.passphraseSave"></button>
+          </form>
         </article>
         <article class="card">
           <h2 data-i18n="settings.autoLock"></h2>
@@ -382,9 +451,20 @@
   </div>
 </div>
 
+<div class="modal-bg" id="recoveryModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="recoveryTitle">
+    <div class="modal-body">
+      <h2 id="recoveryTitle" data-i18n="recovery.title"></h2>
+      <p class="hint" data-i18n="recovery.hint"></p>
+      <p class="recovery-code" id="recoveryCodeText"></p>
+      <div class="button-row mt-4"><button class="btn ghost" type="button" id="recoveryCopy" data-i18n="recovery.copy"></button><button class="btn" type="button" id="recoverySaved" data-i18n="recovery.saved"></button></div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="i18n.js?v=202611160215"></script>
-<script src="app.js?v=202611160215"></script>
-<script type="module" src="main.js?v=202611160215"></script>
+<script src="i18n.js?v=202611160440"></script>
+<script src="app.js?v=202611160440"></script>
+<script type="module" src="main.js?v=202611160440"></script>
 </body>
 </html>
