@@ -1,5 +1,6 @@
 (function () {
   'use strict';
+  document.documentElement.classList.add('bg-booting');   // the splash cover; main.js lifts it (core/splash.js)
   try {
     var theme = localStorage.getItem('begood_theme');
     if (theme === 'light' || theme === 'dark') document.documentElement.setAttribute('data-theme', theme);

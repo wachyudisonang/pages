@@ -2,10 +2,10 @@
   'use strict';
 
   var LS_PREFIX = 'begood_';
-  var TAB_ORDER = ['summary', 'transactions', 'zakat', 'settings'];
+  var TAB_ORDER = ['summary', 'transactions', 'trash', 'record', 'wallets', 'zakat', 'settings'];
   var TOAST_MS = 2600;
   var TO_TOP_SHOW_PX = 400;
-  var THEME_COLORS = Object.freeze({ light: '#397fda', dark: '#161f2e' });
+  var THEME_COLORS = Object.freeze({ light: '#089163', dark: '#101c18' });
   var activeTab = 'summary';
   var toastTimer;
 
@@ -46,9 +46,13 @@
 
   function switchTab(tab) {
     if (TAB_ORDER.indexOf(tab) < 0) return;
+    // The record form keeps its state in the page. Leaving it or entering it tells main.js, which resets or prepares it.
+    if (activeTab === 'record' && tab !== 'record') document.dispatchEvent(new CustomEvent('record-form:closed'));
     activeTab = tab;
     applyTab();
     setMenu(false);
+    if (tab === 'record') document.dispatchEvent(new CustomEvent('record-form:opened'));
+    document.dispatchEvent(new CustomEvent('tab:changed', { detail: { tab: tab } }));
   }
 
   function currentTheme() {
@@ -71,24 +75,6 @@
     $$('#themeSeg button').forEach(function (button) {
       button.classList.toggle('on', button.dataset.theme === mode);
     });
-  }
-
-  function openTransactionModal() {
-    var modal = $('#transactionModal');
-    if (!modal) return;
-    modal.classList.add('on');
-    modal.setAttribute('aria-hidden', 'false');
-    setScrollLocked(true);
-    $('#transactionAmount').focus();
-    document.dispatchEvent(new CustomEvent('transaction-modal:opened'));
-  }
-
-  function closeTransactionModal() {
-    var modal = $('#transactionModal');
-    if (!modal?.classList.contains('on')) return;
-    modal.classList.remove('on');
-    modal.setAttribute('aria-hidden', 'true');
-    setScrollLocked(false);
   }
 
   function toast(message) {
@@ -130,9 +116,11 @@
       setMenu(false);
     });
     // The logo goes to the summary inside the app. The plain href would reload the page, which locks the vault.
+    // The logo is the home link, so it also drops ?tab after switchTab has written it.
     $('.brand').addEventListener('click', function (event) {
       event.preventDefault();
       switchTab('summary');
+      history.replaceState(history.state, '', location.pathname + location.hash);
     });
     $$('[data-tab]').forEach(function (button) {
       button.addEventListener('click', function () {
@@ -157,23 +145,11 @@
         button.setAttribute('aria-pressed', reveal ? 'true' : 'false');
       });
     });
-    $$('[data-open-transaction]').forEach(function (button) {
-      button.addEventListener('click', function () {
-        openTransactionModal();
-      });
-    });
-    $('#transactionModalClose').addEventListener('click', closeTransactionModal);
-    $('#transactionCancel').addEventListener('click', closeTransactionModal);
-    $('#transactionModal').addEventListener('click', function (event) {
-      if (event.target === event.currentTarget) closeTransactionModal();
-    });
-    document.addEventListener('keydown', function (event) {
-      if (event.key !== 'Escape') return;
-      closeTransactionModal();
-      setMenu(false);
-    });
     global.addEventListener('online', updateOnlineStatus);
     global.addEventListener('offline', updateOnlineStatus);
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') setMenu(false);
+    });
     try {
       matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
         if (currentTheme() === 'system') applyTheme('system');
@@ -191,7 +167,7 @@
   }
 
   global.BeGoodShell = {
-    closeTransactionModal: closeTransactionModal,
+    switchTab: switchTab,
     toast: toast,
   };
 

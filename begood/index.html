@@ -3,25 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com https://apis.google.com https://*.firebasedatabase.app; style-src 'self'; img-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebaseio.com wss://*.firebasedatabase.app; frame-src https://accounts.google.com https://*.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'; worker-src 'self'">
-<meta name="theme-color" content="#397fda">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com https://www.google.com https://apis.google.com https://*.firebasedatabase.app; style-src 'self'; img-src 'self' data:; connect-src 'self' https://www.google.com https://*.googleapis.com https://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebaseio.com wss://*.firebasedatabase.app; frame-src https://accounts.google.com https://www.google.com https://*.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'; worker-src 'self'">
+<meta name="theme-color" content="#089163">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="BeGood">
-<meta name="app-version" content="202611041143" />
-<link rel="icon" type="image/png" href="icon.png?v=202611041143">
-<link rel="apple-touch-icon" href="icon.png?v=202611041143">
+<meta name="app-version" content="202611160215" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=202611160215">
+<link rel="icon" type="image/png" href="icon.png?v=202611160215">
+<link rel="apple-touch-icon" href="icon.png?v=202611160215">
 <link rel="manifest" href="manifest.json">
 <title>BeGood — Keuangan &amp; Zakat</title>
-<script src="prepaint.js?v=202611041143"></script>
-<link rel="stylesheet" href="bigown.css?v=202611041143">
-<link rel="stylesheet" href="style.css?v=202611041143">
+<script src="prepaint.js?v=202611160215"></script>
+<link rel="stylesheet" href="bigown.css?v=202611160215">
+<link rel="stylesheet" href="style.css?v=202611160215">
 </head>
 <body>
+<!-- SPLASH: the boot cover (see style.css "SPLASH"). prepaint.js raises html.bg-booting before the first paint and
+     main.js lifts it as soon as the sign-in check has chosen what the page shows. The people grow from the shortest to the
+     tallest, then the two sparkles pop in and twinkle. Generated from tools/logo.js by tools/make-icons.js. -->
+<!-- logo:splash:start --><div id="bg-splash" aria-hidden="true"><svg class="bg-sp" viewBox="38 42 285.49 325.57"><defs><mask id="bgSpCut0" maskUnits="userSpaceOnUse" x="-100" y="-100" width="600" height="600"><rect x="-100" y="-100" width="600" height="600" fill="#fff"/><g fill="#000" stroke="#000" stroke-width="22" stroke-linejoin="round"><g transform="rotate(2 195 245)"><circle cx="195" cy="158" r="29"/><path d="M 146 334 L 150 242 C 151 214, 173 198, 197 198 C 221 198, 241 215, 242 243 L 247 334 Z"/></g><g transform="rotate(-2 142 275)"><circle cx="144" cy="212" r="28"/><path d="M 96 336 L 100 292 C 101 266, 122 250, 145 250 C 168 250, 187 266, 188 292 L 192 336 Z"/></g></g></mask><mask id="bgSpCut1" maskUnits="userSpaceOnUse" x="-100" y="-100" width="600" height="600"><rect x="-100" y="-100" width="600" height="600" fill="#fff"/><g fill="#000" stroke="#000" stroke-width="22" stroke-linejoin="round"><g transform="rotate(-2 142 275)"><circle cx="144" cy="212" r="28"/><path d="M 96 336 L 100 292 C 101 266, 122 250, 145 250 C 168 250, 187 266, 188 292 L 192 336 Z"/></g></g></mask><mask id="bgSpCut2" maskUnits="userSpaceOnUse" x="-100" y="-100" width="600" height="600"><rect x="-100" y="-100" width="600" height="600" fill="#fff"/></mask><linearGradient id="bgSpFig" x1="15%" y1="85%" x2="85%" y2="15%"><stop offset="0" stop-color="#ffe0b8"/><stop offset="1" stop-color="#ffffff"/></linearGradient><linearGradient id="bgSpSpark" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#ffe08a"/></linearGradient></defs><g mask="url(#bgSpCut0)"><g transform="rotate(4 245 220)" fill="url(#bgSpFig)"><circle class="bg-sp-pop bg-sp-h3" cx="242" cy="108" r="30"/><path class="bg-sp-rise bg-sp-b3" d="M 192 332 L 196 196 C 197 166, 220 150, 245 150 C 270 150, 291 167, 292 197 L 298 332 Z"/></g></g><g mask="url(#bgSpCut1)"><g transform="rotate(2 195 245)" fill="url(#bgSpFig)"><circle class="bg-sp-pop bg-sp-h2" cx="195" cy="158" r="29"/><path class="bg-sp-rise bg-sp-b2" d="M 146 334 L 150 242 C 151 214, 173 198, 197 198 C 221 198, 241 215, 242 243 L 247 334 Z"/></g></g><g mask="url(#bgSpCut2)"><g transform="rotate(-2 142 275)" fill="url(#bgSpFig)"><circle class="bg-sp-pop bg-sp-h1" cx="144" cy="212" r="28"/><path class="bg-sp-rise bg-sp-b1" d="M 96 336 L 100 292 C 101 266, 122 250, 145 250 C 168 250, 187 266, 188 292 L 192 336 Z"/></g></g><path class="bg-sp-star bg-sp-s1" d="M140 72Q143.4 102.6 174 106Q143.4 109.4 140 140Q136.6 109.4 106 106Q136.6 102.6 140 72Z" fill="url(#bgSpSpark)"/><path class="bg-sp-star bg-sp-s2" d="M93 145Q95.5 167.5 118 170Q95.5 172.5 93 195Q90.5 172.5 68 170Q90.5 167.5 93 145Z" fill="#ffe08a"/></svg></div><!-- logo:splash:end -->
+<!-- The logo defs the header and the vault card draw from. Generated from tools/logo.js by tools/make-icons.js. -->
+<!-- logo:defs:start --><svg class="bg-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs><mask id="bgLogoCut0" maskUnits="userSpaceOnUse" x="-100" y="-100" width="600" height="600"><rect x="-100" y="-100" width="600" height="600" fill="#fff"/><g fill="#000" stroke="#000" stroke-width="22" stroke-linejoin="round"><g transform="rotate(2 195 245)"><circle cx="195" cy="158" r="29"/><path d="M 146 334 L 150 242 C 151 214, 173 198, 197 198 C 221 198, 241 215, 242 243 L 247 334 Z"/></g><g transform="rotate(-2 142 275)"><circle cx="144" cy="212" r="28"/><path d="M 96 336 L 100 292 C 101 266, 122 250, 145 250 C 168 250, 187 266, 188 292 L 192 336 Z"/></g></g></mask><mask id="bgLogoCut1" maskUnits="userSpaceOnUse" x="-100" y="-100" width="600" height="600"><rect x="-100" y="-100" width="600" height="600" fill="#fff"/><g fill="#000" stroke="#000" stroke-width="22" stroke-linejoin="round"><g transform="rotate(-2 142 275)"><circle cx="144" cy="212" r="28"/><path d="M 96 336 L 100 292 C 101 266, 122 250, 145 250 C 168 250, 187 266, 188 292 L 192 336 Z"/></g></g></mask><mask id="bgLogoCut2" maskUnits="userSpaceOnUse" x="-100" y="-100" width="600" height="600"><rect x="-100" y="-100" width="600" height="600" fill="#fff"/></mask><linearGradient id="bgLogoFig" x1="15%" y1="85%" x2="85%" y2="15%"><stop offset="0" stop-color="#ffe0b8"/><stop offset="1" stop-color="#ffffff"/></linearGradient><linearGradient id="bgLogoSpark" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#ffe08a"/></linearGradient></defs><defs><g id="bgLogoMark"><g mask="url(#bgLogoCut0)"><g transform="rotate(4 245 220)" fill="url(#bgLogoFig)"><circle cx="242" cy="108" r="30"/><path d="M 192 332 L 196 196 C 197 166, 220 150, 245 150 C 270 150, 291 167, 292 197 L 298 332 Z"/></g></g><g mask="url(#bgLogoCut1)"><g transform="rotate(2 195 245)" fill="url(#bgLogoFig)"><circle cx="195" cy="158" r="29"/><path d="M 146 334 L 150 242 C 151 214, 173 198, 197 198 C 221 198, 241 215, 242 243 L 247 334 Z"/></g></g><g mask="url(#bgLogoCut2)"><g transform="rotate(-2 142 275)" fill="url(#bgLogoFig)"><circle cx="144" cy="212" r="28"/><path d="M 96 336 L 100 292 C 101 266, 122 250, 145 250 C 168 250, 187 266, 188 292 L 192 336 Z"/></g></g><path d="M140 72Q143.4 102.6 174 106Q143.4 109.4 140 140Q136.6 109.4 106 106Q136.6 102.6 140 72Z" fill="url(#bgLogoSpark)"/><path d="M93 145Q95.5 167.5 118 170Q95.5 172.5 93 195Q90.5 172.5 68 170Q90.5 167.5 93 145Z" fill="#ffe08a"/></g></defs></svg><!-- logo:defs:end -->
 <section class="vault-gate" id="vaultGate" aria-labelledby="vaultTitle">
   <div class="vault-card">
-    <div class="vault-mark" aria-hidden="true">BG</div>
+    <div class="vault-mark" aria-hidden="true"><!-- logo:use:start --><svg viewBox="62 66 237.49 277.57" aria-hidden="true"><use href="#bgLogoMark"/></svg><!-- logo:use:end --></div>
     <h1 id="vaultTitle" data-i18n="vault.title"></h1>
     <div id="vaultSetup" hidden>
       <h2 data-i18n="vault.setup"></h2>
@@ -37,6 +44,11 @@
         </label>
         <button class="btn mt-4" type="submit" data-i18n="vault.create"></button>
       </form>
+    </div>
+    <div id="cloudSignIn" hidden>
+      <h2 id="cloudSignInTitle" data-i18n="vault.signIn"></h2>
+      <p class="hint" id="cloudSignInHint" data-i18n="vault.signInHint"></p>
+      <button class="btn mt-4" id="cloudSignInButton" type="button" data-i18n="vault.signInButton"></button>
     </div>
     <div id="vaultUnlock" hidden>
       <h2 data-i18n="vault.unlock"></h2>
@@ -58,7 +70,7 @@
   <header class="top">
     <h1>
       <a class="brand" href="./" data-i18n-aria="a11y.home">
-        <span class="logo" aria-hidden="true">BG</span>
+        <span class="logo" aria-hidden="true"><!-- logo:use:start --><svg viewBox="62 66 237.49 277.57" aria-hidden="true"><use href="#bgLogoMark"/></svg><!-- logo:use:end --></span>
         <span data-i18n="app.name"></span>
       </a>
     </h1>
@@ -76,7 +88,7 @@
             <div class="sectitle" data-i18n="summary.title"></div>
             <h2 id="summaryYear"></h2>
           </div>
-          <button class="btn sm" type="button" data-open-transaction data-i18n="transactions.add"></button>
+          <button class="btn sm" type="button" data-tab="record" data-i18n="transactions.add"></button>
         </div>
         <div class="metric-grid">
           <article class="card metric income"><span data-i18n="summary.income"></span><strong id="summaryIncome"></strong></article>
@@ -88,22 +100,121 @@
           <article class="card metric"><span data-i18n="summary.remaining"></span><strong id="summaryRemaining"></strong></article>
         </div>
         <div class="empty mt-4" id="summaryEmpty" hidden data-i18n="summary.empty"></div>
+        <div class="sectitle" data-i18n="wallet.summaryTitle"></div>
+        <div class="wallet-cards" id="walletCards" hidden></div>
+        <div class="empty" id="walletCardsEmpty" hidden>
+          <p class="hint" data-i18n="wallet.summaryEmpty"></p>
+          <button class="btn sm mt-3" type="button" data-tab="wallets" data-i18n="wallet.open"></button>
+        </div>
       </div>
     </section>
 
     <section class="tab" data-view="transactions">
-      <div class="container">
+      <div class="container-wide">
         <div class="page-heading">
           <h2 data-i18n="transactions.title"></h2>
-          <button class="btn sm" type="button" data-open-transaction data-i18n="transactions.add"></button>
+          <div class="page-actions">
+            <button class="btn sm" type="button" id="trashButton" data-tab="trash" hidden data-i18n="transactions.trash"></button>
+            <button class="btn sm" type="button" data-tab="record" data-i18n="transactions.add"></button>
+          </div>
         </div>
-        <div class="transaction-list" id="transactionList"></div>
+        <div class="sync-note" id="syncNote" hidden>
+          <span id="syncNoteText"></span>
+          <button class="btn sm" type="button" id="syncNoteButton" data-i18n="sync.now"></button>
+        </div>
+        <div class="wallet-filter" id="walletFilter" hidden>
+          <span id="walletFilterText"></span>
+          <button class="btn sm ghost" type="button" id="walletFilterClear" data-i18n="wallet.showAll"></button>
+        </div>
+        <div class="table-wrap" id="transactionTable" hidden>
+          <table class="ledger">
+            <thead>
+              <tr>
+                <th data-i18n="transaction.date"></th>
+                <th data-i18n="transaction.category"></th>
+                <th data-i18n="transaction.wallet"></th>
+                <th data-i18n="transaction.description"></th>
+                <th class="num" data-i18n="transactions.income"></th>
+                <th class="num" data-i18n="transactions.expense"></th>
+                <th data-i18n="transactions.actions"></th>
+              </tr>
+            </thead>
+            <tbody id="transactionList"></tbody>
+          </table>
+        </div>
+        <div class="ledger-cards" id="ledgerCards" hidden></div>
         <div class="empty" id="transactionEmpty" data-i18n="transactions.empty"></div>
       </div>
     </section>
 
+    <section class="tab" data-view="trash">
+      <div class="container-wide">
+        <button class="btn sm ghost" type="button" data-tab="transactions" data-i18n="trash.back"></button>
+        <div class="page-heading">
+          <h2 data-i18n="transactions.trash"></h2>
+          <div class="page-actions">
+            <button class="btn sm" type="button" id="trashRestoreAll" data-i18n="trash.restoreAll"></button>
+            <button class="btn sm danger" type="button" id="trashDeleteAll" data-i18n="trash.deleteAll"></button>
+          </div>
+        </div>
+        <p class="hint" id="trashHint"></p>
+        <div class="transaction-list" id="trashList"></div>
+        <div class="empty" id="trashEmpty" hidden data-i18n="trash.empty"></div>
+      </div>
+    </section>
+
+    <section class="tab" data-view="wallets">
+      <div class="container-wide">
+        <div class="page-heading">
+          <h2 data-i18n="wallet.title"></h2>
+          <div class="page-actions">
+            <button class="btn sm" type="button" id="walletNew" data-i18n="wallet.add"></button>
+          </div>
+        </div>
+        <p class="hint" data-i18n="wallet.hint"></p>
+        <div class="transaction-list" id="walletList" hidden></div>
+        <div class="empty" id="walletEmpty" hidden data-i18n="wallet.empty"></div>
+        <form class="card mt-4 form-grid" id="walletForm">
+          <h2 id="walletFormTitle" class="form-wide" data-i18n="wallet.formNew"></h2>
+          <label class="field"><span class="field-lbl" data-i18n="wallet.storage"></span><span class="combo"><input id="walletStorage" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="walletStorageList" maxlength="80" autocomplete="off" required><span class="combo-list" id="walletStorageList" role="listbox" hidden></span></span></label>
+          <label class="field"><span class="field-lbl" data-i18n="wallet.name"></span><span class="combo"><input id="walletName" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="walletNameList" maxlength="80" autocomplete="off" required><span class="combo-list" id="walletNameList" role="listbox" hidden></span></span></label>
+          <label class="field"><span class="field-lbl" data-i18n="wallet.holder"></span><span class="combo"><input id="walletHolder" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="walletHolderList" maxlength="80" autocomplete="off" required><span class="combo-list" id="walletHolderList" role="listbox" hidden></span></span></label>
+          <label class="field"><span class="field-lbl" data-i18n="wallet.accountNumber"></span><input id="walletAccountNumber" maxlength="80" inputmode="numeric" autocomplete="off"></label>
+          <label class="field"><span class="field-lbl" data-i18n="wallet.phone"></span><span class="combo"><input id="walletPhoneNumber" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="walletPhoneList" maxlength="80" inputmode="tel" autocomplete="off"><span class="combo-list" id="walletPhoneList" role="listbox" hidden></span></span></label>
+          <label class="field"><span class="field-lbl" data-i18n="wallet.email"></span><span class="combo"><input id="walletEmail" type="email" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="walletEmailList" maxlength="80" autocomplete="off"><span class="combo-list" id="walletEmailList" role="listbox" hidden></span></span></label>
+          <label class="field"><span class="field-lbl" data-i18n="wallet.description"></span><input id="walletDescription" maxlength="80" autocomplete="off"></label>
+          <p class="form-error form-wide" id="walletError" role="alert"></p>
+          <div class="button-row mt-4 form-wide"><button class="btn" type="submit" data-i18n="wallet.save"></button><button class="btn ghost" type="button" id="walletCancel" data-i18n="transaction.cancel"></button></div>
+        </form>
+      </div>
+    </section>
+
+    <section class="tab" data-view="record">
+      <div class="container-wide">
+        <button class="btn sm ghost" type="button" data-tab="transactions" data-i18n="trash.back"></button>
+        <div class="page-heading">
+          <h2 id="recordTitle" data-i18n="transaction.modalTitle"></h2>
+        </div>
+        <p class="hint" data-i18n="transaction.modalHint"></p>
+        <form class="card form-grid" id="transactionForm">
+          <label class="field"><span class="field-lbl" data-i18n="transaction.type"></span><select id="transactionType"><option value="income" data-i18n="transactions.income"></option><option value="expense" data-i18n="transactions.expense"></option><option value="transfer" data-i18n="transactions.transfer"></option></select></label>
+          <label class="field"><span class="field-lbl" data-i18n="transaction.date"></span><input id="transactionDate" type="date" required></label>
+          <label class="field"><span class="field-lbl" data-i18n="transaction.amount"></span><input id="transactionAmount" inputmode="numeric" autocomplete="off" required><span class="amount-preview" id="transactionAmountPreview" aria-live="polite" hidden></span></label>
+          <label class="field" id="walletField"><span class="field-lbl" data-i18n="transaction.wallet"></span><select id="transactionWallet"></select></label>
+          <label class="field" id="transferFromField" hidden><span class="field-lbl" data-i18n="transfer.from"></span><select id="transferFrom"></select></label>
+          <label class="field" id="transferToField" hidden><span class="field-lbl" data-i18n="transfer.to"></span><select id="transferTo"></select></label>
+          <label class="field" id="categoryField"><span class="field-lbl" data-i18n="transaction.category"></span><span class="combo"><input id="transactionCategory" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="categoryList" autocomplete="off" maxlength="80" required><span class="combo-list" id="categoryList" role="listbox" hidden></span></span></label>
+          <label class="field" id="treatmentField"><span class="field-lbl" data-i18n="transaction.treatment"></span><select id="transactionTreatment"></select></label>
+          <label class="field" id="assessmentField" hidden><span class="field-lbl" data-i18n="zakat.assessments"></span><select id="transactionAssessment"></select></label>
+          <label class="field form-wide"><span class="field-lbl" data-i18n="transaction.description"></span><textarea id="transactionDescription" maxlength="500"></textarea></label>
+          <p class="form-error form-wide" id="transactionError" role="alert"></p>
+          <div class="button-row mt-4 form-wide"><button class="btn" type="submit" data-i18n="transaction.save"></button><button class="btn ghost" type="button" data-tab="transactions" data-i18n="transaction.cancel"></button></div>
+        </form>
+      </div>
+    </section>
+
     <section class="tab" data-view="zakat">
-      <div class="container">
+      <div class="container-wide">
         <h2 class="page-title" data-i18n="zakat.title"></h2>
         <form class="card" id="zakatSettingsForm">
           <label class="field">
@@ -135,7 +246,7 @@
     </section>
 
     <section class="tab" data-view="settings">
-      <div class="container">
+      <div class="container-wide">
         <article class="card">
           <h2 data-i18n="settings.status"></h2>
           <p class="cursect" id="onlineStatus"></p>
@@ -143,9 +254,10 @@
         <article class="card">
           <h2 data-i18n="settings.cloud"></h2>
           <p class="hint" data-i18n="settings.cloudHint"></p>
-          <p class="cursect mt-3" id="cloudStatus"></p>
+          <p class="cursect mt-3" id="googleId"></p>
+          <p class="cursect" id="rtdbUid" hidden></p>
           <div class="button-row mt-3">
-            <button class="btn sm" id="syncCloudButton" type="button" data-i18n="settings.sync"></button>
+            <button class="btn sm" id="syncCloudButton" type="button" data-i18n="settings.syncNow"></button>
             <button class="btn ghost sm" id="signOutCloudButton" type="button" data-i18n="settings.signOut"></button>
           </div>
         </article>
@@ -173,6 +285,20 @@
           </form>
         </article>
         <article class="card">
+          <h2 data-i18n="settings.decimalSeparator"></h2>
+          <p class="hint" data-i18n="settings.decimalSeparatorHint"></p>
+          <form id="decimalSeparatorForm">
+            <label class="field">
+              <span class="field-lbl" data-i18n="settings.decimalSeparatorLabel"></span>
+              <select id="decimalSeparator">
+                <option value="comma" data-i18n="settings.decimalSeparator.comma"></option>
+                <option value="period" data-i18n="settings.decimalSeparator.period"></option>
+              </select>
+            </label>
+            <button class="btn sm mt-3" type="submit" data-i18n="settings.decimalSeparatorSave"></button>
+          </form>
+        </article>
+        <article class="card">
           <h2 data-i18n="settings.language"></h2>
           <div class="seg" id="langSeg">
             <button type="button" data-lang="id">Indonesia</button>
@@ -187,6 +313,11 @@
             <button type="button" data-theme="dark" data-i18n="settings.themeDark"></button>
             <button type="button" data-theme="system" data-i18n="settings.themeSystem"></button>
           </div>
+        </article>
+        <article class="card">
+          <h2 data-i18n="settings.dangerZone"></h2>
+          <p class="hint" data-i18n="settings.clearAllHint"></p>
+          <button class="btn danger sm mt-3" id="clearAllTransactions" type="button" data-i18n="transactions.clearAll"></button>
         </article>
         <article class="card">
           <h2 data-i18n="settings.about"></h2>
@@ -205,6 +336,7 @@
   <nav class="tabs" id="tabs">
     <button class="nav on" type="button" data-tab="summary"><span class="ic" aria-hidden="true">⌂</span><span class="lbl2" data-i18n="nav.summary"></span></button>
     <button class="nav" type="button" data-tab="transactions"><span class="ic" aria-hidden="true">↕</span><span class="lbl2" data-i18n="nav.transactions"></span></button>
+    <button class="nav" type="button" data-tab="wallets"><span class="ic" aria-hidden="true">▣</span><span class="lbl2" data-i18n="nav.wallets"></span></button>
     <button class="nav" type="button" data-tab="zakat"><span class="ic" aria-hidden="true">◇</span><span class="lbl2" data-i18n="nav.zakat"></span></button>
     <button class="nav" type="button" data-tab="settings"><span class="ic" aria-hidden="true">⚙</span><span class="lbl2" data-i18n="nav.settings"></span></button>
   </nav>
@@ -212,7 +344,7 @@
 
   <nav class="botbar" aria-label="Quick navigation">
     <button class="botbar-btn" type="button" data-tab="summary"><span class="ic" aria-hidden="true">⌂</span><span class="lbl2" data-i18n="nav.summary"></span></button>
-    <button class="botbar-btn add-action" type="button" data-open-transaction><span class="ic" aria-hidden="true">＋</span><span class="lbl2" data-i18n="transactions.add"></span></button>
+    <button class="botbar-btn add-action" type="button" data-tab="record"><span class="ic" aria-hidden="true">＋</span><span class="lbl2" data-i18n="transactions.add"></span></button>
     <button class="botbar-btn" type="button" data-tab="zakat"><span class="ic" aria-hidden="true">◇</span><span class="lbl2" data-i18n="nav.zakat"></span></button>
   </nav>
 
@@ -221,31 +353,38 @@
   </button>
 </div>
 
-<div class="modal-bg" id="transactionModal" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="transactionModalTitle">
-    <button class="x" id="transactionModalClose" type="button" data-i18n-aria="common.close">✕</button>
-    <div class="modal-bleed bleed-top bg-accent py-5 px-5">
-      <h2 class="on-accent" id="transactionModalTitle" data-i18n="transaction.modalTitle"></h2>
-      <p class="hint on-accent" data-i18n="transaction.modalHint"></p>
+<div class="modal-bg" id="purgeModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="purgeTitle">
+    <div class="modal-body">
+      <h2 id="purgeTitle" data-i18n="trash.deleteAllTitle"></h2>
+      <p class="hint" data-i18n="trash.deleteAllBody"></p>
+      <label class="field"><span class="field-lbl" data-i18n="transactions.clearAllPrompt"></span><input autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
+      <div class="button-row mt-4"><button class="btn danger typed-confirm" type="button" disabled data-i18n="trash.deleteAllConfirm"></button><button class="btn ghost typed-cancel" type="button" data-i18n="transaction.cancel"></button></div>
     </div>
-    <form class="modal-body" id="transactionForm">
-      <label class="field"><span class="field-lbl" data-i18n="transaction.type"></span><select id="transactionType"><option value="income" data-i18n="transactions.income"></option><option value="expense" data-i18n="transactions.expense"></option></select></label>
-      <label class="field"><span class="field-lbl" data-i18n="transaction.date"></span><input id="transactionDate" type="date" required></label>
-      <label class="field"><span class="field-lbl" data-i18n="transaction.amount"></span><input id="transactionAmount" inputmode="numeric" autocomplete="off" required></label>
-      <label class="field"><span class="field-lbl" data-i18n="transaction.account"></span><input id="transactionAccount" autocomplete="off" maxlength="80" required></label>
-      <label class="field"><span class="field-lbl" data-i18n="transaction.category"></span><input id="transactionCategory" autocomplete="off" maxlength="80" required></label>
-      <label class="field"><span class="field-lbl" data-i18n="transaction.treatment"></span><select id="transactionTreatment"></select></label>
-      <label class="field" id="assessmentField" hidden><span class="field-lbl" data-i18n="zakat.assessments"></span><select id="transactionAssessment"></select></label>
-      <label class="field"><span class="field-lbl" data-i18n="transaction.description"></span><textarea id="transactionDescription" maxlength="500"></textarea></label>
-      <p class="form-error" id="transactionError" role="alert"></p>
-      <div class="button-row mt-4"><button class="btn" type="submit" data-i18n="transaction.save"></button><button class="btn ghost" id="transactionCancel" type="button" data-i18n="transaction.cancel"></button></div>
-    </form>
+  </div>
+</div>
+
+<div class="modal-bg" id="descriptionModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="descriptionBody">
+    <div class="modal-body">
+      <p class="ledger-description" id="descriptionBody"></p>
+      <div class="ledger-popup-actions" id="descriptionActions"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="deleteModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="deleteMessage">
+    <div class="modal-body">
+      <p id="deleteMessage"></p>
+      <div class="button-row mt-4"><button class="btn danger" type="button" id="deleteConfirm" data-i18n="delete.yes"></button><button class="btn ghost" type="button" id="deleteCancel" data-i18n="transaction.cancel"></button></div>
+    </div>
   </div>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="i18n.js?v=202611041143"></script>
-<script src="app.js?v=202611041143"></script>
-<script type="module" src="main.js?v=202611041143"></script>
+<script src="i18n.js?v=202611160215"></script>
+<script src="app.js?v=202611160215"></script>
+<script type="module" src="main.js?v=202611160215"></script>
 </body>
 </html>
