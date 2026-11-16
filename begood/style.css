@@ -109,8 +109,8 @@ body {
 .vault-mark {
   display: grid;
   place-items: center;
-  width: calc(var(--sp-44) * 1.5);
-  height: calc(var(--sp-44) * 1.5);
+  width: 50px;
+  height: 50px;
   margin-inline: auto;
   border-radius: var(--r-sm);
   background: linear-gradient(to bottom right, var(--brand-from), var(--brand-to));
@@ -122,10 +122,9 @@ body {
   height: 80%;
 }
 
-/* The header shows the mark straight on the header gradient, without bigown.css's translucent box. */
+/* The header shows the mark straight on the header gradient, without bigown.css's translucent box. Its size comes from
+   bigown.css. */
 header.top .logo {
-  width: 36px;
-  height: 36px;
   background: none;
   box-shadow: none;
 }
@@ -858,7 +857,7 @@ html.bg-booting {
 }
 
 .bg-sp {
-  width: clamp(160px, 48vmin, 280px);
+  width: 170px;
   height: auto;
   overflow: visible;
 }
